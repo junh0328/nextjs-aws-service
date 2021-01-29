@@ -1,58 +1,81 @@
 import Head from 'next/head';
-import styles from '../styles/Home.module.css';
+import { Form, Input, Button, Checkbox } from 'antd';
+import Link from 'next/link';
+
+const layout = {
+  labelCol: {
+    span: 8,
+  },
+  wrapperCol: {
+    span: 16,
+  },
+};
+const tailLayout = {
+  wrapperCol: {
+    offset: 8,
+    span: 16,
+  },
+};
 
 export default function Home() {
   return (
-    <div className={styles.container}>
+    <div>
       <Head>
-        <title>Create Next App</title>
+        <title>juneed</title>
         <link rel="icon" href="/favicon.png" />
       </Head>
+      <div className="container" style={{ display: 'flex', alignItems: 'flex-end', alignContent: 'center', justifyContent: 'center' }}>
+        <div>
+          <Form style={{ marginRight: 30 }} {...layout} name="basic" initialValues={{ remember: true }}>
+            <Form.Item
+              label="Username"
+              name="username"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please input your username!',
+                },
+              ]}
+            >
+              <Input />
+            </Form.Item>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+            <Form.Item
+              label="Password"
+              name="password"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please input your password!',
+                },
+              ]}
+            >
+              <Input.Password />
+            </Form.Item>
 
-        <p className={styles.description}>
-          Get started by editing <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a href="https://github.com/vercel/next.js/tree/master/examples" className={styles.card}>
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>Instantly deploy your Next.js site to a public URL with Vercel.</p>
-          </a>
+            <Form.Item {...tailLayout} name="remember" valuePropName="checked">
+              <Checkbox>Remember me</Checkbox>
+            </Form.Item>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <Form.Item {...tailLayout}>
+                <Button type="primary" htmlType="submit" style={{ marginRight: 10 }}>
+                  Singin
+                </Button>
+              </Form.Item>
+              <Form.Item {...tailLayout}>
+                <Button type="primary" htmlType="submit">
+                  <Link href="/signup">
+                    <a>Signup</a>
+                  </Link>
+                </Button>
+              </Form.Item>
+            </div>
+          </Form>
         </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
+        <div style={{ textAlign: 'center' }}>
+          <img src="../external/emoji.gif" width="400px" />
+        </div>
+      </div>
     </div>
   );
 }
