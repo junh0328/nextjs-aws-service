@@ -37,7 +37,8 @@ const Signup = () => {
   );
 
   const onsubmit = () => {
-    console.log(' 회원 가입 !');
+    alert(`입력하신 이메일: ${email}\n${nickname}님 환영합니다!`);
+    Router.replace('/main');
   };
 
   return (
