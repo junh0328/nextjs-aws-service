@@ -21,7 +21,7 @@ export default function Home() {
   return (
     <div>
       <Head>
-        <title>juneed</title>
+        <title>juneed | login</title>
         <link rel="icon" href="/favicon.png" />
       </Head>
       <div className="container" style={{ display: 'flex', alignItems: 'flex-end', alignContent: 'center', justifyContent: 'center' }}>

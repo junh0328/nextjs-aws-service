@@ -36,7 +36,10 @@ const randomToFunc = () => {
         </Menu>
       </Sider>
       <Layout className="site-layout">
-        <Header className="site-layout-background" style={{ padding: 0, display: 'flex', alignItems: 'center', marginLeft: 16 }}>
+        <Header
+          className="site-layout-background"
+          style={{ padding: 0, display: 'flex', alignItems: 'center', marginLeft: 16, marginTop: 16 }}
+        >
           {collapsed ? (
             <MenuFoldOutlined className="trigger" onClick={onToggle} style={{ marginLeft: 30 }} />
           ) : (
@@ -44,7 +47,21 @@ const randomToFunc = () => {
           )}
           <Input placeholder="Search" style={{ width: 300, marginLeft: 50 }} />
         </Header>
-        <Content className="site-layout-background" style={{ margin: '24px 16px', padding: 24, minHeight: 600 }}></Content>
+        <Content className="site-layout-background" style={{ margin: '24px 16px', padding: 24, minHeight: 600 }}>
+          <UserProfile />
+          <UserProfile />
+          <UserProfile />
+          <UserProfile />
+          <UserProfile />
+          <UserProfile />
+          <UserProfile />
+          <UserProfile />
+          <UserProfile />
+          <UserProfile />
+          <UserProfile />
+          <UserProfile />
+          <UserProfile />
+        </Content>
       </Layout>
     </Layout>
   );
