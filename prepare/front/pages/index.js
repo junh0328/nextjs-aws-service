@@ -1,6 +1,14 @@
 import Head from 'next/head';
 import { Form, Input, Button, Checkbox } from 'antd';
 import Link from 'next/link';
+import useinput from '../hooks/useInput';
+import styled from 'styled-components';
+import { useCallback } from 'react';
+import Router from 'next/router';
+
+const ButtonWrapper = styled.div`
+  margin-top: 1px;
+`;
 
 const layout = {
   labelCol: {
@@ -18,6 +26,17 @@ const tailLayout = {
 };
 
 export default function Home() {
+  const [email, onChangeEmail] = useinput('');
+  const [password, onChangePassword] = useinput('');
+
+  const onSubmitForm = useCallback(
+    (e) => {
+      alert('로그인 성공! : \n' + email + '님 환영합니다.');
+      Router.replace('/main');
+    },
+    [email, password]
+  );
+
   return (
     <div>
       <Head>
@@ -26,18 +45,18 @@ export default function Home() {
       </Head>
       <div className="container" style={{ display: 'flex', alignItems: 'flex-end', alignContent: 'center', justifyContent: 'center' }}>
         <div>
-          <Form style={{ marginRight: 30 }} {...layout} name="basic" initialValues={{ remember: true }}>
+          <Form style={{ marginRight: 30 }} {...layout} name="basic" initialValues={{ remember: true }} onFinish={onSubmitForm}>
             <Form.Item
-              label="Username"
-              name="username"
+              label="Email"
+              name="email"
               rules={[
                 {
                   required: true,
-                  message: 'Please input your username!',
+                  message: 'Please input your e-mail!',
                 },
               ]}
             >
-              <Input />
+              <Input name="user-email" type="email" value={email} required onChange={onChangeEmail} />
             </Form.Item>
 
             <Form.Item
@@ -50,7 +69,7 @@ export default function Home() {
                 },
               ]}
             >
-              <Input.Password />
+              <Input.Password name="password" value={password} onChange={onChangePassword} required />
             </Form.Item>
 
             <Form.Item {...tailLayout} name="remember" valuePropName="checked">
@@ -58,16 +77,20 @@ export default function Home() {
             </Form.Item>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               <Form.Item {...tailLayout}>
-                <Button type="primary" htmlType="submit" style={{ marginRight: 10 }}>
-                  Singin
-                </Button>
+                <ButtonWrapper>
+                  <Button type="primary" htmlType="submit">
+                    로그인
+                  </Button>
+                </ButtonWrapper>
               </Form.Item>
               <Form.Item {...tailLayout}>
-                <Button type="primary" htmlType="submit">
-                  <Link href="/signup">
-                    <a>Signup</a>
-                  </Link>
-                </Button>
+                <ButtonWrapper>
+                  <Button type="primary" htmlType="submit" loading={false}>
+                    <Link href="/signup">
+                      <a>회원가입</a>
+                    </Link>
+                  </Button>
+                </ButtonWrapper>
               </Form.Item>
             </div>
           </Form>
