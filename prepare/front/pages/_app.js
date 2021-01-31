@@ -1,9 +1,10 @@
 import '../styles/globals.css';
+import '../styles/random.css';
 import 'antd/dist/antd.css';
 import Head from 'next/head';
 import PropTypes from 'prop-types';
 
-function Juneed({ Component }) {
+function Juneed({ Component, pageProps }) {
   return (
     <>
       <Head>
@@ -11,7 +12,7 @@ function Juneed({ Component }) {
         <link rel="icon" href="/favicon.png" />
         <title>Juneed</title>
       </Head>
-      <Component />
+      <Component {...pageProps} />
     </>
   );
 }
