@@ -4,6 +4,8 @@ import Link from 'next/link';
 import useinput from '../hooks/useInput';
 import styled from 'styled-components';
 import { useCallback } from 'react';
+import { useDispatch } from 'react-redux';
+import { loginAction } from '../reducers';
 import Router from 'next/router';
 
 const ButtonWrapper = styled.div`
@@ -26,16 +28,16 @@ const tailLayout = {
 };
 
 export default function Home() {
+  const dispatch = useDispatch();
+
   const [email, onChangeEmail] = useinput('');
   const [password, onChangePassword] = useinput('');
 
-  const onSubmitForm = useCallback(
-    (e) => {
-      alert('로그인 성공! : \n' + email + '님 환영합니다.');
-      Router.replace('/main');
-    },
-    [email, password]
-  );
+  const onSubmitForm = useCallback(() => {
+    alert('로그인 성공! : \n' + email + '님 환영합니다.');
+    dispatch(loginAction({ email, password }));
+    Router.replace('/main');
+  }, [email, password]);
 
   return (
     <div>

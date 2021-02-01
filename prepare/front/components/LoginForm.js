@@ -9,3 +9,5 @@ const LoginForm = () => {
 };
 
 export default LoginForm;
+
+// 임시로 로그인 에러를 나타낼 페이지, useSelector를 통해 initialState의 user.isLoggedIn의 값이 false일 경우 나타날 것임
