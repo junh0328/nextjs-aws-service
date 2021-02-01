@@ -1,12 +1,19 @@
 import React, { useCallback } from 'react';
 import { Card, Avatar, Button } from 'antd';
 import Router from 'next/router';
+import { useDispatch, useSelector } from 'react-redux';
 
 const { Meta } = Card;
 
 const UserProfile = ({}) => {
+  const { isLoggedIn } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+
   const logoutBtn = useCallback((e) => {
-    alert('로그인 페이지로 이동합니다.');
+    alert('로그아웃 완료 페이지로 이동합니다.');
+    dispatch({
+      type: 'LOG_OUT',
+    });
     Router.replace('/');
   });
 

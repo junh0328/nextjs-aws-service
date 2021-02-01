@@ -145,3 +145,28 @@ export default rootReducer;
 <p>
 changeNickName()에 'boogiejun'이라는 파라미터가 들어가 발생하면, changeNickName() 함수가 발생하면서 바꾸고자 하는 객체의 속성 { name }에 접근한다. 루트 리듀서에서 'CHANGE_NICKNAME'을 받아와 기존 상태(...state)를 유지하고 바꾸자고 하는 속성 name만 들어오는 action.data(boogiejun)으로 바꿔준다. 이를 리턴하고, virtualDOM이 변화된 상태를 감지하여 컴포넌트를 리렌더링하여 사용자가 보게 된다.
 </p>
+
+## 3. 📁 downloaded dependencies
+
+- redux-devtools-extension
+
+🌟 redux에 미들웨어, HYDRATE 적용하기 🌟
+
+<p> 우리는 nextjs의 SSR의 장점을 활용하기 위해 HYDRATE를, redux-devtools로 redux-saga/ reducer의 데이터를 추적하기 위해 미들웨어를 추가적으로 구성합니다.</p>
+
+```js
+const rootReducer = (state = initialState, action) => {
+  switch (action.type) {
+    case HYDRATE:
+      console.log('HYDRATE : ', action);
+      return { ...state, ...action.payload };
+    case LOG_IN:
+      ...
+      ...
+    default state;
+  }
+```
+
+<p>📁reducers/index의 rootReducer case에 HYDRATE를 추가합니다. 또한 configureStore도 미들웨어 사용 준비를 거칩니다.</p>
+<img  width="80%" src="./images/confi.png" title="configurationChanged">
+<p>store에 추가한 enhancer를 통해 우리는 redux-devTools를 사용할 수 있습니다. production 즉 배포 상태에서는 사용하지 않지만, production 상태가 아닐 떄(개발상태)는 redux-devTools를 사용하여 state를 추적합니다. middleWares에는 saga/thunk를 추가적으로 넣어 redux를 확장하는 미들웨어를 선언할 것입니다.</p>
