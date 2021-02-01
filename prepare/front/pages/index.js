@@ -5,7 +5,7 @@ import useinput from '../hooks/useInput';
 import styled from 'styled-components';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
-import { loginAction } from '../reducers';
+import { loginAction } from '../reducers/user';
 import Router from 'next/router';
 
 const ButtonWrapper = styled.div`

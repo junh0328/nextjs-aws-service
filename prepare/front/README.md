@@ -170,3 +170,96 @@ const rootReducer = (state = initialState, action) => {
 <p>📁reducers/index의 rootReducer case에 HYDRATE를 추가합니다. 또한 configureStore도 미들웨어 사용 준비를 거칩니다.</p>
 <img  width="80%" src="./images/confi.png" title="configurationChanged">
 <p>store에 추가한 enhancer를 통해 우리는 redux-devTools를 사용할 수 있습니다. production 즉 배포 상태에서는 사용하지 않지만, production 상태가 아닐 떄(개발상태)는 redux-devTools를 사용하여 state를 추적합니다. middleWares에는 saga/thunk를 추가적으로 넣어 redux를 확장하는 미들웨어를 선언할 것입니다.</p>
+
+🌟 antd <-> styled-component 응용하기 🌟
+
+```js
+const ButtonRed = styled(Button)`
+  background-color: salmon;
+  color: white;
+  border: none;
+
+  &:hover {
+    border: 1px solid salmon;
+    color: salmon;
+  }
+`;
+```
+
+<p> 
+기존의 import {Button} from 'antd'를 통헤 블라온 버튼 컴포넌트에 스타일드 컴포넌트로 스타일링하는 과정이다. ( & ) 연산자를 사용하여 기존에 class, id 와 같은 document 선택자에 접근하여 스타일링을 해줄 수 있다. 
+</p>
+
+🌟 리듀서 쪼개기 🌟
+
+<p> 처음 프론트엔드 코드를 작성할 때, 우리는 간단하게 reducer의 원리만 알아보는 index 리듀서에 모든 기능을 작성하여 시험해봤다. 하지만 리덕스사가 및 리듀서를 사용하여 코드를 진행하면서 불가피하게 길어질 코드를 관리하기 위해서 reducer를 user/ post 리듀서로 나눠주었다.</p>
+
+```js
+import { HYDRATE } from 'next-redux-wrapper';
+import { combineReducers } from 'redux';
+import user from './user';
+import post from './post';
+
+const rootReducer = combineReducers({
+  index: (state = {}, action) => {
+    switch (action.type) {
+      case HYDRATE:
+        console.log('HYDRATE : ', action);
+        return { ...state, ...action.payload };
+      default:
+        return { state };
+    }
+  },
+  user,
+  post,
+});
+
+export default rootReducer;
+```
+
+<p>위 커밋으로 되돌아와 이전의 나눠지기 전의 코드와 비교해보면 어느 부분이 바뀌었는 지 쉽게 알 수 있다. rootReducer는 redux의 combineReducers를 이용하여 쪼개주었고, initialState도 각각 user 리듀서와 post 리듀서로 나누어 들어갔다.</p>
+
+```js
+const initialState = {
+  user: {
+    isLoggedIn: false,
+    user: null,
+    signUpData: {},
+    loginData: {},
+  },
+  post: {
+    mainPosts: [],
+  },
+};
+```
+
+<p>원래 user.isLoggedIn에 접근하기 위해서는 기존의 불변성을 지켜줘야 하기 때문에</p>
+
+```js
+case 'LOG_IN':
+  return {
+    ...state,
+    user: {
+      ...state.user,
+      isLoggedIn: true,
+      user: action.data,
+    },
+  };
+```
+
+<p>와 같이 불변성을 지켜서 한단계 더 내려가 isLoggedIn에 접근했다. 하지만, 리듀서를 나눠주었기 때문에 현재 user 리듀서에서는 다음과 같이 접근한다. (user 객체가 initialState이기 때문에 한 번 더 불변성을 지키며 내려갈 필요가 없어졌음)</p>
+
+```js
+case 'LOG_IN':
+  return {
+    ...state,
+    isLoggedIn: true,
+    user: action.data,
+  };
+```
+
+<hr/>
+
+🌟 main Page 구성하기 🌟
+
+<p>기존 강좌에서 index 페이지를 mainPosts로 구성했던 것과 달리, 접근 권한을 높이기 위해 (무분별한 서버의 접속량을 낮추기 위해서) 로그인을 index로 구성하였다. 따라서 기존의 index 페이지는 main 페이지로 대체되었다. 데이터는 reducer의 user에서 받아오기 때문에 useSelector로 관리하여 프로그래밍 상에 문제는 없음을 확인하였다.</p>

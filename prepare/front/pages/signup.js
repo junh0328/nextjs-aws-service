@@ -38,8 +38,8 @@ const Signup = () => {
   );
 
   const onsubmit = () => {
-    alert(`입력하신 이메일: ${email}\n${nickname}님 환영합니다!`);
-    Router.replace('/main');
+    alert(`회원가입 성공!\n로그인 페이지로 이동합니다`);
+    Router.replace('/');
   };
 
   return (
