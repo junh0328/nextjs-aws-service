@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 
-const useinput = (initialValue = null) => {
+const useInput = (initialValue = null) => {
   const [value, setValue] = useState(initialValue);
   // ex) handler는 onChange**와 같다. 변화되는 상태를 감지한다.
   const handler = useCallback((e) => {
@@ -9,4 +9,4 @@ const useinput = (initialValue = null) => {
   return [value, handler, setValue];
 };
 
-export default useinput;
+export default useInput;

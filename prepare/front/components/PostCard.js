@@ -1,11 +1,87 @@
-import React from 'react';
+import { Button, Card, Popover, Avatar, List, Comment } from 'antd';
+import React, { useCallback, useState } from 'react';
+import PropTypes from 'prop-types';
+import { CommentOutlined, EllipsisOutlined, HeartOutlined, HeartTwoTone, RetweetOutlined } from '@ant-design/icons';
+import { useSelector } from 'react-redux';
 
-const PostCard = () => {
+import CommentForm from './CommentForm';
+import PostImages from './PostImages';
+
+const PostCard = ({ post }) => {
+  const [liked, setLiked] = useState(false);
+  const [commentFormOpened, setCommentForemOpened] = useState(false);
+  // const { me } = useSelector((state) => state.user);
+  // const id = me && me.id;
+  // = const id = me?.id; optional channing 연산자
+
+  const id = useSelector((state) => state.user.me?.id);
+
+  const onToggleHeart = useCallback(() => setLiked((prev) => !prev), []);
+
+  const onToggleComment = useCallback((e) => {
+    setCommentForemOpened((prev) => !prev);
+  }, []);
+
   return (
     <div>
-      <h2>포스트카드입니다.</h2>
+      <Card
+        cover={post.Images[0] && <PostImages images={post.images} />}
+        actions={[
+          <RetweetOutlined key="retweet" />,
+          liked ? (
+            <HeartTwoTone twoToneColor="#eb2f96" key="heart" onClick={onToggleHeart} />
+          ) : (
+            <HeartOutlined key="heart" onClick={onToggleHeart} />
+          ),
+          <CommentOutlined key="commet" onClick={onToggleComment} />,
+          <Popover
+            key="more"
+            content={
+              <Button.Group>
+                {id && post.User.id === id ? ((<Button>수정</Button>), (<Button type="danger">삭제</Button>)) : <Button>신고</Button>}
+              </Button.Group>
+            }
+          >
+            <EllipsisOutlined />
+          </Popover>,
+        ]}
+      >
+        <Card.Meta avatar={<Avatar>{post.User.nickname[0]}</Avatar>} title={post.User.nickname} description={post.content} />
+      </Card>
+      {commentFormOpened && (
+        <div>
+          <CommentForm post={post} />
+          <List
+            header={`${post.Comments.length}개의 댓글`}
+            itemLayout="horizontal"
+            dataSource={post.Comments}
+            renderItem={(item) => (
+              <li>
+                <Comment author={item.User.nickname} avatar={<Avatar>{item.User.nickname[0]}</Avatar>} content={item.content} />
+              </li>
+            )}
+          />
+        </div>
+      )}
+      {/* <Comments /> */}
     </div>
   );
 };
 
+PostCard.propTypes = {
+  post: PropTypes.shape({
+    id: PropTypes.number,
+    User: PropTypes.object,
+    content: PropTypes.string,
+    createdAt: PropTypes.string,
+    Comments: PropTypes.arrayOf(PropTypes.object),
+    Images: PropTypes.arrayOf(PropTypes.object),
+    Likers: PropTypes.arrayOf(PropTypes.object),
+    RetweetId: PropTypes.number,
+    Retweet: PropTypes.objectOf(PropTypes.any),
+  }).isRequired,
+};
+
 export default PostCard;
+
+// post는 pages/main 에서 mainPosts를 매핑한 결과이다.

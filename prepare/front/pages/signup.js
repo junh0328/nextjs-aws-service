@@ -5,7 +5,7 @@ import Router from 'next/router';
 import { Form, Input, Button } from 'antd';
 import styled from 'styled-components';
 import Head from 'next/head';
-import useinput from '../hooks/useInput';
+import useInput from '../hooks/useInput';
 import AppLayout from '../components/AppLayout';
 
 const ErrorMessage = styled.div`
@@ -22,9 +22,9 @@ const layout = {
 };
 
 const Signup = () => {
-  const [email, onChangeEmail] = useinput('');
-  const [nickname, onChangeNickname] = useinput('');
-  const [password, onChangePassword] = useinput('');
+  const [email, onChangeEmail] = useInput('');
+  const [nickname, onChangeNickname] = useInput('');
+  const [password, onChangePassword] = useInput('');
 
   // 비밀번호 체크 및 에러
   const [passwordCheck, setPasswordCheck] = useState('');

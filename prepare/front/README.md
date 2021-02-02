@@ -220,6 +220,7 @@ export default rootReducer;
 <p>위 커밋으로 되돌아와 이전의 나눠지기 전의 코드와 비교해보면 어느 부분이 바뀌었는 지 쉽게 알 수 있다. rootReducer는 redux의 combineReducers를 이용하여 쪼개주었고, initialState도 각각 user 리듀서와 post 리듀서로 나누어 들어갔다.</p>
 
 ```js
+// reducer를 나누기 전 index에 몰아넣은 user/ post 객체
 const initialState = {
   user: {
     isLoggedIn: false,
@@ -236,6 +237,7 @@ const initialState = {
 <p>원래 user.isLoggedIn에 접근하기 위해서는 기존의 불변성을 지켜줘야 하기 때문에</p>
 
 ```js
+// reducer를 나누기 전 user 객체를 변화시키는 reducer의 액션 실행시의 불변성
 case 'LOG_IN':
   return {
     ...state,
@@ -250,6 +252,7 @@ case 'LOG_IN':
 <p>와 같이 불변성을 지켜서 한단계 더 내려가 isLoggedIn에 접근했다. 하지만, 리듀서를 나눠주었기 때문에 현재 user 리듀서에서는 다음과 같이 접근한다. (user 객체가 initialState이기 때문에 한 번 더 불변성을 지키며 내려갈 필요가 없어졌음)</p>
 
 ```js
+// reducer를 나눈 후 user 객체를 변화시키는 reducer의 액션 실행시의 불변성
 case 'LOG_IN':
   return {
     ...state,
@@ -262,4 +265,61 @@ case 'LOG_IN':
 
 🌟 main Page 구성하기 🌟
 
-<p>기존 강좌에서 index 페이지를 mainPosts로 구성했던 것과 달리, 접근 권한을 높이기 위해 (무분별한 서버의 접속량을 낮추기 위해서) 로그인을 index로 구성하였다. 따라서 기존의 index 페이지는 main 페이지로 대체되었다. 데이터는 reducer의 user에서 받아오기 때문에 useSelector로 관리하여 프로그래밍 상에 문제는 없음을 확인하였다.</p>
+<p>기존 강좌에서 index 페이지를 mainPosts로 구성했던 것과 달리, 접근 권한을 높이기 위해 (무분별한 서버의 접속량을 낮추기 위해서) 로그인을 index로 구성하였다. 따라서 기존의 index 페이지는 main 페이지로 대체되었다. 데이터는 reducer의 user에서 받아오기 때문에 useSelector로 관리하여 프로그래밍 상에 문제는 없음을 확인하였다. 따라서 우리는 pages/main 에서 post 리듀서의 <b>mainPosts</b>를 매핑하여 하나씩 풀어주는 <b>post</b> props를 통해 모든 정보를 주고받을 것이다.</p>
+
+<p>PostCard를 구현하기 위해서는 처음 어떻게 구현할 지 설계를 해본다.</p>
+
+```js
+// antd 적용 전 우리가 예상하여 작성한 PostCard 컴포넌트, 넣고 싶은 기능들이 들어가있다. (image, content, button, commentform, comment)
+const PostCard = ({ post }) => {
+  return (
+    <div>
+      <Card>
+        <Image />
+        <Content />
+        <Button></Button>
+      </Card>
+      <CommentForm />
+      <Comments />
+    </div>
+  );
+};
+```
+
+<p>위와 같은 형식으로 Card를 구현한다고 했을 때, antd에서 기본적으로 제공하는 속성들이 있다면, 그것을 사용하고 없다면 컴포넌트로 만들어줘야 한다.</p>
+
+```js
+// antd를 적용한 PostCard 컴포넌트
+
+const PostCard = ({ post }) => {
+  const id = useSelector((state) => state.user.me?.id);
+  return (
+    <div>
+      <Card
+        cover={post.Images[0] && <PostImages images={post.images} />}
+        actions={[
+          <RetweetOutlined key="retweet" />,
+          <HeartOutlined key="heart" />,
+          <CommentOutlined key="commet" />,
+          <Popover
+            key="more"
+            content={
+              <Button.Group>
+                {id && post.User.id === id ? ((<Button>수정</Button>), (<Button type="danger">삭제</Button>)) : <Button>신고</Button>}
+              </Button.Group>
+            }
+          >
+            <EllipsisOutlined />
+          </Popover>,
+        ]}
+      >
+        <Card.Meta avatar={<Avatar>{post.User.nickname[0]}</Avatar>} title={post.User.nickname} description={post.content} />
+      </Card>
+      {/* <CommentForm /> */}
+      {/* <Comments /> */}
+    </div>
+  );
+};
+```
+
+<p>위의 PostCard 컴포넌트처럼 우리는 css framework를 사용하지 않더라도, 미리 넣고싶은 기능들을 상상하여 컴포넌트 형식으로 넣어놓고, 존재하는 부분은 css framework에서 참고하여 속성들을 채우고 없는 부분은 따로 컴포넌트를 더 추가하여 만들어주는 식으로 작성하면 된다. (인스타그램의 포스트카드, 트위터의 포스트카드의 레이아웃을 참고하여 구성하는 편이 하나하나 다 만드는 것보다 더 빠르고 효율적일 것)</p>
