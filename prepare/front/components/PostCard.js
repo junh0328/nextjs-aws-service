@@ -1,7 +1,8 @@
-import { Button, Card, Popover, Avatar, List, Comment } from 'antd';
 import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
+import { Button, Card, Popover, Avatar, List, Comment } from 'antd';
 import { CommentOutlined, EllipsisOutlined, HeartOutlined, HeartTwoTone, RetweetOutlined } from '@ant-design/icons';
+
 import { useSelector } from 'react-redux';
 
 import CommentForm from './CommentForm';
@@ -25,7 +26,7 @@ const PostCard = ({ post }) => {
   return (
     <div>
       <Card
-        cover={post.Images[0] && <PostImages images={post.images} />}
+        cover={post.Images[0] && <PostImages images={post.Images} />}
         actions={[
           <RetweetOutlined key="retweet" />,
           liked ? (
