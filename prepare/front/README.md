@@ -146,7 +146,7 @@ export default rootReducer;
 changeNickName()에 'boogiejun'이라는 파라미터가 들어가 발생하면, changeNickName() 함수가 발생하면서 바꾸고자 하는 객체의 속성 { name }에 접근한다. 루트 리듀서에서 'CHANGE_NICKNAME'을 받아와 기존 상태(...state)를 유지하고 바꾸자고 하는 속성 name만 들어오는 action.data(boogiejun)으로 바꿔준다. 이를 리턴하고, virtualDOM이 변화된 상태를 감지하여 컴포넌트를 리렌더링하여 사용자가 보게 된다.
 </p>
 
-## 3. 📁 downloaded dependencies
+## 4. 📁 downloaded dependencies
 
 - redux-devtools-extension
 
@@ -324,7 +324,7 @@ const PostCard = ({ post }) => {
 
 <p>위의 PostCard 컴포넌트처럼 우리는 css framework를 사용하지 않더라도, 미리 넣고싶은 기능들을 상상하여 컴포넌트 형식으로 넣어놓고, 존재하는 부분은 css framework에서 참고하여 속성들을 채우고 없는 부분은 따로 컴포넌트를 더 추가하여 만들어주는 식으로 작성하면 된다. (인스타그램의 포스트카드, 트위터의 포스트카드의 레이아웃을 참고하여 구성하는 편이 하나하나 다 만드는 것보다 더 빠르고 효율적일 것)</p>
 
-## 2. 📁 downloaded dependencies
+## 5. 📁 downloaded dependencies
 
 - react-slick
 
@@ -377,3 +377,98 @@ const PostCardContent = ({ postData }) => (
 🌟<a href="https://regexr.com/">정규식 테스트 사이트</a>🌟<br/>
 //g 에서 g는 global로 여러개의 문자열을 받을 수 있다. split 함수를 통해 해당 정규식이 포함된 postData만을 분리하고, 매핑하는데, slice(1)은 문자열의 맨 앞에 붙어있는 '#'을 떼주기 위함이다. 따라서 해시태그 {url/해당해시태그}를 통해 해당 해시태그가 포함된 글을 검색할 수 있게 되었다.
 </p>
+
+<h1>🌟instagram 디테일🌟</h1>
+- 'postcardcontent' 최대 보여줄 수 있는 댓글 제한
+- 댓글 특정 갯수 이상 달릴 때, 스크롤 적용
+- 좋아요 n 개 갯수 표시
+- 프로필 이미지 설정하기
+
+## 6. 📁 downloaded dependencies
+
+- axios
+- redux-saga
+
+<p>redux-saga는 리덕스의 미들웨어로 주어지는 상황(액션)에 대해 비동기적으로 다음 행동을 할 수 있는 함수를 제공한다. <a href="https://github.com/junh0328/redux-saga">깃허브 공식문서</a>를 통해 더 자세한 사용방법을 알아볼 수 있다. 사용법은 기존 강의를 통해서 공부했으므로, 적용법에 대해서만 남겨보고자 한다. redux-saga는 리덕스의 미들웨어이므로 📁store/configureStore.js 에서 만들었던 변수 middleWares= [...] 에 redux-saga를 넣어 적용가능하다. 적용한 코드는 다음과 같다.</p>
+
+<img  width="80%" src="./images/sagaMiddleware.png" title="usingSagaMiddleware" alt="usingSagaMiddleware">
+
+🌟 📁sagas/index 로 redux-saga 처음 적용하기 🌟
+
+<p> redux-saga 와 같은 비동기 함수 미들웨어를 적용하는 근본적인 이유는 무엇일까? 아마도 사용자가 서버로 요청을 ('~ 해줘, 불러와줘, ... ') 보낼 때, 프론트 서버에서 이 사용자의 요청을 감지(watch)하여 서버로 보내고(api) 결과값을 서버로부터 받는(put) 과정을 진행하기 위해서이다. 이러한 과정들에 들어가는 함수들을 기본적으로 제공한다는 것이 리덕스 사가의 제일 큰 장점이다. 따라서 공식문서에서 제공하는 방향에 따라 함수를 설계해야 한다.
+</p>
+
+🌟 로그인 API로 사가 알아보기 🌟
+
+```js
+import all, { call, fork, put, take } from 'redux-saga/effects';
+import axios from 'axios';
+
+function loginAPI(data) {
+  return axios.post('/api/login', data);
+}
+
+function* logIn(action) {
+  try {
+    const result = yield call(loginAPI, action.data);
+    yield put({
+      type: 'LOG_IN_SUCCESS',
+      data: result.data,
+    });
+  } catch (err) {
+    yield put({
+      type: 'LOG_IN_FAIULURE',
+      data: err.response.data,
+    });
+  }
+}
+
+function* watchLogin() {
+  yield take('LOG_IN_REQUEST', logIn);
+}
+
+export default function* rootSaga() {
+  yield all([fork(watchLogin)]);
+}
+```
+
+- 1. 먼저 export 한 rootSaga를 통해 모든 요청(all)을 감지할 수 있도록 한다(fork).
+- 2. 요청을 감지할 수 있는 watchLogin()함수를 만들고, 해당 요청 ('LOGIN_IN_REQUEST')이 사용자로부터 넘어오면, logIn 함수를 실행시킨다.
+- 3. 로그인 함수에서는 'LOG_IN_REQUEST'를 통해 사용자가 보내고자하는 데이터(payload)를 action으로 받아 와 이 데이터를 loginAPI에게 넘겨주고 결과 값을 result 변수에 담는다.
+- 4. result 변수는 백엔드에서 처리되어 넘어오는 결과에 따라 'LOG_IN_SUCCESS' 또는 'LOG_IN_FAILURE' 함수를 반환하여 사용자에게 전달한다.
+- 5. 이 과정들은 모두 generator 함수(function\*)를 통해 하나하나 끊겨 작동하기 때문에 redux-devtools로 관리할 수 있고, 추적에 용이하다.
+- 6. 'LOG_IN_SUCCESS'와 같은 액션들은 모두 리듀서에 만들어 import 하여 사용하게 된다.
+
+<h2> 🌟 next-redux-saga를 적용한 것이 아니기 때문에, 따로 hoc를 적용하여 \_app.js를 추가적으로 덮어씌울 필요는 없다. 🌟</h2>
+
+🌟 saga의 이펙트 (effects) 🌟
+
+<p> 처음 배울 때 yield 뒤에 변수값을 받아 오거나, 조건 문을 통해 문장을 제어하였는데, saga를 활용하기 위해서는 이펙트들을 잘 활용해야 한다. </p>
+
+|           값           |                                                         의미                                                         |
+| :--------------------: | :------------------------------------------------------------------------------------------------------------------: |
+|        all([ ])        |                 yield에서 배열을 받는다. 그 배열안에 들어있는 함수(fork, call)를 한번에 실행해준다.                  |
+|        fork( )         | 함수를 실행한다. (비동기 함수 호출), 요청을 보내고 결과와 상관없이 바로 다음 함수로 넘어간다. (블로킹을 하지않는다.) |
+|        call( )         |       함수를 실행한다. (동기 함수 호출), 리턴 받을 때까지 기다렸다가 리턴 받은 값을 넣어준다. (블로킹을 한다.)       |
+| take("ACTION", action) |    'ACTION' 이라는 액션이 실행될 때까지 기다리겠다. 'ACTION'이 실행되면, action이라는 generator 함수를 실행한다.     |
+|        put({ })        |                            액션 객체를 실행시킨다. (redux의 dispatch와 같은 행동을 한다)                             |
+|        delay()         |   백엔드 구현 전에, 더미데이터를 통해 데이터를 주고 받지 않고 일정 지연시간만 주고 처리하고 싶을 때 사용하는 함수    |
+
+<p> yield 는 async/ await의 await과 비슷하다고 생각하면 쉽다. </p>
+
+🌟 saga의 이펙트 재 반복성 (take) 🌟
+
+- yield를 통해 take() 함수들을 감싸다보니 생기는 가장 큰 문제는 해당 함수를 한 번 밖에 실행하지 못한다는 것이다.
+- 🌟 띠리사 generator의 특성을 활용하여 yield로 만든 해당 함수들을 while true 문으로 감싸줘야 한다! 🌟
+- while true와 같이 모든 함수를 감싸주게 되면 코드의 양이 늘어나므로 takeEvery()라는 함수를 기존 take() 대신 사용한다.
+
+  |               값               |                                                                      의미                                                                      |
+  | :----------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------: |
+  |          takeEvery()           |                      yield take()를 대신해서 모든 상황에서 take를 계속 받을 수 있는 함수, while true의 역할을 대신 한다.                       |
+  |          takeLatest()          |                            이벤트의 실행이 두 번 혹은 연속적으로 실행됐을 때, 최종적으로 클릭한 액션을 넘겨받는다.                             |
+  | throttle("ACTION", action, 초) | takeLatest()의 한계(요청을 시간 차로 보냈을 때는 두 요청 모두를 처리)를 보완하기 위해서 일정 시간동안 보낼 수 있는 요청의 갯수를 제한하는 함수 |
+
+- 보통은 takeLatest()를 많이 사용한다.
+- 🌟 하지만, takeLatest()를 통해 프론트에서는 최종적으로 마지막 액션을 보여준다고 하더라도, 백에서는 해당 요청에 따라 응답을 두 번 할수 있다. 🌟
+- 🌟 응답은 취소할 수 있지만, 요청을 취소할 수는 없다. 🌟
+- 따라서 throttle() 을 사용하여 요청을 제한하기도 한다.(대부분의 경우는 takeLatest()를 쓴다.)
