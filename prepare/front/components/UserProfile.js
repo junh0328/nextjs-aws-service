@@ -3,17 +3,17 @@ import { Card, Avatar, Button } from 'antd';
 import Router from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { logoutAction } from '../reducers/user';
+import { logoutRequestAction } from '../reducers/user';
 
 const { Meta } = Card;
 
 const UserProfile = ({}) => {
-  const { isLoggedIn } = useSelector((state) => state.user);
+  const { logInLoading } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   const logoutBtn = useCallback((e) => {
     alert('로그아웃 완료 페이지로 이동합니다.');
-    dispatch(logoutAction());
+    dispatch(logoutRequestAction());
     Router.replace('/');
   });
 

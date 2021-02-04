@@ -7,7 +7,7 @@ import PostCard from '../components/PostCard';
 import { useSelector } from 'react-redux';
 
 const main = () => {
-  const { isLoggedIn } = useSelector((state) => state.user);
+  const { me } = useSelector((state) => state.user);
   const { mainPosts } = useSelector((state) => state.post);
   // const mainPosts = useSelector((state)=> state.post.mainPosts) 구조분해를 하지 않으면 다음과 같이 표현할 수 있다.
 
@@ -19,7 +19,7 @@ const main = () => {
         <title>Juneed | main</title>
       </Head>
       <AppLayout>
-        {isLoggedIn && <PostForm />}
+        {me && <PostForm />}
         {mainPosts.map((post) => (
           <PostCard key={post.id} post={post} />
         ))}

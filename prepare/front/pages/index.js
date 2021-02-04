@@ -3,9 +3,9 @@ import { Form, Input, Button, Checkbox } from 'antd';
 import Link from 'next/link';
 import useinput from '../hooks/useInput';
 import styled from 'styled-components';
-import { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
-import { loginAction } from '../reducers/user';
+import { useCallback, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginRequestAction } from '../reducers/user';
 import Router from 'next/router';
 
 const ButtonWrapper = styled.div`
@@ -29,14 +29,20 @@ const tailLayout = {
 
 export default function Home() {
   const dispatch = useDispatch();
+  const { logInLoading, me } = useSelector((state) => state.user);
 
   const [email, onChangeEmail] = useinput('');
   const [password, onChangePassword] = useinput('');
 
+  useEffect(() => {
+    if (me) {
+      alert('로그인 성공 메인페이지로 이동합니다!');
+      Router.push('/main');
+    }
+  }, [me]);
+
   const onSubmitForm = useCallback(() => {
-    alert('로그인 성공! : \n' + email + '님 환영합니다.');
-    dispatch(loginAction({ email, password }));
-    Router.replace('/main');
+    dispatch(loginRequestAction({ email, password }));
   }, [email, password]);
 
   return (
@@ -80,7 +86,7 @@ export default function Home() {
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               <Form.Item {...tailLayout}>
                 <ButtonWrapper>
-                  <Button type="primary" htmlType="submit">
+                  <Button type="primary" htmlType="submit" loading={logInLoading}>
                     로그인
                   </Button>
                 </ButtonWrapper>

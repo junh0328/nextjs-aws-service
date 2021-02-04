@@ -458,17 +458,69 @@ export default function* rootSaga() {
 
 🌟 saga의 이펙트 재 반복성 (take) 🌟
 
-- yield를 통해 take() 함수들을 감싸다보니 생기는 가장 큰 문제는 해당 함수를 한 번 밖에 실행하지 못한다는 것이다.
-- 🌟 띠리사 generator의 특성을 활용하여 yield로 만든 해당 함수들을 while true 문으로 감싸줘야 한다! 🌟
-- while true와 같이 모든 함수를 감싸주게 되면 코드의 양이 늘어나므로 takeEvery()라는 함수를 기존 take() 대신 사용한다.
+<p>
+yield를 통해 take() 함수들을 감싸다보니 생기는 가장 큰 문제는 해당 함수를 한 번 밖에 실행하지 못한다는 것이다.🌟 띠리사 generator의 특성을 활용하여 yield로 만든 해당 함수들을 while true 문으로 감싸줘야 한다! 🌟 while true와 같이 모든 함수를 감싸주게 되면 코드의 양이 늘어나므로 takeEvery()라는 함수를 기존 take() 대신 사용한다.
+</p>
 
-  |               값               |                                                                      의미                                                                      |
-  | :----------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------: |
-  |          takeEvery()           |                      yield take()를 대신해서 모든 상황에서 take를 계속 받을 수 있는 함수, while true의 역할을 대신 한다.                       |
-  |          takeLatest()          |                            이벤트의 실행이 두 번 혹은 연속적으로 실행됐을 때, 최종적으로 클릭한 액션을 넘겨받는다.                             |
-  | throttle("ACTION", action, 초) | takeLatest()의 한계(요청을 시간 차로 보냈을 때는 두 요청 모두를 처리)를 보완하기 위해서 일정 시간동안 보낼 수 있는 요청의 갯수를 제한하는 함수 |
+|               값               |                                                                      의미                                                                      |
+| :----------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------: |
+|          takeEvery()           |                      yield take()를 대신해서 모든 상황에서 take를 계속 받을 수 있는 함수, while true의 역할을 대신 한다.                       |
+|          takeLatest()          |                            이벤트의 실행이 두 번 혹은 연속적으로 실행됐을 때, 최종적으로 클릭한 액션을 넘겨받는다.                             |
+| throttle("ACTION", action, 초) | takeLatest()의 한계(요청을 시간 차로 보냈을 때는 두 요청 모두를 처리)를 보완하기 위해서 일정 시간동안 보낼 수 있는 요청의 갯수를 제한하는 함수 |
 
-- 보통은 takeLatest()를 많이 사용한다.
-- 🌟 하지만, takeLatest()를 통해 프론트에서는 최종적으로 마지막 액션을 보여준다고 하더라도, 백에서는 해당 요청에 따라 응답을 두 번 할수 있다. 🌟
-- 🌟 응답은 취소할 수 있지만, 요청을 취소할 수는 없다. 🌟
-- 따라서 throttle() 을 사용하여 요청을 제한하기도 한다.(대부분의 경우는 takeLatest()를 쓴다.)
+<p>
+보통은 takeLatest()를 많이 사용한다. 하지만, takeLatest()를 통해 프론트에서는 최종적으로 마지막 액션을 보여준다고 하더라도, 백에서는 해당 요청에 따라 응답을 두 번 할수 있다. 응답은 취소할 수 있지만, 요청을 취소할 수는 없다. 따라서 throttle() 을 사용하여 요청을 제한하기도 한다.(대부분의 경우는 takeLatest()를 쓴다.)
+</p>
+<hr/>
+
+<h2> 🌟 그럼 프론트에서만 구성하면 사가를 어떻게 확인하나요? 🌟 </h2>
+
+<p>간단하게 saga의 login function을 살펴 보자</p>
+
+```js
+function loginAPI(data) {
+  return axios.post('/api/login', data);
+}
+
+function* logIn(action) {
+  try {
+    const result = yield call(loginAPI, action.data);
+    yield put({
+      type: 'LOG_IN_SUCCESS',
+      data: result.data,
+    });
+  } catch (err) {
+    yield put({
+      type: 'LOG_IN_FAIULURE',
+      data: err.response.data,
+    });
+  }
+}
+```
+
+<p>watchLogIN을 통해 감지된 사용자의 요청이 logIn 함수를 발생시키면, action.data(사용자가 요청 보낸 이메일 패스워드가 담겨잇겠죠?)를 loginAPI로 보내고 결과를 반환받을 때까지 기다린다(call 함수에 의해), 하지만 front와 backend 작업을 따로 진행한다면 백엔드에 위 action.data를 보내줄 수 없기 때문에 delay 함수를 이용하여 성공된 결과를 반환하는 형식으로 미리 구성해본다.
+</p>
+
+```js
+function loginAPI(data) {
+  return axios.post('/api/login', data);
+}
+
+function* logIn(action) {
+  try {
+    // const result = yield call(loginAPI, action.data);
+    delay(2000);
+    yield put({
+      type: 'LOG_IN_SUCCESS',
+      data: result.data,
+    });
+  } catch (err) {
+    yield put({
+      type: 'LOG_IN_FAIULURE',
+      data: err.response.data,
+    });
+  }
+}
+```
+
+<p>loginAPI는 자동적으로 실행되지 않을 것이고, try catch문에 의해 감싸져 있으므로 action은 2초 뒤에 LOG_IN_SUCCESS 함수를 실행(put)시킬 것이다. 이 delay 함수를 통해 마치 백엔드와 소통하여 데이터를 성공적으로 반환받은 효과를 낼 수 있다.</p>

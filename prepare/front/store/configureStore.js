@@ -12,7 +12,8 @@ const loggerMiddleware = ({ dispatch, getState }) => (next) => (action) => {
 };
 
 const configureStore = () => {
-  const middlewares = [createSagaMiddleware, loggerMiddleware]; // saga,thunk 를 사용하기 위해 미리 만든 middlewares 배열 후에 여기로 들어감
+  const sagaMiddleware = createSagaMiddleware();
+  const middlewares = [sagaMiddleware, loggerMiddleware]; // saga,thunk 를 사용하기 위해 미리 만든 middlewares 배열 후에 여기로 들어감
   const enhancer =
     process.env.NODE_ENV === 'production' ? compose(applyMiddleware(...middlewares)) : composeWithDevTools(applyMiddleware(...middlewares));
   // middleswares 배열에 넣은 saga,thunk를 불변성을 유지하며 가져옴
@@ -23,8 +24,7 @@ const configureStore = () => {
 };
 
 const wrapper = createWrapper(configureStore, {
-  debug: false,
-  //process.env.NODE_ENV === 'developement',
+  debug: process.env.NODE_ENV === 'developement',
 });
 
 export default wrapper;
