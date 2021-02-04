@@ -1,3 +1,4 @@
+import React from 'react';
 import Head from 'next/head';
 import { Form, Input, Button, Checkbox } from 'antd';
 import Link from 'next/link';
@@ -93,7 +94,7 @@ export default function Home() {
               </Form.Item>
               <Form.Item {...tailLayout}>
                 <ButtonWrapper>
-                  <Button type="primary" htmlType="submit" loading={false}>
+                  <Button type="primary">
                     <Link href="/signup">
                       <a>회원가입</a>
                     </Link>

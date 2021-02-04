@@ -2,13 +2,14 @@ import '../styles/globals.css';
 import '../styles/random.css';
 import 'antd/dist/antd.css';
 
+import React from 'react';
 import Head from 'next/head';
 import PropTypes from 'prop-types';
 import withReduxSaga from 'next-redux-saga';
 
 import wrapper from '../store/configureStore';
 
-function Juneed({ Component, pageProps }) {
+function Juneed({ Component }) {
   return (
     <>
       <Head>
@@ -16,7 +17,7 @@ function Juneed({ Component, pageProps }) {
         <link rel="icon" href="/favicon.png" />
         <title>Juneed</title>
       </Head>
-      <Component {...pageProps} />
+      <Component />
     </>
   );
 }

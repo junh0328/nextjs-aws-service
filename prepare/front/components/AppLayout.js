@@ -7,7 +7,6 @@ import { createGlobalStyle } from 'styled-components';
 import { useSelector } from 'react-redux';
 
 import UserProfile from './UserProfile';
-import LoginForm from './LoginForm';
 
 const SearchInput = styled(Input.Search)`
   vertical-align: middle;
@@ -49,7 +48,7 @@ const AppLayout = ({ children }) => {
       </Menu>
       <Row gutter={8}>
         <Col xs={24} md={6}>
-          {me ? <UserProfile /> : <LoginForm />}
+          {me && <UserProfile />}
         </Col>
         <Col xs={24} md={12}>
           {children}

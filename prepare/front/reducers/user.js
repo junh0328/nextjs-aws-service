@@ -8,8 +8,6 @@ const initialState = {
   logOutError: null, // 로그아웃 에러
 
   me: null,
-  signUpData: {},
-  loginData: {},
 };
 
 export const loginRequestAction = (data) => {
@@ -39,7 +37,7 @@ const reducer = (state = initialState, action) => {
         ...state,
         logInLoading: false,
         logInDone: true,
-        me: { ...action.data, nickname: 'zerocho' },
+        me: { ...action.data, nickname: 'dlwnsgml' },
       };
     case 'LOG_IN_FAILURE':
       return {

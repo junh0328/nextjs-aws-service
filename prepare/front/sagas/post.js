@@ -1,16 +1,16 @@
-import { all, delay, fork, put, throttle, takeLatest, call } from 'redux-saga/effects';
+import { all, delay, fork, put, throttle } from 'redux-saga/effects';
 
-function addPostAPI() {
-  return axios.post('/api/post');
-}
+// function addPostAPI() {
+//   return axios.post('/api/post');
+// }
 
-function* addPost() {
+function* addPost(action) {
   try {
     // const result = yield call(addPostAPI);
-    delay(2000);
+    yield delay(2000);
     yield put({
       type: 'ADD_POST_SUCCESS',
-      data: result.data,
+      data: action.data,
     });
   } catch (err) {
     yield put({
