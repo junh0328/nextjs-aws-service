@@ -1,29 +1,22 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, Form, Input } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { addPost } from '../reducers/post';
-import styled from 'styled-components';
-
-// const ButtonRed = styled(Button)`
-//   background-color: salmon;
-//   color: white;
-//   border: none;
-
-//   &:hover {
-//     border: 1px solid salmon;
-//     color: salmon;
-//   }
-// `;
 
 const PostForm = () => {
   const imageInput = useRef();
-  const { imagePaths } = useSelector((state) => state.post);
+  const { imagePaths, addPostDone } = useSelector((state) => state.post);
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    if (addPostDone) {
+      setText('');
+    }
+  }, [addPostDone]);
+
   const onsubmit = useCallback(() => {
-    dispatch(addPost);
-    setText('');
-  }, []);
+    dispatch(addPost(text));
+  }, [text]);
 
   const [text, setText] = useState('');
   const onChangeText = useCallback(

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import Router from 'next/router';
 
@@ -7,6 +7,8 @@ import styled from 'styled-components';
 import Head from 'next/head';
 import useInput from '../hooks/useInput';
 import AppLayout from '../components/AppLayout';
+import { useDispatch, useSelector } from 'react-redux';
+import { SIGN_UP_REQUEST } from '../reducers/user';
 
 const ErrorMessage = styled.div`
   color: red;
@@ -22,6 +24,9 @@ const layout = {
 };
 
 const Signup = () => {
+  const dispatch = useDispatch();
+  const { signUpLoading, signUpDone } = useSelector((state) => state.user);
+
   const [email, onChangeEmail] = useInput('');
   const [nickname, onChangeNickname] = useInput('');
   const [password, onChangePassword] = useInput('');
@@ -37,9 +42,19 @@ const Signup = () => {
     [password]
   );
 
+  useEffect(() => {
+    if (signUpDone) {
+      alert('회원가입 성공\n 로그인 페이지로 이동합니다!');
+      Router.replace('/');
+    }
+  });
+
   const onsubmit = () => {
-    alert(`회원가입 성공!\n로그인 페이지로 이동합니다`);
-    Router.replace('/');
+    console.log('입력하신 사용자 정보' + email + password + nickname);
+    dispatch({
+      type: SIGN_UP_REQUEST,
+      data: { email, password, nickname },
+    });
   };
 
   return (
@@ -92,7 +107,7 @@ const Signup = () => {
             {passwordError && <ErrorMessage style={{ color: 'red' }}>비밀번호가 일치하지 않습니다.</ErrorMessage>}
           </div>
           <div style={{ marginTop: 10 }}>
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" loading={signUpLoading}>
               가입하기
             </Button>
           </div>
