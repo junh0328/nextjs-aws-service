@@ -509,7 +509,7 @@ function loginAPI(data) {
 function* logIn(action) {
   try {
     // const result = yield call(loginAPI, action.data);
-    delay(2000);
+    yield delay(2000);
     yield put({
       type: 'LOG_IN_SUCCESS',
       data: result.data,
