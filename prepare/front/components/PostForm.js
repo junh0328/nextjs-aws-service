@@ -1,12 +1,14 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { Button, Form, Input } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { addPost } from '../reducers/post';
+import useInput from '../hooks/useInput';
 
 const PostForm = () => {
+  const dispatch = useDispatch();
   const imageInput = useRef();
   const { imagePaths, addPostDone } = useSelector((state) => state.post);
-  const dispatch = useDispatch();
+  const [text, onChangeText, setText] = useInput('');
 
   useEffect(() => {
     if (addPostDone) {
@@ -17,14 +19,7 @@ const PostForm = () => {
   const onsubmit = useCallback(() => {
     dispatch(addPost(text));
   }, [text]);
-
-  const [text, setText] = useState('');
-  const onChangeText = useCallback(
-    (e) => {
-      setText(e.target.value);
-    },
-    [text]
-  );
+  // 여기서 addPost는 sagas/post에서 만들어 놓은 함수이기 때문에 파라미터만 넣어주면 된다. (따로 지정 x)
 
   const onClickImageUpload = useCallback(() => {
     imageInput.current.click();
@@ -43,7 +38,7 @@ const PostForm = () => {
       <div>
         {imagePaths.map((v) => (
           <div key={v} style={{ display: 'inline-block' }}>
-            <img src={v} style={{ width: '200px' }} alt={V} />
+            <img src={v} style={{ width: '200px' }} alt={v} />
             <div>
               <Button>제거</Button>
             </div>

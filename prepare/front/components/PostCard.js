@@ -3,11 +3,12 @@ import PropTypes from 'prop-types';
 import { Button, Card, Popover, Avatar, List, Comment } from 'antd';
 import { CommentOutlined, EllipsisOutlined, HeartOutlined, HeartTwoTone, RetweetOutlined } from '@ant-design/icons';
 
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import CommentForm from './CommentForm';
 import PostImages from './PostImages';
 import PostCardContent from './PostCardContent';
+import { REMOVE_POST_REQUEST } from '../reducers/post';
 
 const PostCard = ({ post }) => {
   const [liked, setLiked] = useState(false);
@@ -17,11 +18,19 @@ const PostCard = ({ post }) => {
   // = const id = me?.id; optional channing 연산자
 
   const id = useSelector((state) => state.user.me?.id);
+  const dispatch = useDispatch();
 
   const onToggleHeart = useCallback(() => setLiked((prev) => !prev), []);
 
-  const onToggleComment = useCallback((e) => {
+  const onToggleComment = useCallback(() => {
     setCommentForemOpened((prev) => !prev);
+  }, []);
+
+  const onRemovePost = useCallback(() => {
+    dispatch({
+      type: REMOVE_POST_REQUEST,
+      data: post.id,
+    });
   }, []);
 
   return (
@@ -40,7 +49,16 @@ const PostCard = ({ post }) => {
             key="more"
             content={
               <Button.Group>
-                {id && post.User.id === id ? ((<Button>수정</Button>), (<Button type="danger">삭제</Button>)) : <Button>신고</Button>}
+                {id && post.User.id === id ? (
+                  ((<Button>수정</Button>),
+                  (
+                    <Button type="danger" onClick={onRemovePost}>
+                      삭제
+                    </Button>
+                  ))
+                ) : (
+                  <Button>신고</Button>
+                )}
               </Button.Group>
             }
           >

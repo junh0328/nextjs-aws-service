@@ -466,7 +466,7 @@ yield를 통해 take() 함수들을 감싸다보니 생기는 가장 큰 문제�
 | :----------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------: |
 |          takeEvery()           |                      yield take()를 대신해서 모든 상황에서 take를 계속 받을 수 있는 함수, while true의 역할을 대신 한다.                       |
 |          takeLatest()          |                            이벤트의 실행이 두 번 혹은 연속적으로 실행됐을 때, 최종적으로 클릭한 액션을 넘겨받는다.                             |
-| throttle("ACTION", action, 초) | takeLatest()의 한계(요청을 시간 차로 보냈을 때는 두 요청 모두를 처리)를 보완하기 위해서 일정 시간동안 보낼 수 있는 요청의 갯수를 제한하는 함수 |
+| throttle(초, "ACTION", action) | takeLatest()의 한계(요청을 시간 차로 보냈을 때는 두 요청 모두를 처리)를 보완하기 위해서 일정 시간동안 보낼 수 있는 요청의 갯수를 제한하는 함수 |
 
 <p>
 보통은 takeLatest()를 많이 사용한다. 하지만, takeLatest()를 통해 프론트에서는 최종적으로 마지막 액션을 보여준다고 하더라도, 백에서는 해당 요청에 따라 응답을 두 번 할수 있다. 응답은 취소할 수 있지만, 요청을 취소할 수는 없다. 따라서 throttle() 을 사용하여 요청을 제한하기도 한다.(대부분의 경우는 takeLatest()를 쓴다.)
@@ -524,3 +524,87 @@ function* logIn(action) {
 ```
 
 <p>loginAPI는 자동적으로 실행되지 않을 것이고, try catch문에 의해 감싸져 있으므로 action은 2초 뒤에 LOG_IN_SUCCESS 함수를 실행(put)시킬 것이다. 이 delay 함수를 통해 마치 백엔드와 소통하여 데이터를 성공적으로 반환받은 효과를 낼 수 있다.</p>
+
+## 7. 📁 downloaded dependencies
+
+- eslint-config-airbnb
+- shortid
+- immer
+
+<h2> 🌟 shortId를 사용하여 데이터 중복 없애기 🌟 </h2>
+<p> 우리는 서버와의 통신없이 더미 데이터, 더미 포스트, 더미 유저 등을 통해 데이터를 그려주고 있습니다. mainPosts를 매핑하여 post라는 props로 하여금 포스트 게시물을 하나씩 나열하는 상황입니다. 각각의 포스트와 유저, 댓글(comment) 들은 모두 id를 가지고 있습니다. 이 아이디를 추적하여 게시글을 지우거나 추가하는 등의 모든 행동들이 실행될 수 있기 때문입니다. 따라서 서버와의 소통 이전단계에서는 shortId를 사용하여 절대 겹치지 않는 id를 generate 할 수 있습니다. </p>
+
+```js
+import shortId from 'shortid';
+...
+export const dummyComment = (data) => ({
+  id: shortId.generate(),
+  content: data,
+  User: {
+    id: 1,
+    nickname: '제로초',
+  },
+});
+
+```
+
+<p>shortid 라이브러리를 import 시켜 필요한 id 속성 값에 shortId.generate()로 실행시키면 id는 랜덤한 문자열로 나타납니다.</p>
+
+<h2>🌟 Immer 라이브러리를 사용하여 불변성을 없앤 간단한 리듀서 만들기 🌟</h2>
+<p>immer 라이브러리는 react의 특징인 불변성 유지 없이 코드를 변환할 수 있도록 만들어주는 라이브러리 입니다. immer 라이브러리를 그대로 불러와 'produce'라는 변수명으로 import 시켜 사용합니다.</p>
+
+<h3>기존 불변성을 지킨 코드</h3>
+
+```js
+    case ADD_COMMENT_SUCCESS: {
+      // action.data.content, postId, userId 가 들어옴 > ADD_POST_SUCCESS로 전달됨
+
+      const postIndex = state.mainPosts.findIndex((v) => v.id === action.data.postId);
+      const post = { ...state.mainPosts[postIndex] };
+      post.Comments = [dummyComment(action.data.content), ...post.Comments];
+      const mainPosts = [...state.mainPosts];
+      mainPosts[postIndex] = post;
+
+      return {
+        ...state,
+        mainPosts,
+        addCommentLoading: false,
+        addCommentDone: true,
+      };
+    }
+```
+
+<p>
+불변성을 지키기 위해서 reducer에서 사용한 코드이다.이 불변성 때문에 spread 연산자를 통해 객체의 값을 복사해 오는데 더 깊은 복사를 하게 될 수록 오류가 날 확률이 높아진다.따라서 immer를 통해 오류를 줄이고 더 보기 쉬운 코드로 만들어줄 수 있다.
+</p>
+
+```js
+const reducer = (state = initialState, action) => {
+  return produce(state, (draft) => {
+    draft;
+  });
+};
+==
+ const reducer = (state = initialState, action) => produce(state, (draft) => {});
+
+```
+
+<p>
+위와 같이 화살표 함수 뒤에 바로 붙는 함수는 return이 생략된 것이다! 🌟 immer에서는 state 대신 draft라는 값을 사용하는데, 기존의 불변성의 법칙을 깨고 사용하더라도 immer가 이 draft를 감지하여 자동으로 다음 상태(state, 여기서는 draft)로 만들어준다.
+</p>
+
+<h3>immer를 통해 불변성을 지키지 않은 코드</h3>
+
+```js
+  case ADD_COMMENT_SUCCESS: {
+      const post = draft.mainPosts.find((v) => v.id === action.data.postId);
+      post.Comments.unshift(dummyComment(action.data.content));
+      draft.addCommentLoading = false;
+      draft.addCommentDone = true;
+      break;
+    }
+
+
+```
+
+<p> 기존의 ADD_COMMENT_SUCCESS문을 불변성을 지키기위해 사용했던 것에 비해, immer를 통해 불변성을 지키지 않고 코드를 처리하면 훨씬 더 간결하고 가독성이 좋게 만들어 줄 수 있다. 따라서 immer를 처음부터 도입한 후에 그에 맞춰 작업하는 것이 더 효율적일 수 있다.</p>

@@ -19,7 +19,7 @@ import {
 function* logIn(action) {
   try {
     console.log('saga login');
-    yield delay(2000);
+    yield delay(1000);
     // const result = yield call(loginAPI, action.data);
     yield put({
       type: LOG_IN_SUCCESS,
@@ -39,7 +39,7 @@ function* logIn(action) {
 
 function* logOut() {
   try {
-    yield delay(2000);
+    yield delay(1000);
     // const result = yield call(logOutAPI);
     yield put({
       type: LOG_OUT_SUCCESS,
@@ -58,7 +58,7 @@ function* logOut() {
 
 function* signUp() {
   try {
-    yield delay(2000);
+    yield delay(1000);
     // const result = yield call(signUpAPI);
     yield put({
       type: SIGN_UP_SUCCESS,
