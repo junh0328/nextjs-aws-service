@@ -1,8 +1,9 @@
 import React, { useCallback, useState } from 'react';
 import { Layout, Menu, Input } from 'antd';
 import { MenuUnfoldOutlined, MenuFoldOutlined, UserOutlined, UploadOutlined, DingtalkOutlined } from '@ant-design/icons';
-import UserProfile from '../components/UserProfile';
 import Link from 'next/link';
+
+import UserProfile from '../components/UserProfile';
 
 const { Header, Sider, Content } = Layout;
 

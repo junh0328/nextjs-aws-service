@@ -1,5 +1,8 @@
+/* eslint-disable comma-dangle */
+/* eslint-disable arrow-body-style */
 import shortId from 'shortid';
 import produce from 'immer';
+import faker from 'faker';
 
 const initialState = {
   mainPosts: [
@@ -57,6 +60,33 @@ const initialState = {
   addCommentDone: false, // 포스트 댓글 달기 성공
   addCommentError: null, // 포스트 댓글 달기 실패
 };
+
+initialState.mainPosts = initialState.mainPosts.concat(
+  Array(20)
+    .fill()
+    .map(() => ({
+      id: shortId.generate(),
+      User: {
+        id: shortId.generate(),
+        nickname: faker.name.findName(),
+      },
+      content: faker.lorem.paragraph(),
+      Images: [
+        {
+          src: faker.image.image(),
+        },
+      ],
+      Comments: [
+        {
+          User: {
+            id: shortId.generate(),
+            nickname: faker.name.findName(),
+          },
+          content: faker.lorem.sentence(),
+        },
+      ],
+    }))
+);
 
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
 export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS';

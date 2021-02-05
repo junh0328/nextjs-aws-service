@@ -1,3 +1,6 @@
+/* eslint-disable implicit-arrow-linebreak */
+/* eslint-disable arrow-body-style */
+
 import produce from 'immer';
 
 const initialState = {

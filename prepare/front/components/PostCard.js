@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Card, Popover, Avatar, List, Comment } from 'antd';
@@ -50,12 +51,12 @@ const PostCard = ({ post }) => {
             content={
               <Button.Group>
                 {id && post.User.id === id ? (
-                  ((<Button>수정</Button>),
-                  (
+                  <>
+                    {!post.RetweetId && <Button>수정</Button>}
                     <Button type="danger" onClick={onRemovePost}>
                       삭제
                     </Button>
-                  ))
+                  </>
                 ) : (
                   <Button>신고</Button>
                 )}

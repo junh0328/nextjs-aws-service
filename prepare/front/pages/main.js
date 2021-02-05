@@ -1,10 +1,10 @@
 import React from 'react';
 import Head from 'next/head';
+import { useSelector } from 'react-redux';
 
 import AppLayout from '../components/AppLayout';
 import PostForm from '../components/PostForm';
 import PostCard from '../components/PostCard';
-import { useSelector } from 'react-redux';
 
 const main = () => {
   const { me } = useSelector((state) => state.user);

@@ -1,3 +1,4 @@
+/* eslint-disable prefer-template */
 import React, { useCallback, useEffect, useState } from 'react';
 
 import Router from 'next/router';
@@ -5,9 +6,9 @@ import Router from 'next/router';
 import { Form, Input, Button } from 'antd';
 import styled from 'styled-components';
 import Head from 'next/head';
+import { useDispatch, useSelector } from 'react-redux';
 import useInput from '../hooks/useInput';
 import AppLayout from '../components/AppLayout';
-import { useDispatch, useSelector } from 'react-redux';
 import { SIGN_UP_REQUEST } from '../reducers/user';
 
 const ErrorMessage = styled.div`
