@@ -608,3 +608,149 @@ const reducer = (state = initialState, action) => {
 ```
 
 <p> 기존의 ADD_COMMENT_SUCCESS문을 불변성을 지키기위해 사용했던 것에 비해, immer를 통해 불변성을 지키지 않고 코드를 처리하면 훨씬 더 간결하고 가독성이 좋게 만들어 줄 수 있다. 따라서 immer를 처음부터 도입한 후에 그에 맞춰 작업하는 것이 더 효율적일 수 있다.</p>
+
+<h2>🌟 인피니티 스크롤링 구현하기 🌟</h2>
+<p>인피니티 스크롤링은 프론트 엔지니어가 구현해야 하는 가장 주요한 기술 중 하나이다. 백엔드에서 넘어온 데이터들을 로딩 시간을 최소화하여 사용자에게 빠르게 보여주는 것이 중요하다. 현재 진행 상황에서는 백엔드 서버와의 연동이 되어있지 않기 때문에, 더미 데이터를 활용하여 데이터를 불러올 것이다. </p>
+
+```js
+useEffect(() => {
+  dispatch({ type: LOAD_POSTS_REQUEST });
+}, []);
+
+useEffect(() => {
+  function onScroll() {
+    // console.log(window.scrollY, document.documentElement.clientHeight, document.documentElement.scrollHeight);
+    if (window.scrollY + document.documentElement.clientHeight > document.documentElement.scrollHeight - 300) {
+      if (hasMorePosts && !loadPostsLoading) {
+        dispatch({
+          type: LOAD_POSTS_REQUEST,
+        });
+      }
+    }
+  }
+  window.addEventListener('scroll', onScroll);
+  return () => {
+    window.removeEventListener('scroll', onScroll);
+  };
+}, [hasMorePosts, loadPostsLoading]);
+```
+
+<p>처음 페이지가 렌더링된 상황에서 첫 번째 useEffect는 아무 것도 없는 mainPosts의 상태를 감지하고, LOAD_POSTS_REQUEST를 통해 데이터를 불러온다. 후에 두 번째 useEffect는 일정한 규칙 (우리 화면이 300 픽셀정도 남기고 밑에 까지 내려갔을 때)에 따라 LOAD_POSTS_REQUEST를 실행시킨다. 하지만, 'scroll' 이라는 이벤트는 엄청나게 많이 발생하기 때문에 REQUEST를 한 번만 실행할 수 있도록 조건을 걸어줘야 한다. 우선 더 불러올 포스트가 있는 지에 대한 'hasMorePosts' 상태가 있고, 현재 포스트를 불러오는 상태가 아닐 때만 포스트를 불러오도록 하는 'loadPostsLoading' 상태가 있다. 또한 saga에서 이 요청이 혹여나 더 넘어올 것을 대비하여 takeLatest, throttle 사가 이펙트를 사용하여 특정 상황에서 가장 최신에 넘어오는 요청만 받아주거나, 일정 기간동안 넘어오는 요청 중 오직 하나에만 답하는 속성을 통해 request에 제한을 걸어주었다.  </p>
+
+<p>reducer의 처리 방식은 다음과 같다.</p>
+
+```js
+ case LOAD_POSTS_REQUEST:
+        draft.loadPostsLoading = true;
+        draft.loadPostsDone = false;
+        draft.loadPostsError = null;
+        break;
+      case LOAD_POSTS_SUCCESS:
+        draft.loadPostsLoading = false;
+        draft.loadPostsDone = true;
+        draft.mainPosts = action.data.concat(draft.mainPosts);
+        // 더미데이터와 기존데 이터를 합쳐줌
+        draft.hasMorePosts = draft.mainPosts.length < 50;
+        break;
+      case LOAD_POSTS_FAILURE:
+        draft.loadPostsLoading = false;
+        draft.loadPostsError = action.error;
+        break;
+```
+
+<p>현재 더미데이터로 진행되고 있기 때문에 최대 mainPosts를 50개로 제한해 두었고, 기존 mainPosts에 mainPosts를 concat하여 기존 데이터 밑에(뒤에) 붙여주는 형식으로 인피니티 스크롤링을 완성하였다.</p>
+
+<p>saga에서의 처리 방식은 다음과 같다.</p>
+
+```js
+function* loadPosts() {
+  try {
+    // const result = yield call(loadPostsAPI, action.data);
+    yield delay(1000);
+    yield put({
+      type: LOAD_POSTS_SUCCESS,
+      data: generateDummyPost(10),
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOAD_POSTS_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+...
+
+function* watchloadPosts() {
+  yield takeLatest(LOAD_POSTS_REQUEST, loadPosts);
+}
+```
+
+<p>watchloadPosts로 넘어오는 LOAD_POSTS_REQUEST 요청을 감지하여 loadPosts 함수를 실행시킨다. 현재 상태에서는 백엔드서버에게 정보를 달라는 요청을 할 수 없기 때문에 delay로 대체하였고, 후에 성공하면 우리가 만든 함수에 의해 10개의 더미포스트가 생성된다.</p>
+
+```js
+export const generateDummyPost = (number) =>
+  Array(number)
+    .fill()
+    .map(() => ({
+      id: shortId.generate(),
+      User: {
+        id: shortId.generate(),
+        nickname: faker.name.findName(),
+      },
+      content: faker.lorem.paragraph(),
+      Images: [
+        {
+          src: faker.image.image(),
+        },
+      ],
+      Comments: [
+        {
+          User: {
+            id: shortId.generate(),
+            nickname: faker.name.findName(),
+          },
+          content: faker.lorem.sentence(),
+        },
+      ],
+    }));
+```
+
+<p>generateDummyPost는 파라미터로 숫자를 받는데, 안의 데이터는 faker 라이브러리와 shortId 라이브러리를 이용하여 채워주었다.안의 내용보다는 mainPosts의 속성과 값에 집중해야 한다. 위의 데이터를 현재는 10개만 받아오지만, 프론트 엔지니어로써 수백 수천개의 데이터를 받아 왔을 때 그 데이터를 얼마나 간결하게 받아올 수 잇는 지에 대해 더 공부해야 할 것이다.</p>
+
+<h2>🌟 팔로우 버튼 만들기 🌟</h2>
+
+<p> 구현하고자 하는 팔로우 언팔로우 버튼의 완성된 모습은 다음과 같다.</p>
+
+<img  width="80%" src="./images/followButton.png" title="followButton">
+
+<p> 큰 틀의 디자인은 antd의 모습을 따라가고 있기 때문에 우리는 antd에서 제공하는 속성들에 어떻게 로직을 만들어줘야 할 지를 고민하면 된다.</p>
+
+```js
+
+const id = useSelector((state) => state.user.me?.id);
+...
+
+  <Card
+        extra={id && <FollowButton post={post} />}
+        cover={post.Images[0] && <PostImages images={post.Images} />}
+        ...
+  />
+```
+
+<p>antd에서는 'extra'라는 속성을 통해 image 위에 버튼을 구성할 수 있도록 제공하였다. 따라서 우리는 extra 속성에 id && (id가 존재하면) FollowButton을 누를 수 있는 로직을 제일 처음 짰다. 알다시피 post는 mainPosts를 매핑한 값인데, 이 값에 post와 user에 대한 전체적인 속성값이 들어잇으므로 props로 내려준다. follow request를 보내거나 unfollow request를 보내려면 누구를 팔로우하고 누구를 언팔로우할 지를 데이터로 보내줘야 하기 때문에 이때 post.User.id를 사용하여 데이터에 접근하여 saga에 전달한다.</p>
+
+<p>FollowButton 컴포넌트의 로직은 다음과 같다.</p>
+
+```js
+const isFollowing = me && me.Followings.find((v) => v.id == post.User.id);
+...
+
+return (
+  <Button loading={followLoading || unfollowLoading} onClick={onFollowButton}>
+    {isFollowing ? '언팔로우' : '팔로우'}
+  </Button>
+);
+```
+
+<p>isFollowing이라는 변수에 그 사람이 내가 팔로우한 사람인지를 찾기 위한 find((v) => v.id == post.User.id)의 결과 값을 넣어준다. 이미 로그인 상태에서만 팔로우 언팔로우 상태를 볼 수 있으므로 이 결과값은 후에 db에 저장된 데이터에서 불러오게 될 것이다. 현재는 더미 상태이므로 항상 비어 있을 수밖에 없다. 따라서 isFollowing 상태에 따라 <Button></Button>에 언팔로우 또는 팔로우를 보여지게 만들어준다. 결과적으로 주목해야할 것은 ' mainPosts의 post.User.id에 접근하여 isFollowing의 상태를 가져올 수 있느냐 '이다. 프론트 엔지니어라 할 지라도 데이터에 접근하는 방법에 대해 공부해야 할 것이다. </p>
