@@ -11,8 +11,33 @@ import {
   REMOVE_POST_REQUEST,
   REMOVE_POST_SUCCESS,
   REMOVE_POST_FAILURE,
+  LOAD_POSTS_REQUEST,
+  LOAD_POSTS_SUCCESS,
+  LOAD_POSTS_FAILURE,
+  generateDummyPost,
 } from '../reducers/post';
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from '../reducers/user';
+
+// function loadPostsAPI() {
+//   return axios.get('/api/post');
+// }
+
+function* loadPosts() {
+  try {
+    // const result = yield call(loadPostsAPI, action.data);
+    yield delay(1000);
+    yield put({
+      type: LOAD_POSTS_SUCCESS,
+      data: generateDummyPost(10),
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOAD_POSTS_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
 
 // function addPostAPI() {
 //   return axios.post('/api/post');
@@ -93,6 +118,9 @@ function* addComment(action) {
     });
   }
 }
+function* watchloadPosts() {
+  yield throttle(5000, LOAD_POSTS_REQUEST, loadPosts);
+}
 
 function* watchAddPost() {
   yield throttle(1000, ADD_POST_REQUEST, addPost);
@@ -106,5 +134,5 @@ function* watchAddComment() {
 }
 
 export default function* postSaga() {
-  yield all([fork(watchAddPost), fork(watchAddComment), fork(watchRemovePost)]);
+  yield all([fork(watchloadPosts), fork(watchAddPost), fork(watchAddComment), fork(watchRemovePost)]);
 }

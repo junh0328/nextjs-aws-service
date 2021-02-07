@@ -5,52 +5,17 @@ import produce from 'immer';
 import faker from 'faker';
 
 const initialState = {
-  mainPosts: [
-    {
-      id: 1,
-      User: {
-        id: 1,
-        nickname: '이준희',
-      },
-      content: '첫 번째 게시글 #해시태그 #익스프레스',
-      Images: [
-        {
-          id: shortId.generate(),
-          src: 'https://image.chosun.com/sitedata/image/202012/09/2020120900033_0.png',
-        },
-        {
-          id: shortId.generate(),
-          src: 'https://pds.joins.com/news/component/htmlphoto_mmdata/202012/09/0fd0db44-301a-4f8d-8907-29803b2ccecc.jpg',
-        },
-        {
-          id: shortId.generate(),
-          src: 'https://image.zdnet.co.kr/2020/12/17/1d4de0a692e1c978f09639336b1adca0.jpg',
-        },
-      ],
-      Comments: [
-        {
-          id: shortId.generate(),
-          User: {
-            id: shortId.generate(),
-            nickname: 'nero',
-          },
-          content: '우와 개정판이 나왔군요!',
-        },
-        {
-          User: {
-            id: shortId.generate(),
-            nickname: '부기',
-          },
-          content: '저도 사고싶어요!',
-        },
-      ],
-    },
-  ],
+  mainPosts: [],
   imagePaths: [],
+  hasMorePosts: true,
 
-  addPostLoading: false, // 포스트 불러오기 요청중
-  addPostDone: false, // 포스트 불러오기 성공
-  addPostError: null, // 포스트 불러오기 실패
+  loadPostsLoading: false, // 포스트 불러오기 요청중
+  loadPostsDone: false, // 포스트 불러오기 성공
+  loadPostsError: null, // 포스트 불러오기 실패
+
+  addPostLoading: false, // 포스트 추가 요청중
+  addPostDone: false, // 포스트 추가 성공
+  addPostError: null, // 포스트 추가 실패
 
   removePostLoading: false, // 포스트 삭제 요청중
   removePostDone: false, // 포스트 삭제 성공
@@ -61,8 +26,8 @@ const initialState = {
   addCommentError: null, // 포스트 댓글 달기 실패
 };
 
-initialState.mainPosts = initialState.mainPosts.concat(
-  Array(20)
+export const generateDummyPost = (number) =>
+  Array(number)
     .fill()
     .map(() => ({
       id: shortId.generate(),
@@ -85,8 +50,11 @@ initialState.mainPosts = initialState.mainPosts.concat(
           content: faker.lorem.sentence(),
         },
       ],
-    }))
-);
+    }));
+
+export const LOAD_POSTS_REQUEST = 'LOAD_POSTS_REQUEST';
+export const LOAD_POSTS_SUCCESS = 'LOAD_POSTS_SUCCESS';
+export const LOAD_POSTS_FAILURE = 'LOAD_POSTS_FAILURE';
 
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
 export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS';
@@ -134,6 +102,22 @@ export const dummyComment = (data) => ({
 const reducer = (state = initialState, action) => {
   return produce(state, (draft) => {
     switch (action.type) {
+      case LOAD_POSTS_REQUEST:
+        draft.loadPostsLoading = true;
+        draft.loadPostsDone = false;
+        draft.loadPostsError = null;
+        break;
+      case LOAD_POSTS_SUCCESS:
+        draft.loadPostsLoading = false;
+        draft.loadPostsDone = true;
+        draft.mainPosts = action.data.concat(draft.mainPosts);
+        // 더미데이터와 기존데 이터를 합쳐줌
+        draft.hasMorePosts = draft.mainPosts.length < 50;
+        break;
+      case LOAD_POSTS_FAILURE:
+        draft.loadPostsLoading = false;
+        draft.loadPostsError = action.error;
+        break;
       case ADD_POST_REQUEST:
         draft.addPostLoading = true;
         draft.addPostDone = false;
