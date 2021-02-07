@@ -305,7 +305,11 @@ const PostCard = ({ post }) => {
             key="more"
             content={
               <Button.Group>
-                {id && post.User.id === id ? ((<Button>수정</Button>), (<Button type="danger">삭제</Button>)) : <Button>신고</Button>}
+                {id && post.User.id === id ? (
+                  ((<Button>수정</Button>), (<Button type="danger">삭제</Button>))
+                ) : (
+                  <Button>신고</Button>
+                )}
               </Button.Group>
             }
           >
@@ -313,7 +317,11 @@ const PostCard = ({ post }) => {
           </Popover>,
         ]}
       >
-        <Card.Meta avatar={<Avatar>{post.User.nickname[0]}</Avatar>} title={post.User.nickname} description={post.content} />
+        <Card.Meta
+          avatar={<Avatar>{post.User.nickname[0]}</Avatar>}
+          title={post.User.nickname}
+          description={post.content}
+        />
       </Card>
       {/* <CommentForm /> */}
       {/* <Comments /> */}
@@ -620,7 +628,10 @@ useEffect(() => {
 useEffect(() => {
   function onScroll() {
     // console.log(window.scrollY, document.documentElement.clientHeight, document.documentElement.scrollHeight);
-    if (window.scrollY + document.documentElement.clientHeight > document.documentElement.scrollHeight - 300) {
+    if (
+      window.scrollY + document.documentElement.clientHeight >
+      document.documentElement.scrollHeight - 300
+    ) {
       if (hasMorePosts && !loadPostsLoading) {
         dispatch({
           type: LOAD_POSTS_REQUEST,
@@ -754,3 +765,7 @@ return (
 ```
 
 <p>isFollowing이라는 변수에 그 사람이 내가 팔로우한 사람인지를 찾기 위한 find((v) => v.id == post.User.id)의 결과 값을 넣어준다. 이미 로그인 상태에서만 팔로우 언팔로우 상태를 볼 수 있으므로 이 결과값은 후에 db에 저장된 데이터에서 불러오게 될 것이다. 현재는 더미 상태이므로 항상 비어 있을 수밖에 없다. 따라서 isFollowing 상태에 따라 <Button></Button>에 언팔로우 또는 팔로우를 보여지게 만들어준다. 결과적으로 주목해야할 것은 ' mainPosts의 post.User.id에 접근하여 isFollowing의 상태를 가져올 수 있느냐 '이다. 프론트 엔지니어라 할 지라도 데이터에 접근하는 방법에 대해 공부해야 할 것이다. </p>
+
+<h1> 🌟 백엔드서버와 소통하는 프론트 구성하기 🌟 </h1>
+
+<p>지금까지 작업한 코드들은 가짜(더미)로 데이터를 만들어 구성하고, 보여주는 방법을 사용했습니다. 지금부터는 실제 프로젝트라고 생각하고 백엔드 작업과 api를 공휴하면서 작업하는 형식으로 문서를 작성하겠습니다. 📁prepare/backend 는 제가 기존에 작성했던 제로초님의 강의 <a href="https://github.com/junh0328/nextjs-sns/tree/master/prepare/backend">리액트 노드버드</a>를 클론 받아 사용합니다. 백엔드의 주요 기능에 대한 설명은 해당 레포지토리에 있으므로 부족한 부분은 링크의 설명 부분을 참고해주세요</p>

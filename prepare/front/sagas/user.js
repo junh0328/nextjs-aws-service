@@ -1,6 +1,7 @@
 // import axios from 'axios';
 import { all, delay, fork, put, takeLatest } from 'redux-saga/effects';
 import {
+  FOLLOW_FAILURE,
   FOLLOW_REQUEST,
   FOLLOW_SUCCESS,
   LOG_IN_FAILURE,
@@ -137,5 +138,11 @@ function* watchUnfollow() {
 }
 
 export default function* userSaga() {
-  yield all([fork(watchLogin), fork(watchLogOut), fork(watchSignUp), fork(watchFollow), fork(watchUnfollow)]);
+  yield all([
+    fork(watchLogin),
+    fork(watchLogOut),
+    fork(watchSignUp),
+    fork(watchFollow),
+    fork(watchUnfollow),
+  ]);
 }

@@ -31,6 +31,6 @@
     "linebreak-style": "off",
     "no-param-reassign": "off",
     "eslint-disable max-len": "off",
- "eslint-disable react/jsx-wrap-multilines": "off",
+    "eslint-disable react/jsx-wrap-multilines": "off"
   }
 }
