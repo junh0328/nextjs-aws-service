@@ -1,8 +1,14 @@
-/* eslint-disable max-len */
-import React, { useCallback, useEffect, useState } from 'react';
+/* eslint-disable react/jsx-wrap-multilines */
+import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Card, Popover, Avatar, List, Comment } from 'antd';
-import { CommentOutlined, EllipsisOutlined, HeartOutlined, HeartTwoTone, RetweetOutlined } from '@ant-design/icons';
+import {
+  CommentOutlined,
+  EllipsisOutlined,
+  HeartOutlined,
+  HeartTwoTone,
+  RetweetOutlined,
+} from '@ant-design/icons';
 
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -85,7 +91,11 @@ const PostCard = ({ post }) => {
             dataSource={post.Comments}
             renderItem={(item) => (
               <li>
-                <Comment author={item.User.nickname} avatar={<Avatar>{item.User.nickname[0]}</Avatar>} content={item.content} />
+                <Comment
+                  author={item.User.nickname}
+                  avatar={<Avatar>{item.User.nickname[0]}</Avatar>}
+                  content={item.content}
+                />
               </li>
             )}
           />
