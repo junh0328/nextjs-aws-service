@@ -37,7 +37,7 @@ export default function Home() {
   useEffect(() => {
     if (me) {
       alert('로그인 성공 메인페이지로 이동합니다!');
-      Router.push('/main');
+      Router.replace('/main');
     }
   }, [me]);
 
@@ -51,9 +51,23 @@ export default function Home() {
         <title>juneed | login</title>
         <link rel="icon" href="/favicon.png" />
       </Head>
-      <div className="container" style={{ display: 'flex', alignItems: 'flex-end', alignContent: 'center', justifyContent: 'center' }}>
+      <div
+        className="container"
+        style={{
+          display: 'flex',
+          alignItems: 'flex-end',
+          alignContent: 'center',
+          justifyContent: 'center',
+        }}
+      >
         <div>
-          <Form style={{ marginRight: 30 }} {...layout} name="basic" initialValues={{ remember: true }} onFinish={onSubmitForm}>
+          <Form
+            style={{ marginRight: 30 }}
+            {...layout}
+            name="basic"
+            initialValues={{ remember: true }}
+            onFinish={onSubmitForm}
+          >
             <Form.Item
               label="Email"
               name="email"
@@ -64,7 +78,13 @@ export default function Home() {
                 },
               ]}
             >
-              <Input name="user-email" type="email" value={email} required onChange={onChangeEmail} />
+              <Input
+                name="user-email"
+                type="email"
+                value={email}
+                required
+                onChange={onChangeEmail}
+              />
             </Form.Item>
 
             <Form.Item
@@ -77,7 +97,12 @@ export default function Home() {
                 },
               ]}
             >
-              <Input.Password name="password" value={password} onChange={onChangePassword} required />
+              <Input.Password
+                name="password"
+                value={password}
+                onChange={onChangePassword}
+                required
+              />
             </Form.Item>
 
             <Form.Item {...tailLayout} name="remember" valuePropName="checked">

@@ -769,3 +769,71 @@ return (
 <h1> 🌟 백엔드서버와 소통하는 프론트 구성하기 🌟 </h1>
 
 <p>지금까지 작업한 코드들은 가짜(더미)로 데이터를 만들어 구성하고, 보여주는 방법을 사용했습니다. 지금부터는 실제 프로젝트라고 생각하고 백엔드 작업과 api를 공휴하면서 작업하는 형식으로 문서를 작성하겠습니다. 📁prepare/backend 는 제가 기존에 작성했던 제로초님의 강의 <a href="https://github.com/junh0328/nextjs-sns/tree/master/prepare/backend">리액트 노드버드</a>를 클론 받아 사용합니다. 백엔드의 주요 기능에 대한 설명은 해당 레포지토리에 있으므로 부족한 부분은 링크의 설명 부분을 참고해주세요</p>
+
+<p>우리가 만든 더미 포스트를 통해 작업해야 할 내용은 다음과 같습니다.</p>
+<ol>
+  <li>회원가입</li>
+  <li>로그인</li>
+  <li>게시글 블러오기</li>
+  <li>게시글 작성</li>
+  <li>게시글 제거</li>
+  <li>댓글 작성</li>
+  <li>닉네임 변경</li>
+  <li>팔로잉</li>
+  <li>이미지 업로드</li>
+  <li>해시태그 등록</li>
+  <li>리트윗 </li>
+</ol>
+
+<p>회원가입과 로그인을 우선 다루고 axios를 통해 데이터를 어떻게 전달하고 처리받아 virtual DOM이 리렌더링 하는 지까지의 과정을 공부하겠습니다.</p>
+
+<h2>🌟 api로 실제 데이터를 통해 회원가입하기 🌟</h2>
+
+<p>redux-saga를 통해 데이터를 넘기기 위해서는 반드시 post, put, patch를 사용해야 한다. (GET METHOD는 안돼요) 브라우저에서 사용자의 회원가입 요청을 백엔드 서버로 보내게 되면 서로 다른 포트에서 소통을 하게 되므로 <a href="https://developer.mozilla.org/ko/docs/Web/HTTP/CORS">cors(Cross-Origin Resource Sharing)</a> 문제가 발생한다. 따라서 우리는 같은 포트를 사용하는 프론트서버에게 요청을 보내고, 프론트 서버가 백엔드 서버에게 요청을 보내는 방식, <a href="https://react.vlpt.us/redux-middleware/09-cors-and-proxy.html">프록시 방식(proxy)</a>을 사용할 것입니다.</p>
+
+<p> pages/signup 에서 정보를 입력하고 회원가입을 누르면 onsubmit 함수를 실행시킵니다.</p>
+
+```js
+const onsubmit = () => {
+  // dispatch로 SIGN_UP_REQUEST action을 실행시킴
+  dispatch({
+    type: SIGN_UP_REQUEST,
+    data: { email, password, nickname },
+  });
+};
+```
+
+<p>onsubmit 함수는 SIGN_UP_REQUEST 액션을 실행시키는데, 데이터에는 우리가 input 안에 useState로 주었던 value 값을 action.data로 담아줍니다.</p>
+
+```js
+function signUpAPI(data) {
+  return axios.post('http://localhost:3065/user', data);
+  // data : { email: ... , password: ..., nickname: .... }
+}
+
+function* signUp(action) {
+  try {
+    const result = yield call(signUpAPI, action.data);
+    // action.data = { email, password, nickname }
+    console.log(result);
+    yield put({
+      type: SIGN_UP_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    yield put({
+      type: SIGN_UP_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+
+...
+
+function* watchSignUp() {
+  yield takeLatest(SIGN_UP_REQUEST, signUp);
+}
+
+```
+
+<p>watchSignUp을 통해 dispatch된 액션인 SIGN_UP_REQUEST 요청을 받은 뒤에, signUp 메소드를 실행시킵니다. signUp 액션은 파라미털 (action)을 받는데 이 액션은 SIGN_UP_REQUEST입니다. 안에 있는 data인 {email, password, nickname} 속성을 call 함수를 통해 signUpAPI로 보내고 결과값을 기다렸다 result에 저장합니다. 백엔드에서 라우팅 처리에 의해 결과값이 반환되고, 성공 시에 SIGN_UP_SUCCESS를 반환하면서 result.data(backend에서 json 형식으로 넘겨준 반환 값)를 함께 넘겨줍니다. 이 상황을 리듀서는 동시에 감지하고 있으며, 성공적으로 데이터가 넘어 왔을 때 signUpDone이 실행되면서 useEffect를 통해 감지되어 ('/') 로그인 페이지로 넘어가게 됩니다. </p>

@@ -1,3 +1,5 @@
+/* eslint-disable comma-dangle */
+/* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable prefer-template */
 import React, { useCallback, useEffect, useState } from 'react';
 
@@ -26,7 +28,7 @@ const layout = {
 
 const Signup = () => {
   const dispatch = useDispatch();
-  const { signUpLoading, signUpDone } = useSelector((state) => state.user);
+  const { signUpLoading, signUpDone, signUpError } = useSelector((state) => state.user);
 
   const [email, onChangeEmail] = useInput('');
   const [nickname, onChangeNickname] = useInput('');
@@ -48,10 +50,17 @@ const Signup = () => {
       alert('회원가입 성공\n 로그인 페이지로 이동합니다!');
       Router.replace('/');
     }
-  });
+  }, [signUpDone]);
+
+  useEffect(() => {
+    if (signUpError) {
+      alert(signUpError);
+    }
+  }, [signUpError]);
 
   const onsubmit = () => {
     console.log('입력하신 사용자 정보' + email + password + nickname);
+    // dispatch로 SIGN_UP_REQUEST action을 실행시킴
     dispatch({
       type: SIGN_UP_REQUEST,
       data: { email, password, nickname },
@@ -80,7 +89,13 @@ const Signup = () => {
           <div>
             <label htmlFor="user-nick">닉네임</label>
             <br />
-            <Input name="user-nick" value={nickname} required onChange={onChangeNickname} placeholder="사용하실 닉네임을 입력해주세요" />
+            <Input
+              name="user-nick"
+              value={nickname}
+              required
+              onChange={onChangeNickname}
+              placeholder="사용하실 닉네임을 입력해주세요"
+            />
           </div>
           <div>
             <label htmlFor="user-password">비밀번호</label>
@@ -105,7 +120,9 @@ const Signup = () => {
               placeholder="비밀번호는 8자 이상입니다."
               style={{ marginTop: 3 }}
             />
-            {passwordError && <ErrorMessage style={{ color: 'red' }}>비밀번호가 일치하지 않습니다.</ErrorMessage>}
+            {passwordError && (
+              <ErrorMessage style={{ color: 'red' }}>비밀번호가 일치하지 않습니다.</ErrorMessage>
+            )}
           </div>
           <div style={{ marginTop: 10 }}>
             <Button type="primary" htmlType="submit" loading={signUpLoading}>

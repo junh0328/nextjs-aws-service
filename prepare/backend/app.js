@@ -36,30 +36,19 @@ db.sequelize
 
 passportConfig(); // /passport/index 에서 exports한 전략을 실행시킴
 
-if (process.env.NODE_ENV === 'production') {
-  app.use(morgan('combined'));
-  app.use(hpp());
-  app.use(helmet());
-  app.use(
-    cors({
-      origin: 'http://nodebird.com',
-      credentials: true,
-    })
-  );
-} else {
-  app.use(morgan('dev'));
-  app.use(
-    cors({
-      origin: true,
-      credentials: true,
-    })
-  );
-}
+app.use(morgan('dev'));
+app.use(
+  cors({
+    origin: '*',
+    credentials: false,
+  })
+);
+
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use('/', express.static(path.join(__dirname, 'uploads')));
 // static(path.join(...))을 사용하여 현재 폴더 + uploads 폴더에 접근할 수 있도록 허용
 // front의 PostForm 컴포넌트 <img src={`http://localhost:3065/${v}`} 에서 'http://localhost:3065/'
-app.use(express.json());
+app.use(express.json()); // 프론트에서 넘겨주는 json({ ...}) 형식의 데이터를 express 에서 사용하기 위한 명령어
 app.use(express.urlencoded({ extended: true })); // form 으로 넘어오는 데이터 관리
 app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(
