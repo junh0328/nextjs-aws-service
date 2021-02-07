@@ -20,6 +20,14 @@ const initialState = {
   changeNicknameDone: false, // 닉네임 변경 완료
   changeNicknameError: null, // 닉네임 변경 에러
 
+  followLoading: false, // 팔로우 시도 중
+  followDone: false, // 팔로우 성공
+  followError: null, // 팔로우 실패
+
+  unfollowLoading: false, // 언팔로우 시도 중
+  unfollowDone: false, // 언팔로우 성공
+  unfollowError: null, // 언팔로우 실패
+
   me: null,
 };
 
@@ -86,14 +94,6 @@ const reducer = (state = initialState, action) =>
         draft.me = dummyUser(action.data);
         draft.logInDone = true;
         break;
-      /*
-        return {
-          ...state,
-          logInLoading: false,
-          logInDone: true,
-          me: dummyUser(action.data),
-        };
-        */
       case LOG_IN_FAILURE:
         draft.logInLoading = false;
         draft.logInError = action.error;
@@ -137,6 +137,34 @@ const reducer = (state = initialState, action) =>
       case CHANGE_NICKNAME_FAILURE:
         draft.changeNicknameLoading = false;
         draft.changeNicknameError = action.error;
+        break;
+      case FOLLOW_REQUEST:
+        draft.followLoading = true;
+        draft.followDone = false;
+        draft.followError = action.error;
+        break;
+      case FOLLOW_SUCCESS:
+        draft.followLoading = false;
+        draft.me.Followings.push({ id: action.data });
+        draft.followDone = true;
+        break;
+      case FOLLOW_FAILURE:
+        draft.followLoading = false;
+        draft.followError = action.error;
+        break;
+      case UNFOLLOW_REQUEST:
+        draft.unfollowLoading = true;
+        draft.unfollowDone = false;
+        draft.unfollowError = action.error;
+        break;
+      case UNFOLLOW_SUCCESS:
+        draft.unfollowLoading = false;
+        draft.me.Followings = draft.me.Followings.filter((v) => v.id !== action.data);
+        draft.unfollowDone = true;
+        break;
+      case UNFOLLOW_FAILURE:
+        draft.unfollowLoading = false;
+        draft.unfollowError = action.error;
         break;
       case ADD_POST_TO_ME:
         draft.me.Posts.unshift({ id: action.data });

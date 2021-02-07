@@ -119,7 +119,7 @@ function* addComment(action) {
   }
 }
 function* watchloadPosts() {
-  yield throttle(5000, LOAD_POSTS_REQUEST, loadPosts);
+  yield takeLatest(LOAD_POSTS_REQUEST, loadPosts);
 }
 
 function* watchAddPost() {
