@@ -938,3 +938,101 @@ function loginAPI(data) {
   return axios.post('user/login', data);
 }
 ```
+
+<h2>🌟 api로 실제 데이터를 통해 게시글, 댓글 작성하기 🌟</h2>
+
+<p>게시글 기능과 댓글 구현하기 기능을 만들기에 앞서 dispatch로 액션을 실행시킬 때 차이점이 있습니다. 이 차이점으로 인해 사가에서 보내는 action.data 속성 값이 변화합니다.</p>
+
+```js
+  🌟 게시글 달기 🌟
+  const onsubmit = useCallback(() => {
+    dispatch(addPost(text));
+  }, [text]);
+```
+
+```js
+  🌟 댓글 달기 🌟
+const onsubmitComment = useCallback(() => {
+  dispatch({
+    type: ADD_COMMENT_REQUEST,
+    data: { content: commentText, postId: post.id, userId: id },
+  });
+  setCommentText('');
+}, [commentText, id]);
+```
+
+<p> 게시글 달기는 dispatch 시에 action의 data 속성명을 따로 지정해주지 않았고 useState에 의해 관리되는 <Input> 컴포넌트의 value값인 text를 그대로 담아주었고, 댓글 달기에서는 data의 속성명들(content, postId, userId)을 모두 지정해줬습니다.</p>
+
+```js
+function addPostAPI(data) {
+  return axios.post('/post', { content: data });
+}
+
+function* addPost(action) {
+  try {
+    const result = yield call(addPostAPI, action.data);
+    yield put({
+      type: ADD_POST_SUCCESS,
+      data: result.data,
+    });
+    yield put({
+      type: ADD_POST_TO_ME,
+      data: result.data.id,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: ADD_POST_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+```
+
+<p>따라서 addPost를 서버에 보낼 때는 그 data가 무엇을 의미하는지 데이터의 속성명{ content : data }을 같이 보내줘야 서버에서 req.body.content로 인식하여 받아줄 수 있습니다.</p>
+
+```js
+function addCommentAPI(data) {
+  return axios.post(`/post/${data.postId}/comment`, data);
+}
+
+function* addComment(action) {
+  try {
+    const result = yield call(addCommentAPI, action.data);
+    yield put({
+      type: ADD_COMMENT_SUCCESS,
+      data: result.data,
+      /*
+        action.data.content,
+        action.data.postId,
+        action.data.userId,
+        가 dispatch type, data에 의해 넘어옴
+      */
+    });
+  } catch (err) {
+    yield put({
+      type: ADD_COMMENT_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+```
+
+<p>하지만 addComment를 액션할 때는 action.data를 모두 지정해주었죠? 그래서 사가에서 addCommentAPI를 보낼 때도, data라고만 표시해도 서버에서 무슨 데이터가 들어 있는지 알 수 있는 겁니다. 결과적으로 데이터를 보낼 때(dispatch 할 때) type과 더불어 data를 보내주는 편이 좋습니다.</p>
+
+<h3>🌟 credentials 속성으로 글쓰기 권한 가져오기 🌟</h3>
+<p>addComment, addPost와 관련된 로직을 다 작성하고, 글을 쓰려는 순간 401(로그인이 필요합니다.) 라는 에러가 뜹니다. </p>
+
+<img  width="60%" src="./images/credentials401.png" title="credentials401">
+<p> CORS 문제를 해결했다고 생각했지만, 권한을 다 주기 위해서는 sagas/index에서 axios를 통해 서버로 데이터를 보낼 때 </p>
+
+```js
+📁 sagas/index.js
+...
+axios.defaults.withCredentials = true;
+```
+
+<p>속성이 필요합니다. 서버(app.js)에서도 마찬가지로 기존에 false로 되어있던 withCredentials 속성을 true로 만들고, 정확한 프론트의 로컬 포트번호를 적어줘야 합니다.</p>
+<img  width="80%" src="./images/credentialsApp.png" title="credentialsApp">
+
+<p>이제 정상적으로 데이터베이스에 저장되는 addPost를 작성할 수 있습니다.</p>

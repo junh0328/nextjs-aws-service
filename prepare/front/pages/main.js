@@ -25,9 +25,9 @@ const main = () => {
   }, [logOutDone]);
 
   // 제일 처음 mainPosts가 빈 배열일 때 실행됨
-  useEffect(() => {
-    dispatch({ type: LOAD_POSTS_REQUEST });
-  }, []);
+  // useEffect(() => {
+  //   dispatch({ type: LOAD_POSTS_REQUEST });
+  // }, []);
 
   useEffect(() => {
     function onScroll() {

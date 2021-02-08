@@ -39,8 +39,8 @@ passportConfig(); // /passport/index 에서 exports한 전략을 실행시킴
 app.use(morgan('dev'));
 app.use(
   cors({
-    origin: '*',
-    credentials: false,
+    origin: 'http://localhost:3000',
+    credentials: true,
   })
 );
 

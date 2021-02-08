@@ -1,8 +1,10 @@
+/* eslint-disable react/require-default-props */
+/* eslint-disable max-len */
 import { Button, Form, Input } from 'antd';
 import React, { useCallback, useEffect } from 'react';
-import useInput from '../hooks/useInput';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
+import useInput from '../hooks/useInput';
 import { ADD_COMMENT_REQUEST } from '../reducers/post';
 
 const CommentForm = ({ post }) => {
@@ -33,7 +35,11 @@ const CommentForm = ({ post }) => {
     <Form onFinish={onsubmitComment}>
       <Form.Item style={{ position: 'relative', margin: 0 }}>
         <Input.TextArea rows={3} value={commentText} onChange={onChangecommentText} />
-        <Button style={{ position: 'absolute', bottom: -40, right: 0, zIndex: 1 }} type="primary" htmlType="submit">
+        <Button
+          style={{ position: 'absolute', bottom: -40, right: 0, zIndex: 1 }}
+          type="primary"
+          htmlType="submit"
+        >
           삐약
         </Button>
       </Form.Item>

@@ -1,5 +1,5 @@
-import { all, delay, fork, put, takeLatest, throttle } from 'redux-saga/effects';
-import shortId from 'shortid';
+import { all, call, delay, fork, put, takeLatest, throttle } from 'redux-saga/effects';
+import axios from 'axios';
 
 import {
   ADD_POST_REQUEST,
@@ -14,7 +14,6 @@ import {
   LOAD_POSTS_REQUEST,
   LOAD_POSTS_SUCCESS,
   LOAD_POSTS_FAILURE,
-  generateDummyPost,
 } from '../reducers/post';
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from '../reducers/user';
 
@@ -28,7 +27,6 @@ function* loadPosts() {
     yield delay(1000);
     yield put({
       type: LOAD_POSTS_SUCCESS,
-      data: generateDummyPost(10),
     });
   } catch (err) {
     console.error(err);
@@ -39,25 +37,23 @@ function* loadPosts() {
   }
 }
 
-// function addPostAPI() {
-//   return axios.post('/api/post');
-// }
+function addPostAPI(data) {
+  return axios.post('/post', { content: data });
+  /* Backend에서 req.body.***에서 넘어오는 데이터의 이름이 없었으므로
+ mainPosts에서 우리가 사전에 약속한 json 속성 content를 data의 속성명으로 줍니다.
+ */
+}
 
 function* addPost(action) {
   try {
-    // const result = yield call(addPostAPI, action.data);
-    yield delay(1000);
-    const id = shortId.generate();
+    const result = yield call(addPostAPI, action.data);
     yield put({
       type: ADD_POST_SUCCESS,
-      data: {
-        id,
-        content: action.data,
-      },
+      data: result.data,
     });
     yield put({
       type: ADD_POST_TO_ME,
-      data: id,
+      data: result.data.id,
     });
   } catch (err) {
     console.error(err);
@@ -93,17 +89,16 @@ function* removePost(action) {
   }
 }
 
-// function addCommentAPI() {
-//   return axios.post('/api/comment');
-// }
+function addCommentAPI(data) {
+  return axios.post(`/post/${data.postId}/comment`, data);
+}
 
 function* addComment(action) {
   try {
-    // const result = yield call(addCommentAPI);
-    yield delay(1000);
+    const result = yield call(addCommentAPI, action.data);
     yield put({
       type: ADD_COMMENT_SUCCESS,
-      data: action.data,
+      data: result.data,
       /*
         action.data.content,
         action.data.postId,
