@@ -29,10 +29,16 @@ const tailLayout = {
 
 export default function Home() {
   const dispatch = useDispatch();
-  const { logInLoading, me } = useSelector((state) => state.user);
+  const { logInLoading, me, logInError } = useSelector((state) => state.user);
 
   const [email, onChangeEmail] = useinput('');
   const [password, onChangePassword] = useinput('');
+
+  useEffect(() => {
+    if (logInError) {
+      alert(logInError);
+    }
+  }, [logInError]);
 
   useEffect(() => {
     if (me) {
@@ -129,7 +135,7 @@ export default function Home() {
           </Form>
         </div>
         <div style={{ textAlign: 'center' }}>
-          <img src="../external/emoji.gif" width="400px" />
+          <img src="../external/emoji.gif" width="400px" alt="emoji" />
         </div>
       </div>
     </div>

@@ -18,35 +18,32 @@ import {
   UNFOLLOW_SUCCESS,
 } from '../reducers/user';
 
-// function loginAPI(data) {
-//   return axios.post('/api/login', data);
-// }
+function loginAPI(data) {
+  return axios.post('user/login', data);
+}
 
 function* logIn(action) {
   try {
-    console.log('saga login');
-    yield delay(1000);
-    // const result = yield call(loginAPI, action.data);
+    const result = yield call(loginAPI, action.data);
     yield put({
       type: LOG_IN_SUCCESS,
-      data: action.data,
+      data: result.data,
     });
   } catch (err) {
     yield put({
       type: LOG_IN_FAILURE,
-      // data: err.response.data,
+      data: err.response.data,
     });
   }
 }
 
-// function logOutAPI() {
-//   return axios.post('/api/logout');
-// }
+function logOutAPI() {
+  return axios.post('/user/logout');
+}
 
 function* logOut() {
   try {
-    yield delay(1000);
-    // const result = yield call(logOutAPI);
+    yield call(logOutAPI);
     yield put({
       type: LOG_OUT_SUCCESS,
     });
@@ -59,7 +56,7 @@ function* logOut() {
 }
 
 function signUpAPI(data) {
-  return axios.post('http://localhost:3065/user', data);
+  return axios.post('user', data);
   // data : { email: ... , password: ..., nickname: .... }
 }
 

@@ -749,7 +749,7 @@ const id = useSelector((state) => state.user.me?.id);
   />
 ```
 
-<p>antd에서는 'extra'라는 속성을 통해 image 위에 버튼을 구성할 수 있도록 제공하였다. 따라서 우리는 extra 속성에 id && (id가 존재하면) FollowButton을 누를 수 있는 로직을 제일 처음 짰다. 알다시피 post는 mainPosts를 매핑한 값인데, 이 값에 post와 user에 대한 전체적인 속성값이 들어잇으므로 props로 내려준다. follow request를 보내거나 unfollow request를 보내려면 누구를 팔로우하고 누구를 언팔로우할 지를 데이터로 보내줘야 하기 때문에 이때 post.User.id를 사용하여 데이터에 접근하여 saga에 전달한다.</p>
+<p>antd에서는 'extra'라는 속성을 통해 image 위에 버튼을 구성할 수 있도록 제공하였다. 따라서 우리는 extra 속성에 id && (id가 존재하면) FollowButton을 누를 수 있는 로직을 제일 처음 짰다. 알다시피 post는 mainPosts를 매핑한 값인데, 이 값에 post와 user에 대한 전체적인 속성값이 들어 있으므로 props로 내려준다. follow request를 보내거나 unfollow request를 보내려면 누구를 팔로우하고 누구를 언팔로우할 지를 데이터로 보내줘야 하기 때문에 이때 post.User.id를 사용하여 데이터에 접근하여 saga에 전달한다.</p>
 
 <p>FollowButton 컴포넌트의 로직은 다음과 같다.</p>
 
@@ -837,3 +837,104 @@ function* watchSignUp() {
 ```
 
 <p>watchSignUp을 통해 dispatch된 액션인 SIGN_UP_REQUEST 요청을 받은 뒤에, signUp 메소드를 실행시킵니다. signUp 액션은 파라미털 (action)을 받는데 이 액션은 SIGN_UP_REQUEST입니다. 안에 있는 data인 {email, password, nickname} 속성을 call 함수를 통해 signUpAPI로 보내고 결과값을 기다렸다 result에 저장합니다. 백엔드에서 라우팅 처리에 의해 결과값이 반환되고, 성공 시에 SIGN_UP_SUCCESS를 반환하면서 result.data(backend에서 json 형식으로 넘겨준 반환 값)를 함께 넘겨줍니다. 이 상황을 리듀서는 동시에 감지하고 있으며, 성공적으로 데이터가 넘어 왔을 때 signUpDone이 실행되면서 useEffect를 통해 감지되어 ('/') 로그인 페이지로 넘어가게 됩니다. </p>
+
+<h2>🌟 api로 실제 데이터를 통해 로그인하기 🌟</h2>
+
+<p>회원가입 로직을 바탕으로 우리는 컴포넌트에서 보내는 액션을 사가와 리듀서로 하여금 감지하고 서버로 보낸 뒤, 서버에서 판별한 결과 값을 다시 프론트에서 렌더링하는 과정을 살펴보았습니다. 이를 바탕으로 로그인로직을 구현해보겠습니다. </p>
+
+```js
+useEffect(() => {
+  if (me) {
+    alert('로그인 성공 메인페이지로 이동합니다!');
+    Router.replace('/main');
+  }
+}, [me]);
+
+const onSubmitForm = useCallback(() => {
+  dispatch(loginRequestAction({ email, password }));
+}, [email, password]);
+
+...
+
+ <Form
+      style={{ marginRight: 30 }}
+      {...layout}
+      name="basic"
+      initialValues={{ remember: true }}
+      onFinish={onSubmitForm}
+      />
+```
+
+<p>onSubmitForm은 form 태그의 onFinish 속성에 해당하는 상황에 발생됩니다. button 태그를 누르면 실행할 수 있도록 onFinish라는 속성을 이용합니다. loginRequestAction 함수는 다음과 같습니다.</p>
+
+```js
+export const loginRequestAction = (data) => {
+  return {
+    type: LOG_IN_REQUEST,
+    data, // email, password가 들어있음
+  };
+};
+```
+
+<p> LOG_IN_REQUEST 액션의 데이터에는 당연히 email과 password가 들어있겠죠? 이 LOG_IN_REQUEST를 사가에서 감지하고 서버로 action.data를 넘겨줍니다.</p>
+
+```js
+function loginAPI(data) {
+  return axios.post('user/login', data);
+}
+
+function* logIn(action) {
+  try {
+    const result = yield call(loginAPI, action.data);
+    yield put({
+      type: LOG_IN_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    yield put({
+      type: LOG_IN_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+...
+
+function* watchLogin() {
+  yield takeLatest(LOG_IN_REQUEST, logIn);
+}
+```
+
+<p>백엔드에서 어떤 일이 일어나는지 몰라도 괜찮습니다.(알면 좋아요) 프론트엔드에서는 백엔드에서 결과적으로 처리된 result를 다시 front에 컴포넌트로 반환해줍니다. 이때 리듀서도 동시에 결과에 따라 동작하겠죠?  </p>
+
+```js
+      case LOG_IN_SUCCESS:
+        draft.logInLoading = false;
+        draft.me = action.data;
+        draft.logInDone = true;
+        break;
+      case LOG_IN_FAILURE:
+        draft.logInLoading = false;
+        draft.logInError = action.error;
+        break;
+```
+
+<p>기존에 더미데이터를 통해 draft.me = dummyUser(action.data)를 넣어줬던 것과 다르게 실제 백엔드에서 처리한 data를 리듀서에 넣어줬습니다. 이제 데이터가 성공적으로 들어 있엇다면, pages/index에서 리듀서에 의해 logInDone=true 인 상황을 감지하고 routing을 통해 pages/main 으로 라우팅해줄 것입니다. 현재 우리는 회원가입을 통해 직접 정보를 입력해야지만 로그인을 할 수 있지만, 백엔드와의 작업을 통해 다양한 로그인 전략(strategy)를 짜서 '카카오로 로그인', '네이버로 로그인', '애플로 로그인' 등 다양한 로그인 방법을 추가할 수 있습니다.</p>
+
+<h2>🌟 axios로 baseURL 설정하기🌟</h2>
+<p> saga에서 서버로 데이터를 보낼 때, 우리는 프론트 서버에서 백엔드 서버로 데이터를 넘겨주는 것이기 때문에 cors를 지켜줘야 합니다. 그래서 프론트서버(3000)에서 백엔드 서버(3065)번으로 보내주기 위해서 api에 <b>return axios.post('http://localhost:3065/****', data);</b> 와 같은 형식으로 데이터를 보내주는 것을 알 수 있습니다. 그렇다면 모든 사가에서의 작업에 이런 localhost:3065를 붙여줘야 할까요? 우리는 axios 모듈을 통해 백엔드 포트번호를 사전에 지정해줄 수 있습니다. </p>
+
+```js
+📁 sagas/index.js
+
+import axios from 'axios'
+...
+axios.defaults.baseURL = 'http://localhost:3065';
+```
+
+<p>다음과 같이 axios.defaults.baseURL을 통해 같은 로컬 내의 3065번 포트로 보내겠다는 약속을 해줬습니다. 그렇기 때문에 앞으로 saga에서 보내는 작업에서 포트번호를 생략할 수 있습니다.</p>
+
+```js
+function loginAPI(data) {
+  return axios.post('user/login', data);
+}
+```
