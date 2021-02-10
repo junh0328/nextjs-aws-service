@@ -298,15 +298,15 @@ const PostCard = ({ post }) => {
       <Card
         cover={post.Images[0] && <PostImages images={post.images} />}
         actions={[
-          <RetweetOutlined key="retweet" />,
-          <HeartOutlined key="heart" />,
-          <CommentOutlined key="commet" />,
+          <RetweetOutlined key='retweet' />,
+          <HeartOutlined key='heart' />,
+          <CommentOutlined key='commet' />,
           <Popover
-            key="more"
+            key='more'
             content={
               <Button.Group>
                 {id && post.User.id === id ? (
-                  ((<Button>수정</Button>), (<Button type="danger">삭제</Button>))
+                  ((<Button>수정</Button>), (<Button type='danger'>삭제</Button>))
                 ) : (
                   <Button>신고</Button>
                 )}
@@ -628,10 +628,7 @@ useEffect(() => {
 useEffect(() => {
   function onScroll() {
     // console.log(window.scrollY, document.documentElement.clientHeight, document.documentElement.scrollHeight);
-    if (
-      window.scrollY + document.documentElement.clientHeight >
-      document.documentElement.scrollHeight - 300
-    ) {
+    if (window.scrollY + document.documentElement.clientHeight > document.documentElement.scrollHeight - 300) {
       if (hasMorePosts && !loadPostsLoading) {
         dispatch({
           type: LOAD_POSTS_REQUEST,
@@ -1038,3 +1035,15 @@ axios.defaults.withCredentials = true;
 <p>이제 정상적으로 데이터베이스에 저장되는 addPost를 작성할 수 있습니다. addComment는 잠시 볼 수 없는 상태입니다. 기존에 useEffect를 통해 dummyPosts를 가져왔었지만, 실제 데이터를 집어 넣으면서 사가에서 dummyPost()를 넘겨주지 않았기 때문에, post.User.nickname이 빈 배열 상태로 존재합니다. loadPosts 액션을 구현하면서 바꿀 예정이므로 후에 결과물을 확인할 것입니다.</p>
 
 <h2>🌟 api로 실제 데이터를 통해 게시글, 댓글 가져오기 🌟</h2>
+
+<p>우리는 이제 더미데이터가 아닌 실제 DB에 저장된 데이터를 불러오기 위한 작업을 시작합니다. 기존의 dummy***으로 작성했던 더미 유저와, 더미 게시글(faker)는 주석처리하거나 지워도 무방합니다.</p>
+
+```js
+// 제일 처음 mainPosts가 빈 배열일 때 실행됨
+useEffect(() => {
+  dispatch({ type: LOAD_USER_REQUEST });
+  dispatch({ type: LOAD_POSTS_REQUEST });
+}, []);
+```
+
+<p>우선 useEffect()를 통해 아무것도 없는 상황일 때 두 가지 액션을 dispatch 합니다. 두 액션에는 data를 따로 보내줄 필요가 없는데, LOAD_USER_REQUEST의 경우 이미 로그인 하면서 데이터를 서버에서 확인을 했기 때문이고, LOAD_POSTS_REQYEST는 권한관 상관없이 사전에 작성되어 db에 저장된 게시글을 불러오는 액션이기 때문입니다. </p>

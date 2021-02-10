@@ -18,7 +18,7 @@ import {
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from '../reducers/user';
 
 function loadPostsAPI() {
-  return axios.get('/post');
+  return axios.get('/posts');
 }
 
 function* loadPosts() {
@@ -83,6 +83,7 @@ function* removePost(action) {
       data: action.data,
     });
   } catch (err) {
+    console.error(err);
     yield put({
       type: REMOVE_POST_FAILURE,
       data: err.response.data,
@@ -108,6 +109,7 @@ function* addComment(action) {
       */
     });
   } catch (err) {
+    console.error(err);
     yield put({
       type: ADD_COMMENT_FAILURE,
       data: err.response.data,
@@ -130,10 +132,5 @@ function* watchAddComment() {
 }
 
 export default function* postSaga() {
-  yield all([
-    fork(watchloadPosts),
-    fork(watchAddPost),
-    fork(watchAddComment),
-    fork(watchRemovePost),
-  ]);
+  yield all([fork(watchloadPosts), fork(watchAddPost), fork(watchAddComment), fork(watchRemovePost)]);
 }
