@@ -14,6 +14,12 @@ import {
   LOAD_POSTS_REQUEST,
   LOAD_POSTS_SUCCESS,
   LOAD_POSTS_FAILURE,
+  LIKE_POST_REQUEST,
+  LIKE_POST_SUCCESS,
+  LIKE_POST_FAILURE,
+  UNLIKE_POST_REQUEST,
+  UNLIKE_POST_SUCCESS,
+  UNLIKE_POST_FAILURE,
 } from '../reducers/post';
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from '../reducers/user';
 
@@ -116,6 +122,49 @@ function* addComment(action) {
     });
   }
 }
+
+function likePostAPI(data) {
+  return axios.patch(`/post/${data}/like`, data);
+}
+
+function* likePost(action) {
+  try {
+    const result = yield call(likePostAPI, action.data);
+    yield put({
+      type: LIKE_POST_SUCCESS,
+      data: result.data, // backend 처리에 의해 PostId 와 UserId가 들어있음 >> 리듀서 draft에서 이 result.data를 처리할 것
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LIKE_POST_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+
+function unlikePostAPI(data) {
+  return axios.delete(`/post/${data}/like`);
+}
+
+function* unlikePost(action) {
+  try {
+    console.log('start unlikepost api!');
+    const result = yield call(unlikePostAPI, action.data);
+    yield put({
+      type: UNLIKE_POST_SUCCESS,
+      data: result.data, // backend 처리에 의해 PostId 와 UserId가 들어있음 >> 리듀서 draft에서 이 result.data를 처리할 것
+    });
+    console.log('end! unlikepost api!');
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: UNLIKE_POST_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+
 function* watchloadPosts() {
   yield takeLatest(LOAD_POSTS_REQUEST, loadPosts);
 }
@@ -130,7 +179,20 @@ function* watchRemovePost() {
 function* watchAddComment() {
   yield takeLatest(ADD_COMMENT_REQUEST, addComment);
 }
+function* watchLikePost() {
+  yield takeLatest(LIKE_POST_REQUEST, likePost);
+}
+function* watchUnLikePost() {
+  yield takeLatest(UNLIKE_POST_REQUEST, unlikePost);
+}
 
 export default function* postSaga() {
-  yield all([fork(watchloadPosts), fork(watchAddPost), fork(watchAddComment), fork(watchRemovePost)]);
+  yield all([
+    fork(watchloadPosts),
+    fork(watchAddPost),
+    fork(watchAddComment),
+    fork(watchRemovePost),
+    fork(watchLikePost),
+    fork(watchUnLikePost),
+  ]);
 }

@@ -1047,3 +1047,141 @@ useEffect(() => {
 ```
 
 <p>우선 useEffect()를 통해 아무것도 없는 상황일 때 두 가지 액션을 dispatch 합니다. 두 액션에는 data를 따로 보내줄 필요가 없는데, LOAD_USER_REQUEST의 경우 이미 로그인 하면서 데이터를 서버에서 확인을 했기 때문이고, LOAD_POSTS_REQYEST는 권한관 상관없이 사전에 작성되어 db에 저장된 게시글을 불러오는 액션이기 때문입니다. </p>
+
+<h2>🌟 api로 실제 데이터를 통해 좋아요, 좋아요 취소 구현하기 🌟</h2>
+
+<p>기존에 useState를 통해 [liked, setLiked] = useState(false)를 통해 버튼의 활성화 <->비활성화만 가늠했던 liked 변수를 backend와 데이터를 송수신할 수 있도록 만들어 보겠습니다. 첫 번째로 토글 기능으로는 더이상 구현할 수 없기 때문에 onClick시 메소드를 onLike와 onUnLike 두개로 만들어 주었습니다. 각각 코드는 다음과 같습니다. </p>
+
+```js
+const onLike = useCallback(() => {
+  dispatch({
+    type: LIKE_POST_REQUEST,
+    data: post.id,
+  });
+}, []);
+
+const onUnLike = useCallback(
+  () =>
+    dispatch({
+      type: UNLIKE_POST_REQUEST,
+      data: post.id,
+    }),
+  []
+);
+```
+
+<p>data는 모두 해당 글(post)에 '좋아요'를 누르는 기능이기 때문에 post(게시글).id(아이디)를 action.data로 넘겨 주었습니다.</p>
+
+```js
+function likePostAPI(data) {
+  return axios.patch(`/post/${data}/like`, data);
+}
+
+function* likePost(action) {
+  try {
+    const result = yield call(likePostAPI, action.data);
+    yield put({
+      type: LIKE_POST_SUCCESS,
+      data: result.data, // backend 처리에 의해 PostId 와 UserId가 들어있음 >> 리듀서 draft에서 이 result.data를 처리할 것
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LIKE_POST_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+
+function unlikePostAPI(data) {
+  return axios.delete(`/post/${data}/like`);
+}
+
+function* unlikePost(action) {
+  try {
+    const result = yield call(unlikePostAPI, action.data);
+    yield put({
+      type: UNLIKE_POST_SUCCESS,
+      data: result.data, // backend 처리에 의해 PostId 와 UserId가 들어있음 >> 리듀서 draft에서 이 result.data를 처리할 것
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: UNLIKE_POST_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+```
+
+<p>이번에튼 RESTAPI 중에서 patch와 delete를 사용했는데, db에서 한 속성의 속성값을 변경할 때 사용하는 것이 patch입니다. 또한 그렇게 추가했던 속성값을 delete로 지워줄 수도 있고,</p>
+
+```js
+function unlikePostAPI(data) {
+  return axios.patch(`/post/${data}/unlike`);
+}
+```
+
+<p>와 같은 형태로 같이 patch로 unlike 관리를 할 수도 있습니다. 우리는 data를 보낼 때, post.id(게시글을 판별할 수 있는 기본 키값)을 action.data로 보냈습니다. 하지만, 이러한 수송신에 있어서 백엔드의 라우팅기능이 어떻게 처리되는지 알아볼 필요가 있습니다. 데이터가 어떻게 가공되어 프론트로 전달되는 지 알면 이 데이터를 reducer에서 알맞게 사용할 수 있겠죠? 해당 라우팅 처리는 다음과 같습니다. </p>
+
+```js
+// 게시글 좋아요
+router.patch('/:postId/like', isLoggedIn, async (req, res, next) => {
+  // PATCH /post/1/like  >> ${data} = post.id
+  try {
+    const post = await Post.findOne({ where: { id: req.params.postId } });
+    if (!post) {
+      return res.status(403).send('게시글이 존재하지 않습니다.');
+    }
+    // post가 있다면, models/post의 관계에 따라 나타낸다
+    await post.addLikers(req.user.id);
+    res.json({ PostId: post.id, UserId: req.user.id }); // sagas/post 에서 likePost 의 data : result.data로 PostId와 UserId가 넘어간다.
+  } catch (error) {
+    console.error(error);
+    return next(error);
+  }
+});
+```
+
+<p>우리가 봐야할 부분은 await.post.addLikers(req.user.id) 부분입니다. Post 모델(db)에서 사용자로부터 넘겨저 온 postId가 있는지 찾고, 있다면 post변수에 저장하도록 하였습니다. 이 post 변수에 요청을 보낸 user의 id 즉, 해당 게시글에 좋아요를 누른 사람의 id를 addLikers()메소드를 통해 추가한 것입니다. 이 addLikers 메소드는 시퀄라이즈의 관계에 의해 생기게 됩니다. </p>
+
+```js
+db.Post.belongsToMany(db.User, { through: 'Like', as: 'Likers' }); // 사용자와 게시글의 좋아요 관계, 왜 복수인가? belongsToMany 이므로
+```
+
+<p>add 뿐만아니라, get, set 등 다양한 메소드가 있지만, 프론트에서 주목할 부분은 아닙니다. 그래도 왜 봐야 하나면, 우리는 post.id에 좋아요 요청만 했는데 백엔드에서 사용자의 id를 post 테이블에 저장해주고, 결과물을 json 형식으로 PostId와 UserId로 넘겨주기 때문입니다. 이 PostId와 UserId를 통해 reducer에서 추가해줘야 합니다. </p>
+
+```js
+case LIKE_POST_SUCCESS: {
+        const post = draft.mainPosts.find((v) => v.id === action.data.PostId);
+        post.Likers.push({ id: action.data.UserId });
+        draft.likePostLoading = false;
+        draft.likePostDone = true;
+        break;
+      }
+...
+
+case UNLIKE_POST_SUCCESS: {
+        const post = draft.mainPosts.find((v) => v.id === action.data.PostId);
+        post.Likers = post.Likers.filter((v) => v.id !== action.data.UserId);
+        draft.unlikePostLoading = false;
+        draft.unlikePostDone = true;
+        break;
+      }
+```
+
+<p>백엔드에서 반환 받은 action.data 안에는 PostId와 UserId가 들어있는데, 협업과정에서 사전에 정하지 않는다면 위와 같이 표현하기 어려울 것입니다. 우리는 단순히 프론트엔드만을 사용하여 더미데이터로 정보를 나타내는 것이 아닌, 실제 데이터를 관리하기 위해 위 프로젝트를 진행하기 때문에, '백엔드에서 어떤 데이터를 넘겨줄거야 그걸 쓰면 되' 와 같은 과정을 알아둬야 합니다.</p>
+
+<p>그럼 결과적으로 화면에는 어떻게 보여줘야 할까요? '기존에 useState로 관리했던 liked를 어떻게 변경해야 하나요?' 라는 궁금증이 생깁니다. 결과는 다음과 같습니다.</p>
+
+```js
+📁components/PostCard
+
+const PostCard = ({ post }) => {
+    ...
+  const liked = post.Likers.find((v) => v.id === id);
+```
+
+<p>post는 mainPosts를 매핑한 것입니다. 따라서 실제 db에 들어있는 데이터가 들어있겠죠? 그 post에 db에서 시퀄라이즈 관계에 의해 생성된 Likers에 접근하여 사용자의 id가 Likers 테이블 안에 좋아요를 누른 id로 포함되어 있는 지 찾고 그 여부를 liked 에 저장합니다. 이 liked를 통해 만약 없다면?(좋아요를 누르지 않은 사람) 좋아요를 누를 수 있도록 보여주고 liked에 있다면?(좋아요를 눌러 db에 사용자 id가 남겨진 사람) 좋아요 취소를 누를 수 있도록 보여주면 됩니다.</p>
+
+<p>이번 '좋아요', '좋아요 취소' 기능은 백엔드와의 사전 기획을 통해 정한 변수명들이 주요하게 들어가는 기능입니다. 따라서 후에 기획을 할 때 이러한 경험을 되살려 작업한다면 결과물을 낼 때 오류를 줄일 수 있을 것입니다.</p>

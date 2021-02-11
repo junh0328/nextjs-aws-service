@@ -34,10 +34,7 @@ const main = () => {
   useEffect(() => {
     function onScroll() {
       // console.log(window.scrollY, document.documentElement.clientHeight, document.documentElement.scrollHeight);
-      if (
-        window.scrollY + document.documentElement.clientHeight >
-        document.documentElement.scrollHeight - 300
-      ) {
+      if (window.scrollY + document.documentElement.clientHeight > document.documentElement.scrollHeight - 300) {
         if (hasMorePosts && !loadPostsLoading) {
           dispatch({
             type: LOAD_POSTS_REQUEST,
@@ -53,8 +50,8 @@ const main = () => {
   return (
     <>
       <Head>
-        <meta charSet="utf-8" />
-        <link rel="icon" href="/favicon.png" />
+        <meta charSet='utf-8' />
+        <link rel='icon' href='/favicon.png' />
         <title>Juneed | main</title>
       </Head>
       <AppLayout>
