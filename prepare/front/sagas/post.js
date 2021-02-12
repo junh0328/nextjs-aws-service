@@ -1,4 +1,4 @@
-import { all, call, delay, fork, put, takeLatest, throttle } from 'redux-saga/effects';
+import { all, call, fork, put, takeLatest, throttle } from 'redux-saga/effects';
 import axios from 'axios';
 
 import {
@@ -71,18 +71,16 @@ function* addPost(action) {
   }
 }
 
-// function removePostAPI() {
-//   return axios.delete('/api/post');
-// }
+function removePostAPI(data) {
+  return axios.delete(`/post/${data}`);
+}
 
 function* removePost(action) {
   try {
-    // const result = yield call(removePostAPI);
-    yield delay(1000);
+    const result = yield call(removePostAPI, action.data);
     yield put({
-      // post 리듀서 살태와 user 리듀서 상태를 동시에 바꿔줄 수 없으므로 액션을 두번 실행하여 바꿔준다.
       type: REMOVE_POST_SUCCESS,
-      data: action.data,
+      data: result.data,
     });
     yield put({
       type: REMOVE_POST_OF_ME,

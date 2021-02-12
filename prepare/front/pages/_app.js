@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import '../styles/globals.css';
 import '../styles/random.css';
 import 'antd/dist/antd.css';

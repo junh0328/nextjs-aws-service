@@ -2,7 +2,13 @@
 import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Card, Popover, Avatar, List, Comment } from 'antd';
-import { CommentOutlined, EllipsisOutlined, HeartOutlined, HeartTwoTone, RetweetOutlined } from '@ant-design/icons';
+import {
+  CommentOutlined,
+  EllipsisOutlined,
+  HeartOutlined,
+  HeartTwoTone,
+  RetweetOutlined,
+} from '@ant-design/icons';
 
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -29,14 +35,12 @@ const PostCard = ({ post }) => {
     });
   }, []);
 
-  const onUnLike = useCallback(
-    () =>
-      dispatch({
-        type: UNLIKE_POST_REQUEST,
-        data: post.id,
-      }),
-    []
-  );
+  const onUnLike = useCallback(() => {
+    dispatch({
+      type: UNLIKE_POST_REQUEST,
+      data: post.id,
+    });
+  }, []);
 
   const onToggleComment = useCallback(() => {
     setCommentForemOpened((prev) => !prev);
@@ -56,21 +60,21 @@ const PostCard = ({ post }) => {
         extra={id && <FollowButton post={post} />}
         cover={post.Images[0] && <PostImages images={post.Images} />}
         actions={[
-          <RetweetOutlined key='retweet' />,
+          <RetweetOutlined key="retweet" />,
           liked ? (
-            <HeartTwoTone twoToneColor='#eb2f96' key='heart' onClick={onUnLike} />
+            <HeartTwoTone twoToneColor="#eb2f96" key="heart" onClick={onUnLike} />
           ) : (
-            <HeartOutlined key='heart' onClick={onLike} />
+            <HeartOutlined key="heart" onClick={onLike} />
           ),
-          <CommentOutlined key='commet' onClick={onToggleComment} />,
+          <CommentOutlined key="commet" onClick={onToggleComment} />,
           <Popover
-            key='more'
+            key="more"
             content={
               <Button.Group>
                 {id && post.User.id === id ? (
                   <>
                     {!post.RetweetId && <Button>수정</Button>}
-                    <Button type='danger' onClick={onRemovePost}>
+                    <Button type="danger" onClick={onRemovePost}>
                       삭제
                     </Button>
                   </>
@@ -95,7 +99,7 @@ const PostCard = ({ post }) => {
           <CommentForm post={post} />
           <List
             header={`${post.Comments.length}개의 댓글`}
-            itemLayout='horizontal'
+            itemLayout="horizontal"
             dataSource={post.Comments}
             renderItem={(item) => (
               <li>
@@ -125,7 +129,6 @@ PostCard.propTypes = {
     Likers: PropTypes.arrayOf(PropTypes.object),
     RetweetId: PropTypes.number,
     Retweet: PropTypes.objectOf(PropTypes.any),
-    Likers: PropTypes.arrayOf(PropTypes.object),
   }).isRequired,
 };
 

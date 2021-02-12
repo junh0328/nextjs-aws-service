@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React, { useCallback, useEffect } from 'react';
 import Head from 'next/head';
 import { Form, Input, Button, Checkbox } from 'antd';
@@ -20,6 +21,7 @@ const layout = {
     span: 16,
   },
 };
+
 const tailLayout = {
   wrapperCol: {
     offset: 8,
