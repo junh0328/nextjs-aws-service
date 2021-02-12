@@ -1,12 +1,27 @@
-import React from 'react';
+/* eslint-disable react/jsx-wrap-multilines */
+/* eslint-disable no-empty */
+import React, { useEffect } from 'react';
 import { Button, Card, List } from 'antd';
 import { StopOutlined } from '@ant-design/icons';
 import propTypes from 'prop-types';
+import { useDispatch } from 'react-redux';
+import { LOAD_FOLLOWERS_REQUEST, LOAD_FOLLOWINGS_REQUEST } from '../reducers/user';
 
 const FollowList = ({ header, data }) => {
+  const dispatch = useDispatch();
   if (header === '팔로잉 목록') {
   } else if (header === '팔로워 목록') {
   }
+
+  useEffect(() => {
+    dispatch({
+      type: LOAD_FOLLOWINGS_REQUEST,
+    });
+    dispatch({
+      type: LOAD_FOLLOWERS_REQUEST,
+    });
+  }, []);
+
   return (
     <List
       style={{ marginBottom: 20 }}

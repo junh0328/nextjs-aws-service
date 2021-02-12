@@ -1,8 +1,8 @@
+/* eslint-disable react/require-default-props */
 import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import { PlusOutlined } from '@ant-design/icons';
 import ImagesZoom from './ImagesZoom';
-import styled from 'styled-components';
 
 const PostImages = ({ images }) => {
   const [showImageZoom, setShowImageZoom] = useState(false);

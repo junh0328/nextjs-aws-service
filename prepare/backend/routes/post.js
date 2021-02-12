@@ -56,7 +56,9 @@ router.post('/', isLoggedIn, upload.none(), async (req, res, next) => {
     if (req.body.image) {
       if (Array.isArray(req.body.image)) {
         // 이미지를 여러 개 올리면 image: [제로초.png , 부기초.png] >> 배열로 올라감
-        const images = await Promise.all(req.body.image.map((image) => Image.create({ src: image })));
+        const images = await Promise.all(
+          req.body.image.map((image) => Image.create({ src: image }))
+        );
         // 매핑하여 시퀄라이즈 테이블에 올려준다. 파일 주소는 db에 저장되고 파일 자체는 uploads 폴더에 저장됨
         await post.addImages(images);
       } else {
@@ -105,11 +107,17 @@ router.post('/images', isLoggedIn, upload.array('image'), async (req, res, next)
   res.json(req.files.map((v) => v.filename));
 });
 
+/* 
+여기서 파라미터로 받는 /:postId 는 models에서 belongsTo 관계에서 생기는 PostId가 아닌,
+프론트에서 json 형식의 data { postId: post.id }의 postId이므로 헷갈리면 안된다.
+시퀄라이즈에 의해 생성된 Id는 단어 앞이 대문자임을 명심 ㅎㅎ
+
+postId는 컴포넌트 <CommentForm/> 에서 ADD_COMMENT_REQUEST의 {data : .... } 데이터이다.
+*/
+
 // 특정 게시글에 댓글달기
 router.post('/:postId/comment', isLoggedIn, async (req, res, next) => {
   // POST /post/1/comment
-  console.log('req.params는 ?');
-  console.log(req.params);
   try {
     const post = await Post.findOne({
       where: { id: req.params.postId },
@@ -134,7 +142,7 @@ router.post('/:postId/comment', isLoggedIn, async (req, res, next) => {
     res.status(201).json(fullComment);
   } catch (error) {
     console.error(error);
-    return next(error);
+    next(error);
   }
 });
 // 게시글 좋아요

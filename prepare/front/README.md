@@ -1252,7 +1252,7 @@ const onRemovePost = useCallback(() => {
 
 <img  width="80%" src="./images/removePostAPI.png" title="removePostAPI">
 
-<p>기존과 같은 흐름이지만 이번에는 이미지로 만들어 보았습니다.</p>
+<p>기존과 같은 흐름이지만 이번에는 비교를 위해 코드를 이미지로 만들어 보았습니다.</p>
 
 ```js
 // 게시글 삭제
@@ -1295,6 +1295,8 @@ const onsubmit = useCallback(() => {
   dispatch({
     type: CHANGE_NICKNAME_REQUEST,
     data: nickname,
+      // nickname은 useState로 관리되는 상태 값이기 때문에 정확히 data를 어떤 속성으로 전달할 지 정해주지 않았다.
+      // 따라서 사가에서 { nickname : data } 로 api 요청시에 action.data 값을 명확히 지정해 주었다.
   });
 }, [nickname]);
 ...
@@ -1314,6 +1316,7 @@ const onsubmit = useCallback(() => {
 ```js
 function changeNicknameAPI(data) {
   return axios.patch('/user/nickname', { nickname: data });
+  // 프론트에서 action.data를 백엔드에 전달하는 과정에서 json 형식의 키,값을 따로 지정해주지 못했기 때문에 data의 키를 nickname으로 주었다.
 }
 
 function* changeNickname(action) {
@@ -1339,7 +1342,7 @@ router.patch('/nickname', isLoggedIn, async (req, res, next) => {
   try {
     await User.update(
       {
-        nickname: req.body.nickname, // 프론트에서 제공받은 닉네임
+        nickname: req.body.nickname, // 프론트에서 제공받은 닉네임 { nickname : data }
       },
       {
         where: { id: req.user.id },
@@ -1362,3 +1365,95 @@ router.patch('/nickname', isLoggedIn, async (req, res, next) => {
       draft.changeNicknameDone = true;
       break;
 ```
+
+<h2>🌟 api로 실제 데이터를 통해 팔로우 언팔로우 구현하기 🌟</h2>
+
+<p>기존의 dummyUser로 진행했던 부분과 달라지는 부분은 서버로 api를 요청할 때 보내는 파라미터 부분과 서버에서 json으로 넘겨주는 결과 값을 reducer에서 적용하는 부분밖에 없으므로 빠르게 코드 리뷰를 해보겠습니다.</p>
+
+```js
+const onFollowButton = useCallback(() => {
+  if (isFollowing) {
+    dispatch({
+      type: UNFOLLOW_REQUEST,
+      data: post.User.id,
+    });
+  } else {
+    dispatch({
+      type: FOLLOW_REQUEST,
+      data: post.User.id,
+    });
+  }
+}, [isFollowing]);
+```
+
+```js
+function followAPI(data) {
+  return axios.patch(`/user/${data}/follow`);
+}
+
+function* follow(action) {
+  try {
+    const result = yield call(followAPI, action.data);
+    yield put({
+      type: FOLLOW_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    yield put({
+      type: FOLLOW_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+```
+
+<p>unfollow 부분은 같은 api 요청에서 axios.patch > axios.delete로 쿼리를 지우는 방식을 택했습니다.</p>
+
+```js
+// 팔로우하기
+router.patch('/:userId/follow', isLoggedIn, async (req, res, next) => {
+  //PATCH /user/1/follow  1번 유저를 팔로우 하겠다.
+  try {
+    const user = await User.findOne({ where: { id: req.params.userId } });
+    if (!user) {
+      res.status(403).send('존재하지 않는 사람을 팔로우하고 계시네요?');
+    }
+    await user.addFollowers(req.user.id);
+    // 내가 그사람의 팔로워가 되는 것이므로 넘겨받은 유저(팔로우할 아이디)에 팔로워로 추가되는 것이다.
+    res.status(200).json({ UserId: parseInt(req.params.userId, 10) });
+  } catch (error) {
+    console.error(error);
+    return next(error);
+  }
+});
+```
+
+<p>리듀서에서는 json 형식으로 백엔드에서 내려 받은 UserId를 사용하여 state를 변경해 줍니다.</p>
+
+```js
+case FOLLOW_SUCCESS:
+        draft.followLoading = false;
+        draft.me.Followings.push({ id: action.data.UserId });
+        draft.followDone = true;
+        break;
+```
+
+<p>기존 더미데이터 작업과 달라진 점은 action.data 뒤에 UserId를 붙여준 것인데, 더미로 전달할 경우 delay() 메소드만으로 데이터를 받아오는 작업 없이 무조건 성공처리를 하여 넘겨줬기 때문에 action.data.****가 필요하지 않았습니다. 하지만 이제는 백엔드서버와의 소통을 통해 결과값을 내려받으므로 result.data(UserId)를 리듀서에 정확히 적어줘야 합니다.</p>
+
+<p>자신도 팔로우 <-> 언팔로우 버튼이 보이던 모습을 변경시켜 주었습니다.</p>
+
+```js
+📁components/FollowButton
+
+...
+
+  if (post.User.id === me.id) {
+    return null;
+  }
+```
+
+<p>🌟 return 문이 들어간 문장은 더이상 그 밑에 코드를 실행시키지 않기 때문에 가장 마지막에 써줘야 합니다. 🌟</p>
+
+<h2>🌟 api로 실제 데이터를 통해 팔로워 팔로잉 목록 불러오기 🌟</h2>
+
+<p>우리 서비스에서 로그인이 되었다는 가정하에, profile 페이지로 접근하였을 때 me 데이터에 의해 나의 following followers를 불러올 수 있습니다. 지금까지는 더미 데이터로 직접 id와 nickname을 입력하여 팔로잉 팔로워를 보여주었다면 이제는 우리가 앞서 만들 동작(팔로잉)에 의해 db에 저장된 me의 팔로잉 팔로워를 불러올 것입니다.</p>

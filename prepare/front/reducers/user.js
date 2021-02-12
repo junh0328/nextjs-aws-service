@@ -32,6 +32,14 @@ const initialState = {
   unfollowDone: false, // 언팔로우 성공
   unfollowError: null, // 언팔로우 실패
 
+  loadFollowingsLoading: false, // 팔로잉 목록 가져오기 시도 중
+  loadFollowingsDone: false, // 팔로잉 목록 가져오기 성공
+  loadFollowingsError: null, // 팔로잉 목록 가져오기 실패
+
+  loadFollowersLoading: false, // 팔로워 목록 가져오기 시도 중
+  loadFollowersDone: false, // 팔로워 목록 가져오기 성공
+  loadFollowersError: null, // 팔로워 목록 가져오기 실패
+
   me: null,
 };
 
@@ -62,6 +70,14 @@ export const FOLLOW_FAILURE = 'FOLLOW_FAILURE';
 export const UNFOLLOW_REQUEST = 'UNFOLLOW_REQUEST';
 export const UNFOLLOW_SUCCESS = 'UNFOLLOW_SUCCESS';
 export const UNFOLLOW_FAILURE = 'UNFOLLOW_FAILURE';
+
+export const LOAD_FOLLOWINGS_REQUEST = 'LOAD_FOLLOWINGS_REQUEST';
+export const LOAD_FOLLOWINGS_SUCCESS = 'LOAD_FOLLOWINGS_SUCCESS';
+export const LOAD_FOLLOWINGS_FAILURE = 'LOAD_FOLLOWINGS_FAILURE';
+
+export const LOAD_FOLLOWERS_REQUEST = 'LOAD_FOLLOWERS_REQUEST';
+export const LOAD_FOLLOWERS_SUCCESS = 'LOAD_FOLLOWERS_SUCCESS';
+export const LOAD_FOLLOWERS_FAILURE = 'LOAD_FOLLOWERS_FAILURE';
 
 // 게시물을 등록/삭제할 때 user reducer에도 정보를 추가하고 싶을 경우 userReducer에서 액션을 만들어주면 된다.
 export const ADD_POST_TO_ME = 'ADD_POST_TO_ME';
@@ -168,7 +184,7 @@ const reducer = (state = initialState, action) =>
         break;
       case FOLLOW_SUCCESS:
         draft.followLoading = false;
-        draft.me.Followings.push({ id: action.data });
+        draft.me.Followings.push({ id: action.data.UserId });
         draft.followDone = true;
         break;
       case FOLLOW_FAILURE:
@@ -182,7 +198,7 @@ const reducer = (state = initialState, action) =>
         break;
       case UNFOLLOW_SUCCESS:
         draft.unfollowLoading = false;
-        draft.me.Followings = draft.me.Followings.filter((v) => v.id !== action.data);
+        draft.me.Followings = draft.me.Followings.filter((v) => v.id !== action.data.UserId);
         draft.unfollowDone = true;
         break;
       case UNFOLLOW_FAILURE:
@@ -194,6 +210,34 @@ const reducer = (state = initialState, action) =>
         break;
       case REMOVE_POST_OF_ME:
         draft.me.Posts = draft.me.Posts.filter((v) => v.id !== action.data);
+        break;
+      case LOAD_FOLLOWINGS_REQUEST:
+        draft.loadFollowingsLoading = true;
+        draft.loadFollowingsDone = false;
+        draft.loadFollowingsError = action.error;
+        break;
+      case LOAD_FOLLOWINGS_SUCCESS:
+        draft.me.Followerings = action.data;
+        draft.loadFollowingsLoading = false;
+        draft.loadFollowingsDone = true;
+        break;
+      case LOAD_FOLLOWINGS_FAILURE:
+        draft.loadFollowingsLoading = false;
+        draft.loadFollowingsError = action.error;
+        break;
+      case LOAD_FOLLOWERS_REQUEST:
+        draft.loadFollowersLoading = true;
+        draft.loadFollowersDone = false;
+        draft.loadFollowersError = action.error;
+        break;
+      case LOAD_FOLLOWERS_SUCCESS:
+        draft.me.Followers = action.data;
+        draft.loadFollowersLoading = false;
+        draft.loadFollowersDone = true;
+        break;
+      case LOAD_FOLLOWERS_FAILURE:
+        draft.loadFollowersLoading = false;
+        draft.loadFollowersError = action.error;
         break;
       default:
         break;
