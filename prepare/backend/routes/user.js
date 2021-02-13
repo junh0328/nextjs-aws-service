@@ -8,7 +8,6 @@ const { isLoggedIn, isNotLoggedIn } = require('./middlewars');
 const router = express.Router();
 
 router.get('/', async (req, res, next) => {
-  // console.log(req.headers);
   //GET /user
   try {
     if (req.user) {
@@ -48,13 +47,21 @@ router.get('/', async (req, res, next) => {
 router.get('/followers', isLoggedIn, async (req, res, next) => {
   // GET /user/followers
   try {
-    const user = await User.findOne({ where: { id: req.user.id } });
+    const user = await User.findOne({
+      where: { id: req.user.id },
+      attributes: {
+        exclude: ['password'],
+      },
+    });
+    if (user) {
+      console.log('팔로워 유저 정보 확인!');
+    }
     if (!user) {
       res.status(403).send('존재하지 않는 사람을 찾으려고 하시네요?');
     }
-    const followers = await user.getFollowers({
-      limit: parseInt(req.query.limit, 10), // 최대 3명을 불러옴
-    });
+    const followers = await user.getFollowers();
+    console.log('팔로워는 : ');
+    console.log(followers);
     res.status(200).json(followers);
   } catch (error) {
     console.error(error);
@@ -66,15 +73,21 @@ router.get('/followers', isLoggedIn, async (req, res, next) => {
 router.get('/followings', isLoggedIn, async (req, res, next) => {
   // GET /user/followings
   try {
-    const user = await User.findOne({ where: { id: req.user.id } });
+    const user = await User.findOne({
+      where: { id: req.user.id },
+      attributes: {
+        exclude: ['password'],
+      },
+    });
+    if (user) {
+      console.log('팔로잉 유저 정보 확인!');
+    }
     if (!user) {
       res.status(403).send('존재하지 않는 사람을 찾으려고 하시네요?');
     }
-    const followings = await user.getFollowings({
-      limit: parseInt(req.query.limit, 10),
-    });
-    console.log('팔로윙 목록 전달! ');
+    console.log('팔로잉은 : ');
     console.log(followings);
+    const followings = await user.getFollowings();
     res.status(200).json(followings);
   } catch (error) {
     console.error(error);
