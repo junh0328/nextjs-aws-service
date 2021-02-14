@@ -1456,4 +1456,78 @@ case FOLLOW_SUCCESS:
 
 <h2>🌟 api로 실제 데이터를 통해 팔로워 팔로잉 목록 불러오기 🌟</h2>
 
-<p>우리 서비스에서 로그인이 되었다는 가정하에, profile 페이지로 접근하였을 때 me 데이터에 의해 나의 following followers를 불러올 수 있습니다. 지금까지는 더미 데이터로 직접 id와 nickname을 입력하여 팔로잉 팔로워를 보여주었다면 이제는 우리가 앞서 만들 동작(팔로잉)에 의해 db에 저장된 me의 팔로잉 팔로워를 불러올 것입니다.</p>
+<p>서비스에 사용자가 로그인이 하였다는 가정하에, profile 페이지로 접근하였을 때 me 데이터에 의해 나의 following followers를 불러올 수 있습니다. 지금까지는 더미 데이터로 직접 id와 nickname을 입력하여 팔로잉 팔로워를 보여주었다면 이제는 우리가 앞서 만들 동작(팔로잉)에 의해 db에 저장된 me의 팔로잉 팔로워를 불러올 것입니다.</p>
+
+```js
+useEffect(() => {
+  dispatch({
+    type: LOAD_FOLLOWINGS_REQUEST,
+  });
+  dispatch({
+    type: LOAD_FOLLOWERS_REQUEST,
+  });
+}, []);
+```
+
+<p>팔로잉 목록과 팔로우 목록을 각각 불러올 수 있도록 액션을 만들어 줍니다. 이번 작업은 프론트에서는 요청만 넘겨주고 사용자(me)에 들어있는 팔로잉 id와 팔로우 id에 따른 정보를 백엔드에서 불러주기 때문에 넘겨받는 데이터를 화면에 다시 보여질 수 있도록 객체를 잘 넘겨주는 것이 중요합니다.</p>
+
+```js
+// 팔로우 목록 불러오기
+router.get('/followers', isLoggedIn, async (req, res, next) => {
+  // GET /user/followers
+  try {
+    const user = await User.findOne({
+      where: { id: req.user.id },
+      attributes: {
+        exclude: ['password'],
+      },
+    });
+    if (user) {
+      console.log('팔로워 유저 정보 확인!');
+    }
+    if (!user) {
+      res.status(403).send('존재하지 않는 사람을 찾으려고 하시네요?');
+    }
+    const followers = await user.getFollowers();
+    console.log('팔로워는 : ');
+    console.log(followers);
+    res.status(200).json(followers);
+  } catch (error) {
+    console.error(error);
+    return next(error);
+  }
+});
+```
+
+<p>위 코드는 백엔드에서 프론트(사가)서버의 요청에 따라 데이터를 전달해주는 형식을 담은 코드입니다. 우리가 reducers를 통해 풀어줘야할 값은 당연히 res.status와 함께 json으로 넘겨받겠죠? 우리는 followers 변수를 통해 reducers에 나타내줄 것입니다.</p>
+
+```js
+case LOAD_FOLLOWERS_SUCCESS:
+        draft.loadFollowersLoading = false;
+        draft.me.Followers = action.data;
+        draft.loadFollowersDone = true;
+        break;
+```
+
+<p>me.Followers에 넘겨받은 action.data를 넘겨주었습니다. 우리는 이번 followers 데이터를 넘겨받을 때, 다양한 프로퍼티를 갖지 않고 단일 데이터만 넘겨 받았으므로 action.data.*** 형식이 아닌 action.data 만으로도 이것이 백엔드에서 넘겨 받은 followers 데이터임을 알 수 있습니다. 이해가 가지 않는다면, 위의 다양한 형식으로 받는 코드들을 참조해 주세요. </p>
+
+<h2>🌟 api로 실제 데이터를 통해 팔로워 팔로잉 유저 삭제하기 🌟</h2>
+
+<p>가면 갈수록 리듀서와 사가를 통한 비동기처리 과정에 익숙해지고 있습니다. 팔로잉 팔로워를 삭제하는 기능은 기존 팔로우,언팔로우 기능을 차용하기 때문에 어렵지 않습니다.</p>
+
+```js
+  const onCancel = (id) => () => {
+    if (header === '팔로잉 목록') {
+      dispatch({
+        type: UNFOLLOW_REQUEST,
+        data: id,
+      });
+    } else if (header === '팔로워 목록') {
+      dispatch({
+        type: REMOVE_FOLLOWER_REQUEST,
+        data: id,
+      });
+    }
+```
+
+<p>팔로잉 목록을 지울 때는 기존의 언팔로우를 채택하였고, 팔로워를 지울 때만 새로운 액션을 만들어 줬습니다. 백엔드에서도 같은 로직을 가지므로, 코드를 비교해보며 만들어보세요</p>

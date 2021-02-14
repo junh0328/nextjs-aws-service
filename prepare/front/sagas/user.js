@@ -22,6 +22,9 @@ import {
   LOG_OUT_FAILURE,
   LOG_OUT_REQUEST,
   LOG_OUT_SUCCESS,
+  REMOVE_FOLLOWER_FAILURE,
+  REMOVE_FOLLOWER_REQUEST,
+  REMOVE_FOLLOWER_SUCCESS,
   SIGN_UP_FAILURE,
   SIGN_UP_REQUEST,
   SIGN_UP_SUCCESS,
@@ -164,21 +167,20 @@ function* unfollow(action) {
   }
 }
 
-function loadFollowingsAPI(data) {
-  return axios.get('/user/followings', data);
+function removeFollowerAPI(data) {
+  return axios.delete(`/user/follower/${data}`);
 }
 
-function* loadFollowings(action) {
+function* removeFollower(action) {
   try {
-    const result = yield call(loadFollowingsAPI, action.data);
+    const result = yield call(removeFollowerAPI, action.data);
     yield put({
-      type: LOAD_FOLLOWINGS_SUCCESS,
+      type: REMOVE_FOLLOWER_SUCCESS,
       data: result.data,
     });
   } catch (err) {
-    console.error(err);
     yield put({
-      type: LOAD_FOLLOWINGS_FAILURE,
+      type: REMOVE_FOLLOWER_FAILURE,
       data: err.response.data,
     });
   }
@@ -199,6 +201,26 @@ function* loadFollowers(action) {
     console.error(err);
     yield put({
       type: LOAD_FOLLOWERS_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+
+function loadFollowingsAPI(data) {
+  return axios.get('/user/followings', data);
+}
+
+function* loadFollowings(action) {
+  try {
+    const result = yield call(loadFollowingsAPI, action.data);
+    yield put({
+      type: LOAD_FOLLOWINGS_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOAD_FOLLOWINGS_FAILURE,
       data: err.response.data,
     });
   }
@@ -228,6 +250,10 @@ function* watchUnfollow() {
   yield takeLatest(UNFOLLOW_REQUEST, unfollow);
 }
 
+function* watchRemoveFollower() {
+  yield takeLatest(REMOVE_FOLLOWER_REQUEST, removeFollower);
+}
+
 function* watchLoadFollowings() {
   yield takeLatest(LOAD_FOLLOWINGS_REQUEST, loadFollowings);
 }
@@ -248,6 +274,7 @@ export default function* userSaga() {
     fork(watchSignUp),
     fork(watchFollow),
     fork(watchUnfollow),
+    fork(watchRemoveFollower),
     fork(watchLoadFollowings),
     fork(watchLoadFollowers),
     fork(watchChangeNickname),
