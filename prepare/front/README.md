@@ -301,15 +301,15 @@ const PostCard = ({ post }) => {
       <Card
         cover={post.Images[0] && <PostImages images={post.images} />}
         actions={[
-          <RetweetOutlined key="retweet" />,
-          <HeartOutlined key="heart" />,
-          <CommentOutlined key="commet" />,
+          <RetweetOutlined key='retweet' />,
+          <HeartOutlined key='heart' />,
+          <CommentOutlined key='commet' />,
           <Popover
-            key="more"
+            key='more'
             content={
               <Button.Group>
                 {id && post.User.id === id ? (
-                  ((<Button>수정</Button>), (<Button type="danger">삭제</Button>))
+                  ((<Button>수정</Button>), (<Button type='danger'>삭제</Button>))
                 ) : (
                   <Button>신고</Button>
                 )}
@@ -635,10 +635,7 @@ useEffect(() => {
 useEffect(() => {
   function onScroll() {
     // console.log(window.scrollY, document.documentElement.clientHeight, document.documentElement.scrollHeight);
-    if (
-      window.scrollY + document.documentElement.clientHeight >
-      document.documentElement.scrollHeight - 300
-    ) {
+    if (window.scrollY + document.documentElement.clientHeight > document.documentElement.scrollHeight - 300) {
       if (hasMorePosts && !loadPostsLoading) {
         dispatch({
           type: LOAD_POSTS_REQUEST,
@@ -1726,3 +1723,60 @@ function* retweet(action) {
 <p>unshift 함수를 통해 mainPosts의 최 상단에 넘겨받은 결과물을 넣어주었습니다. 그럼 결과물을 볼까요?</p>
 <img  width="80%" src="./images/myFirstRetweet.png" title="myFirstRetweet">
 <p>리트윗이 성공적으로 되긴 했는데... 예상했던 content와는 다르게 'retweet'이라는 글자가 넘어왔습니다. 다른 게시물을 retweet 해도 똑같이 retweet이라는 content가 넘어옵니다. 왜 데이터가 이렇게 넘오는지 생각해보세요</p>
+
+<p>강의를 다 들어보니, 기존에 만들었던 로직들에는 문제가 없었습니다. 단지 📁components/PostCard 컴포넌트에서 성공적으로 리트윗된 게시글을 어떻게 표현할 것인지 설정을 안해줬기 때문이였습니다. 상대방의 게시글을 그대로 가져오면서 누가 리트윗했는지 리트윗한 사용자의 닉네임을 표시하는 antd 카드 사용하여 남은 로직을 완성해보겠습니다.</p>
+
+```js
+// 리트윗 게시글이 맞으면 전자 아니면 후자로 보여줘라
+{
+  post.RetweetId && post.Retweet ? (
+    <Card cover={post.Retweet.Images[0] && <PostImages images={post.Retweet.Images} />}>
+      <Card.Meta
+        avatar={<Avatar>{post.Retweet.User.nickname[0]}</Avatar>}
+        title={post.Retweet.User.nickname}
+        description={<PostCardContent postData={post.Retweet.content} />}
+      />
+    </Card>
+  ) : (
+    <Card.Meta
+      avatar={<Avatar>{post.User.nickname[0]}</Avatar>}
+      title={post.User.nickname}
+      description={<PostCardContent postData={post.content} />}
+    />
+  );
+}
+```
+
+<p>post 리듀서에 initialState로 제공되는 RetweetId와 Retweet을 통해 조건 문을 만듭니다. 
+1. RetweetId가 있니? 2.Retweet된 게시물이니? 이 두 조건이 참이면 앞의 컴포넌트를 렌더링합니다.</p>
+
+```js
+<Card cover={post.Retweet.Images[0] && <PostImages images={post.Retweet.Images} />}>
+  <Card.Meta
+    avatar={<Avatar>{post.Retweet.User.nickname[0]}</Avatar>}
+    title={post.Retweet.User.nickname}
+    description={<PostCardContent postData={post.Retweet.content} />}
+  />
+</Card>
+```
+
+<p>그렇지 않은 일반 게시물이면 뒤의 컴포넌트를 렌더링합니다.</p>
+
+```js
+<Card.Meta
+  avatar={<Avatar>{post.User.nickname[0]}</Avatar>}
+  title={post.User.nickname}
+  description={<PostCardContent postData={post.content} />}
+/>
+```
+
+<p>그리고 누가 리트윗했는지 알려주기 위해 antd에서 제공하는 card의 속성 중 하나인 'title'에 해당 조건을 추가합니다.</p>
+
+```js
+<Card
+  title={post.RetweetId ? `${post.User.nickname} 님이 리트윗하셨습니다.` : null}
+  ...
+  >
+```
+
+<p>리트윗 아이디가 존재한다면 해당 게시글 유저의 닉네임을 적어주는 로직입니다.</p>

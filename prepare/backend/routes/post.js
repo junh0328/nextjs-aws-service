@@ -56,9 +56,7 @@ router.post('/', isLoggedIn, upload.none(), async (req, res, next) => {
     if (req.body.image) {
       if (Array.isArray(req.body.image)) {
         // 이미지를 여러 개 올리면 image: [제로초.png , 부기초.png] >> 배열로 올라감
-        const images = await Promise.all(
-          req.body.image.map((image) => Image.create({ src: image }))
-        );
+        const images = await Promise.all(req.body.image.map((image) => Image.create({ src: image })));
         // 매핑하여 시퀄라이즈 테이블에 올려준다. 파일 주소는 db에 저장되고 파일 자체는 uploads 폴더에 저장됨
         await post.addImages(images);
       } else {
@@ -297,6 +295,7 @@ router.post('/:postId/retweet', isLoggedIn, async (req, res, next) => {
       RetweetId: retweetTargetId,
       content: 'retweet', // model 설정에서 allowNull(빈 값)을 넣지 못하게 만들었음..
     });
+    // 내가 어떤 게시글을 리트윗했는지 알려주는 변수 retweetWithPrevPost
     const retweetWithPrevPost = await Post.findOne({
       where: { id: retweet.id },
       include: [
@@ -334,9 +333,12 @@ router.post('/:postId/retweet', isLoggedIn, async (req, res, next) => {
           as: 'Likers',
           attributes: ['id'],
         },
-      ], // 댓글 부분은 게시글에서 바로 보여지는 부분이 아니기 때문에 추가적으로 로직이 길어진다면, routes를 새로 만들어 ('/comments'), (reducer, saga 포함) 그 행동을 할 때 {ex) loadComment} 등 을 만들어 분리해줘도 된다.
+      ],
+      // 댓글 부분은 게시글에서 바로 보여지는 부분이 아니기 때문에 추가적으로 로직이 길어진다면, routes를 새로 만들어 ('/comments'), (reducer, saga 포함) 그 행동을 할 때 {ex) loadComment} 등 을 만들어 분리해줘도 된다.
     });
     res.status(201).json(retweetWithPrevPost);
+    console.log('리트윗 정보는 ?');
+    console.log(retweetWithPrevPost);
   } catch (error) {
     console.error(error);
     return next(error);

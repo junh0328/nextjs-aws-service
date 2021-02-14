@@ -14,9 +14,15 @@ import { LOAD_USER_REQUEST } from '../reducers/user';
 
 const main = () => {
   const { me, logOutDone } = useSelector((state) => state.user);
-  const { mainPosts, hasMorePosts, loadPostsLoading } = useSelector((state) => state.post);
+  const { mainPosts, hasMorePosts, loadPostsLoading, retweetError } = useSelector((state) => state.post);
   // const mainPosts = useSelector((state)=> state.post.mainPosts) 구조분해를 하지 않으면 다음과 같이 표현할 수 있다.
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (retweetError) {
+      alert(retweetError);
+    }
+  }, [retweetError]);
 
   useEffect(() => {
     if (logOutDone) {
@@ -34,10 +40,7 @@ const main = () => {
   useEffect(() => {
     function onScroll() {
       // console.log(window.scrollY, document.documentElement.clientHeight, document.documentElement.scrollHeight);
-      if (
-        window.scrollY + document.documentElement.clientHeight >
-        document.documentElement.scrollHeight - 300
-      ) {
+      if (window.scrollY + document.documentElement.clientHeight > document.documentElement.scrollHeight - 300) {
         if (hasMorePosts && !loadPostsLoading) {
           dispatch({
             type: LOAD_POSTS_REQUEST,
@@ -53,8 +56,8 @@ const main = () => {
   return (
     <>
       <Head>
-        <meta charSet="utf-8" />
-        <link rel="icon" href="/favicon.png" />
+        <meta charSet='utf-8' />
+        <link rel='icon' href='/favicon.png' />
         <title>Juneed | main</title>
       </Head>
       <AppLayout>
