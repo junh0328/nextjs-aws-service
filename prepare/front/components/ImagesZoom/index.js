@@ -1,5 +1,6 @@
 /*
-ImagesZoom을 폴더로 만들고 index 페이지로 나눈 이유는 styled-components로 인해 코드의 양이 방대해지는데, 이를 style.js와 같이 분리하여 관리하기 위해
+ImagesZoom을 폴더로 만들고 index 페이지로 나눈 이유는 styled-components로 인해 코드의 양이 방대해지는데,
+이를 style.js와 같이 분리하여 관리하기 위해
 ImagesZoom을 페이지가 아닌 폴더로 만들었다. (css 파일을 없앴기 때문)
 가장 중요한 파일을 index.js로 만들고 스타일 페이지를 styles.js로 만들어 import <->export 시킨다.
 */
@@ -30,7 +31,7 @@ const ImagesZoom = ({ images, onClose }) => {
           >
             {images.map((v) => (
               <ImgWrapper key={v.src}>
-                <img src={v.src} alt={v.src} />
+                <img src={`http://localhost:3065/${v.src}`} alt={v.src} />
               </ImgWrapper>
             ))}
           </Slick>

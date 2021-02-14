@@ -1,3 +1,4 @@
+/* eslint-disable spaced-comment */
 import { all, call, fork, put, takeLatest, throttle } from 'redux-saga/effects';
 import axios from 'axios';
 
@@ -20,6 +21,9 @@ import {
   UNLIKE_POST_REQUEST,
   UNLIKE_POST_SUCCESS,
   UNLIKE_POST_FAILURE,
+  UPLOAD_IMAGES_REQUEST,
+  UPLOAD_IMAGES_SUCCESS,
+  UPLOAD_IMAGES_FAILURE,
 } from '../reducers/post';
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from '../reducers/user';
 
@@ -44,11 +48,36 @@ function* loadPosts() {
   }
 }
 
+function uploadImagesAPI(data) {
+  return axios.post('/post/images', data);
+  // form data는 {} json 형식으로 감싸는 게 아닌 data 그대로 들어가야 한다.
+}
+
+function* uploadImages(action) {
+  try {
+    const result = yield call(uploadImagesAPI, action.data);
+    yield put({
+      type: UPLOAD_IMAGES_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: UPLOAD_IMAGES_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+
 function addPostAPI(data) {
-  return axios.post('/post', { content: data });
+  return axios.post('/post', data);
   /* Backend에서 req.body.***에서 넘어오는 데이터의 이름이 없었으므로
  mainPosts에서 우리가 사전에 약속한 json 속성 content를 data의 속성명으로 줍니다.
  */
+
+  /*
+  form data로 보내주는 것으로 변환되었기 때문에 content와 같은 json 형식이 아닌, data 그대로를 보내준다.
+  */
 }
 
 function* addPost(action) {
@@ -166,6 +195,9 @@ function* unlikePost(action) {
 function* watchloadPosts() {
   yield takeLatest(LOAD_POSTS_REQUEST, loadPosts);
 }
+function* watchUploadImages() {
+  yield takeLatest(UPLOAD_IMAGES_REQUEST, uploadImages);
+}
 
 function* watchAddPost() {
   yield throttle(1000, ADD_POST_REQUEST, addPost);
@@ -187,6 +219,7 @@ function* watchUnLikePost() {
 export default function* postSaga() {
   yield all([
     fork(watchloadPosts),
+    fork(watchUploadImages),
     fork(watchAddPost),
     fork(watchAddComment),
     fork(watchRemovePost),

@@ -1531,3 +1531,130 @@ case LOAD_FOLLOWERS_SUCCESS:
 ```
 
 <p>팔로잉 목록을 지울 때는 기존의 언팔로우를 채택하였고, 팔로워를 지울 때만 새로운 액션을 만들어 줬습니다. 백엔드에서도 같은 로직을 가지므로, 코드를 비교해보며 만들어보세요</p>
+
+<p>저의 레포지토리 해당 커밋은 'b300f9129e362e47888a7bf79e53842d74e05166'입니다.</p>
+
+<h2>🌟 api로 실제 데이터를 통해 게시물에 이미지 추가하기 🌟</h2>
+
+<p>기존에 이미지를 넣기 위해서 더미데이터를 통해 우리 로컬에 존재하는 이미지를 넣어보았습니다. 지금부터는 이번 프로젝트의 핵심인 실제 이미지 파일을 서버에 저장하고, main 페이지에도 보여질 수 있도록 로직을 짜보도록 하겠습니다. 백엔드 개발자 기준으로 'multer' 라는 모듈을 사용하여 파일/이미지를 서버에 업로드할 수 있습니다. 까다로운 과정이고, 이미지를 주로 서비스하는 어플리케이션 입장에서 서버에서 이미지와 글 데이터들을 얼마나 사용하게 될 지는 매우 중요한 부분입니다. 이 과정까지 알게 된다면 더 할 나위 없겠지만, 우선은 백엔드에서 이러한 처리를 할 수 있도록 안전하게 이미지와 글을 서버에 올려주고 다시 보여줄 수 있도록 표현해 봅시다.</p>
+
+```js
+  📁components/PostForm
+
+  const onChangeImages = useCallback((e) => {
+    console.log(e.target.files);
+    const imageFormData = new FormData(); // multipart 형식으로 보내야 multer에서 처리할 수 있음
+    [].forEach.call(e.target.files, (f) => {
+      imageFormData.append('image', f); // apend의 키('image'), 값(f)는 backend의 multer에서 준 키 값과 맞춰 줘야 한다.
+    });
+    dispatch({
+      type: UPLOAD_IMAGES_REQUEST,
+     function uploadImagesAPI(data) {
+  return axios.post('/post/images', data);
+  // form data는 {} json 형식으로 감싸는 게 아닌 data 그대로 들어가야 한다.
+}
+
+function* uploadImages(action) {
+  try {
+    const result = yield call(uploadImagesAPI, action.data);
+    yield put({
+      type: UPLOAD_IMAGES_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: UPLOAD_IMAGES_FAILURE,
+      data: err.response.data,
+    });
+  }
+} data: imageFormData,
+    });
+  });
+...
+<input type="file" multiple hidden ref={imageInput} onChange={onChangeImages} />
+```
+
+<p>PostForm 컴포넌트에 업로드한 파일(이미지)를 관리하기 위해서 onChangeImages 함수를 만들어 주었습니다. FormData는 기본적으로 forEach문을 지원하지 않기 때문에, 빈 배열([])을 통해 forEach문을 사용할 수 있도록 하였습니다. 해당 파일(e.target.files)들을 'image' 형식으로 해당 파일(f)을 각각 올려줄 것을 말합니다. 그럼 imageFormData에 추가된 images 들이 form data 형식으로 UPLOAD_IMAGES_REQUEST가 보내지게 됩니다. </p>
+
+```js
+function uploadImagesAPI(data) {
+  return axios.post('/post/images', data);
+  // form data는 {} json 형식으로 감싸는 게 아닌 data 그대로 들어가야 한다.
+}
+
+function* uploadImages(action) {
+  try {
+    const result = yield call(uploadImagesAPI, action.data);
+    yield put({
+      type: UPLOAD_IMAGES_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: UPLOAD_IMAGES_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+```
+
+<p>해당 처리는 서버에 이미지를 올리기 위한 처리이고, 실제로 이미지를 PostForm에 올리기 위해서는 AddPost 함수에서 content와 함께 올려줘야 합니다. </p>
+
+```js
+ADD_POST를 처리하는 함수에 image와 content를 동시에 addPost할 수 있도록 만들어 줍니다.
+
+const onsubmit = useCallback(() => {
+  if (!text || !text.trim()) {
+    return alert('게시글을 작성하세요.');
+  }
+  const formData = new FormData();
+  imagePaths.forEach((p) => {
+    formData.append('image', p);
+  });
+  formData.append('content', text);
+
+  return dispatch({
+    type: ADD_POST_REQUEST,
+    data: formData,
+  });
+}, [text, imagePaths]);
+```
+
+<p>form data 형식으로 보내기 위해서 image와 content를 각각 formData에 추가하고, 이 formData를 action.data로 보내줍니다.</p>
+
+<img  width="80%" src="./images/ImagesFromServer.png" title="ImagesFromServer">
+
+<p>이제 우리는 서버에 성공적으로 이미지를 올린 뒤에, 이 이미지를 서버로부터 받아오게 됩니다. 그렇기 때문에 이미지를 받아오는 주소도 더미데이터로 json 형식으로 받아오던 기존의 방식과 다르게 서버에서부터 해당 post에 속해있는 이미지를 찾아 다운받아야 합니다. 따라서 다음과 같은 설정을 기존 경로에 추가해 줍니다.</p>
+
+<h2>🌟 게시물 업로드시 이미지 제거하기 🌟</h2>
+
+<p>우리는 변심으로 인해 이미지를 올리지 않고 싶은 상황에 놓일 수 있습니다. 백엔드 프로그래밍에 있어서 사용자가 올린 이미지를 기반으로 다양한 데이터 분석을 하기 때문에 최대한 이미지 및 파일 자료들을 남기고 싶어하는 것과 반대로 말이죠. 따라서 프로그래머는 이 상황에서 파일(이미지)을 서버에서도 완전히 지울 지, 아니면 사용자가 올리지만 않도록 할 지를 정해야 합니다. 이번에는 upload 파일에는 그대로 올라가되, 사용자의 게시물에는 올라가지 않도록 '동기 액션 처리'를 하도록 하겠습니다. 사가에서 서버에게 요청을 보내 이 파일 지워줘가 아닌, 내가 실제로 올리는 post 에서만 없어지도록 말이죠.</p>
+
+```js
+📁components/PostForm
+...
+
+  const onRemoveImage = useCallback((index) => () => {
+    dispatch({
+      type: REMOVE_IMAGE,
+      data: index,
+    });
+  });
+
+...
+
+<Button onClick={onRemoveImage(i)}>제거</Button>
+```
+
+<p>고차 함수를 사용하여 우리가 선택한 그 이미지(i)를 파라미터로 넘겨주어 action의 data로 만들어 줍니다. 고차 함수는 이처럼 함수에서 지정하여 액션의 데이터로 바로 넘겨줄 수 있습니다.</p>
+
+```js
+      case REMOVE_IMAGE: {
+        draft.imagePaths = draft.imagePaths.filter((v, i) => i !== action.data);
+        break;
+      }
+```
+
+<p>리듀서에서는 다음과 같이 filter 처리를 하고 우리가 선택한 이미지(i)를 필터링할 수 있습니다. 이것이 고차함수를 사용하는 이유입니다. </p>

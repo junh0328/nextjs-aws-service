@@ -107,14 +107,6 @@ router.post('/images', isLoggedIn, upload.array('image'), async (req, res, next)
   res.json(req.files.map((v) => v.filename));
 });
 
-/* 
-여기서 파라미터로 받는 /:postId 는 models에서 belongsTo 관계에서 생기는 PostId가 아닌,
-프론트에서 json 형식의 data { postId: post.id }의 postId이므로 헷갈리면 안된다.
-시퀄라이즈에 의해 생성된 Id는 단어 앞이 대문자임을 명심 ㅎㅎ
-
-postId는 컴포넌트 <CommentForm/> 에서 ADD_COMMENT_REQUEST의 {data : .... } 데이터이다.
-*/
-
 // 특정 게시글에 댓글달기
 router.post('/:postId/comment', isLoggedIn, async (req, res, next) => {
   // POST /post/1/comment
