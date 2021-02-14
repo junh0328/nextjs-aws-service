@@ -37,6 +37,10 @@ const initialState = {
   uploadImagesLoading: false, // 이미지 업로드 시도중
   uploadImagesDone: false, // 이미지 업로드 성공
   uploadImagesError: null, // 이미지 업로드 실패
+
+  retweetLoading: false, // 리트윗 시도중
+  retweetDone: false, // 리트윗 성공
+  retweetError: null, // 리트윗 실패
 };
 
 // export const generateDummyPost = (number) =>
@@ -94,6 +98,10 @@ export const REMOVE_POST_FAILURE = 'REMOVE_POST_FAILURE';
 export const ADD_COMMENT_REQUEST = 'ADD_COMMENT_REQUEST';
 export const ADD_COMMENT_SUCCESS = 'ADD_COMMENT_SUCCESS';
 export const ADD_COMMENT_FAILURE = 'ADD_COMMENT_FAILURE';
+
+export const RETWEET_REQUEST = 'RETWEET_REQUEST';
+export const RETWEET_SUCCESS = 'RETWEET_SUCCESS';
+export const RETWEET_FAILURE = 'RETWEET_FAILURE';
 
 // 동적 액션 크리에이터 : 액션을 그때그때 만들어줌
 export const addPost = (data) => ({
@@ -241,6 +249,21 @@ const reducer = (state = initialState, action) => {
       case UNLIKE_POST_FAILURE:
         draft.unlikePostLoading = false;
         draft.unlikePostError = action.error;
+        break;
+      case RETWEET_REQUEST:
+        draft.retweetLoading = true;
+        draft.retweetDone = false;
+        draft.retweetError = null;
+        break;
+      case RETWEET_SUCCESS: {
+        draft.retweetLoading = false;
+        draft.mainPosts.unshift(action.data);
+        draft.retweetDone = true;
+        break;
+      }
+      case RETWEET_FAILURE:
+        draft.retweetLoading = false;
+        draft.retweetError = action.error;
         break;
       default:
         break;

@@ -1,7 +1,7 @@
 # 어디서나 적용가능한 front 구성하기
 
-클론 코딩을 따라치면서, 따라칠 때는 분명 이해가 갔는데, 막상 기획하여 만들려니깐 어디서부터 시작할 지 모르겠는 주니어 개발자를 위한 계획서입니다.
-antd 적용부터 리액트 핵심 기술인 SSR까지 download한 dependencies를 바탕으로 어떤 작업을 했는지 작성해 나갈 예정입니다. <a href="https://nextjs.org/" target="_blank">next.js</a>프레임워크를 사용하여 서비스를 계획중이기 때문에, 공식 문서를 보고 오는 것을 추천합니다. <a href="https://github.com/junh0328/nextjs_org/tree/master/nextjs-blog" target="_blank">저의 깃허브</a>에도 공식문서를 바탕으로 작성한 readme.md 파일이 있으니 참고하시고 부족한 부분이나 해석이 잘못된 부분은 pull request를 통해 알려주시면 바로바로 참고하여 고치겠습니다.
+클론 코딩을 따라 치면서, 따라칠 때는 분명 이해가 갔는데, 막상 기획하여 만들려니깐 어디서부터 시작할 지 모르겠는 주니어 개발자를 위한 계획서입니다.
+antd 적용부터 리액트 핵심 기술인 SSR까지 download한 dependencies를 바탕으로 어떤 작업을 했는지 작성해 나갈 예정입니다. <a href="https://nextjs.org/" target="_blank">next.js</a> 프레임워크를 사용하여 서비스를 계획중이기 때문에, 공식 문서를 보고 오는 것을 추천합니다. <a href="https://github.com/junh0328/nextjs_org/tree/master/nextjs-blog" target="_blank">저의 깃허브</a>에도 공식문서를 바탕으로 작성한 readme.md 파일이 있으니 참고하시고 부족한 부분이나 해석이 잘못된 부분은 pull request를 통해 알려주시면 바로바로 참고하여 고치겠습니다.
 
 ## 1. 📁 downloaded dependencies
 
@@ -1536,6 +1536,8 @@ case LOAD_FOLLOWERS_SUCCESS:
 
 <h2>🌟 api로 실제 데이터를 통해 게시물에 이미지 추가하기 🌟</h2>
 
+<p>제일 어려운 로직이 있는 부분 (고차 함수, formdata 관련) 다시 보세영 [이미지 업로드를 위한 multer, express.static 미들웨어]</p>
+
 <p>기존에 이미지를 넣기 위해서 더미데이터를 통해 우리 로컬에 존재하는 이미지를 넣어보았습니다. 지금부터는 이번 프로젝트의 핵심인 실제 이미지 파일을 서버에 저장하고, main 페이지에도 보여질 수 있도록 로직을 짜보도록 하겠습니다. 백엔드 개발자 기준으로 'multer' 라는 모듈을 사용하여 파일/이미지를 서버에 업로드할 수 있습니다. 까다로운 과정이고, 이미지를 주로 서비스하는 어플리케이션 입장에서 서버에서 이미지와 글 데이터들을 얼마나 사용하게 될 지는 매우 중요한 부분입니다. 이 과정까지 알게 된다면 더 할 나위 없겠지만, 우선은 백엔드에서 이러한 처리를 할 수 있도록 안전하게 이미지와 글을 서버에 올려주고 다시 보여줄 수 있도록 표현해 봅시다.</p>
 
 ```js
@@ -1658,3 +1660,69 @@ const onsubmit = useCallback(() => {
 ```
 
 <p>리듀서에서는 다음과 같이 filter 처리를 하고 우리가 선택한 이미지(i)를 필터링할 수 있습니다. 이것이 고차함수를 사용하는 이유입니다. </p>
+
+<h2>🌟 api로 실제 데이터를 통해 해시태그 등록하기 🌟</h2>
+
+<h2>🌟 api로 실제 데이터를 통해 게시물 리트윗(공유)하기 🌟</h2>
+
+<p>이미지 업로드까지 마친 상태에서 SSR에 들어서기 전, 마지막 기능을 남겨두고 있습니다. 타인이 작성했던 게시글(PostCard)를 내 짹짹에 등록하는 리트윗입니다. 리트윗 기능처럼 평소에 사용하지 않을 법한 기능들은 어떤 것들이 필요할 까를 먼저 생각하고 들어가는 편이 좋습니다.</p>
+
+<p>첫 번째로는 antd에서 받아온 아이콘을 클릭했을 때 해당 게시글(post)의 id를 기반으로 액션을 보내겠죠? 그럼 사가에서는 이 액션과 액션.데이터를 바탕으로   action.data를 파라미터 형식으로 넘겨줄 겁니다. db에서 해당 post.id를 찾아 일정 조건문을 만들어주고(리트윗 할 게시물이 내가 쓴 게시물인지?, 아니면 실제로 존재하는 리트윗인지? 등등), mainPosts 배열에 기존 정보를 받아와 post를 새로 추가하며 결과값을 json으로 넘겨줄 것입니다. 우리는 json 형식으로 넘겨받은 result.data를 사가에서 SUCCESS 처리함과 동시에 reducer로 넘어가 SUCCESS시에 실행해야 하는 로직을 실행해줘야 합니다. mainPosts에 해당 게시글을 추가해 줄 건데, 새롭게 추가된 게시물인 만큼 제일 위에 만들어져야 겠지요?</p>
+
+```js
+const onRetweet = useCallback(() => {
+  dispatch({
+    type: RETWEET_REQUEST,
+    data: post.id,
+  });
+});
+```
+
+<p>antd 에서 제공하는 컴포넌트를 사용하므로 해당 컴포넌트를 클릭했을 때 발생할 액션 onRetweet을 만들어 줍니다. 물론 type과 data도 새로 정해줘야 합니다.리트윗 할 게시글의 post.id에 접근하여 db에서 해당 글의 content와 글쓴이, 댓글까지 모두 가져옵니다.</p>
+
+```js
+// POST /post/1/retweet
+function retweetAPI(data) {
+  return axios.post(`/post/${data}/retweet`);
+}
+
+function* retweet(action) {
+  try {
+    const result = yield call(retweetAPI, action.data);
+    yield put({
+      type: RETWEET_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: RETWEET_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+```
+
+<p>백엔드쪽 라우터를 보니, 'POST /post/1/retweet' 와 같은 형식으로 데이터를 넘겨 받기를 원하고 있습니다. 그에 맞춰 retweet 파라미터를 넘겨줍니다. action.data에는 post.id가 들어있고, 이 data를 post/()/retweet 사이의 파라미터로 넘겨줍니다. 그럼 백엔드에서 처리하고, 해당 결과물을 담은 result를 반환할 겁니다. 성공했다는 가정하에, reducer를 만들어 줍니다. </p>
+
+```js
+      case RETWEET_REQUEST:
+        draft.retweetLoading = true;
+        draft.retweetDone = false;
+        draft.retweetError = null;
+        break;
+      case RETWEET_SUCCESS: {
+        draft.retweetLoading = false;
+        draft.mainPosts.unshift(action.data);
+        draft.retweetDone = true;
+        break;
+      }
+      case RETWEET_FAILURE:
+        draft.retweetLoading = false;
+        draft.retweetError = action.error;
+        break;
+```
+
+<p>unshift 함수를 통해 mainPosts의 최 상단에 넘겨받은 결과물을 넣어주었습니다. 그럼 결과물을 볼까요?</p>
+<img  width="80%" src="./images/myFirstRetweet.png" title="myFirstRetweet">
+<p>리트윗이 성공적으로 되긴 했는데... 예상했던 content와는 다르게 'retweet'이라는 글자가 넘어왔습니다. 다른 게시물을 retweet 해도 똑같이 retweet이라는 content가 넘어옵니다. 왜 데이터가 이렇게 넘오는지 생각해보세요</p>

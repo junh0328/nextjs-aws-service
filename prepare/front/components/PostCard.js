@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-wrap-multilines */
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Card, Popover, Avatar, List, Comment } from 'antd';
 import {
@@ -16,7 +16,12 @@ import CommentForm from './CommentForm';
 import PostImages from './PostImages';
 import PostCardContent from './PostCardContent';
 import FollowButton from './FollowButton';
-import { REMOVE_POST_REQUEST, LIKE_POST_REQUEST, UNLIKE_POST_REQUEST } from '../reducers/post';
+import {
+  REMOVE_POST_REQUEST,
+  LIKE_POST_REQUEST,
+  UNLIKE_POST_REQUEST,
+  RETWEET_REQUEST,
+} from '../reducers/post';
 
 const PostCard = ({ post }) => {
   const dispatch = useDispatch();
@@ -25,8 +30,15 @@ const PostCard = ({ post }) => {
   // const id = me && me.id;
   // = const id = me?.id; optional channing 연산자
 
+  const { retweetError } = useSelector((state) => state.post);
   const id = useSelector((state) => state.user.me?.id);
   const liked = post.Likers.find((v) => v.id === id);
+
+  useEffect(() => {
+    if (retweetError) {
+      alert(retweetError);
+    }
+  }, [retweetError]);
 
   const onLike = useCallback(() => {
     dispatch({
@@ -53,6 +65,13 @@ const PostCard = ({ post }) => {
     });
   }, []);
 
+  const onRetweet = useCallback(() => {
+    dispatch({
+      type: RETWEET_REQUEST,
+      data: post.id,
+    });
+  });
+
   return (
     <div>
       {/* 이 postcard의 주인이 내가 아니면, 팔로우 언팔로우 버튼을 띄워 가능하게 한다. */}
@@ -60,7 +79,7 @@ const PostCard = ({ post }) => {
         extra={id && <FollowButton post={post} />}
         cover={post.Images[0] && <PostImages images={post.Images} />}
         actions={[
-          <RetweetOutlined key="retweet" />,
+          <RetweetOutlined key="retweet" onClick={onRetweet} />,
           liked ? (
             <HeartTwoTone twoToneColor="#eb2f96" key="heart" onClick={onUnLike} />
           ) : (

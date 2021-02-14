@@ -24,6 +24,9 @@ import {
   UPLOAD_IMAGES_REQUEST,
   UPLOAD_IMAGES_SUCCESS,
   UPLOAD_IMAGES_FAILURE,
+  RETWEET_REQUEST,
+  RETWEET_SUCCESS,
+  RETWEET_FAILURE,
 } from '../reducers/post';
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from '../reducers/user';
 
@@ -191,6 +194,26 @@ function* unlikePost(action) {
     });
   }
 }
+// POST /post/1/retweet
+function retweetAPI(data) {
+  return axios.post(`/post/${data}/retweet`);
+}
+
+function* retweet(action) {
+  try {
+    const result = yield call(retweetAPI, action.data);
+    yield put({
+      type: RETWEET_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: RETWEET_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
 
 function* watchloadPosts() {
   yield takeLatest(LOAD_POSTS_REQUEST, loadPosts);
@@ -215,6 +238,9 @@ function* watchLikePost() {
 function* watchUnLikePost() {
   yield takeLatest(UNLIKE_POST_REQUEST, unlikePost);
 }
+function* watchRetweet() {
+  yield takeLatest(RETWEET_REQUEST, retweet);
+}
 
 export default function* postSaga() {
   yield all([
@@ -225,5 +251,6 @@ export default function* postSaga() {
     fork(watchRemovePost),
     fork(watchLikePost),
     fork(watchUnLikePost),
+    fork(watchRetweet),
   ]);
 }
