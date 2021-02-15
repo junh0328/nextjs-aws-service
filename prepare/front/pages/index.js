@@ -3,11 +3,19 @@ import React, { useCallback, useEffect } from 'react';
 import Head from 'next/head';
 import { Form, Input, Button, Checkbox } from 'antd';
 import Link from 'next/link';
-import styled from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 import Router from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginRequestAction } from '../reducers/user';
 import useinput from '../hooks/useInput';
+
+const GlobalFlex = createGlobalStyle`
+  body{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+`;
 
 const ButtonWrapper = styled.div`
   margin-top: 1px;
@@ -54,11 +62,18 @@ export default function Home() {
   }, [email, password]);
 
   return (
-    <div>
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
       <Head>
         <title>juneed | login</title>
         <link rel="icon" href="/favicon.png" />
       </Head>
+      <GlobalFlex />
       <div
         className="container"
         style={{
@@ -68,7 +83,7 @@ export default function Home() {
           justifyContent: 'center',
         }}
       >
-        <div>
+        <>
           <Form
             style={{ marginRight: 30 }}
             {...layout}
@@ -135,7 +150,7 @@ export default function Home() {
               </Form.Item>
             </div>
           </Form>
-        </div>
+        </>
         <div style={{ textAlign: 'center' }}>
           <img src="../external/emoji.gif" width="400px" alt="emoji" />
         </div>

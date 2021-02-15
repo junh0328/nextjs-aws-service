@@ -1885,8 +1885,8 @@ alert(user?.address);
 </div>
 
 <div>
-<img style="margin-right:10px" width="40%" src="./images/retweetSuccess.png" title="retweetSuccess">
-<img width="40%" src="./images/retweetSuccess.png" title="retweetSuccess">
+<img style="margin-right:10px" width="45%" src="./images/myFirstRetweet.png" title="myFirstRetweet">
+<img width="45%" src="./images/retweetSuccess.png" title="retweetSuccess">
 </div>
 
 <p>자 이제 SSR 전까지의 작업이 모두 진행되었습니다. 추가하고 싶은 부분이나, 정리할 부분을 다시 정리해서 리액트, 넥스트의 꽃인 SSR과 다이나믹 라우팅을 공부해 봅시다!</p>
