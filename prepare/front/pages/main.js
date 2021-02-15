@@ -1,3 +1,4 @@
+/* eslint-disable comma-dangle */
 /* eslint-disable operator-linebreak */
 /* eslint-disable space-infix-ops */
 /* eslint-disable max-len */
@@ -14,7 +15,9 @@ import { LOAD_USER_REQUEST } from '../reducers/user';
 
 const main = () => {
   const { me, logOutDone } = useSelector((state) => state.user);
-  const { mainPosts, hasMorePosts, loadPostsLoading, retweetError } = useSelector((state) => state.post);
+  const { mainPosts, hasMorePosts, loadPostsLoading, retweetError, retweetDone } = useSelector(
+    (state) => state.post
+  );
   // const mainPosts = useSelector((state)=> state.post.mainPosts) 구조분해를 하지 않으면 다음과 같이 표현할 수 있다.
   const dispatch = useDispatch();
 
@@ -23,6 +26,12 @@ const main = () => {
       alert(retweetError);
     }
   }, [retweetError]);
+
+  useEffect(() => {
+    if (retweetDone) {
+      alert('리트윗 성공! \n포스트 상단에서 리트윗된 게시물을 확인하세요!');
+    }
+  }, [retweetDone]);
 
   useEffect(() => {
     if (logOutDone) {
@@ -40,10 +49,19 @@ const main = () => {
   useEffect(() => {
     function onScroll() {
       // console.log(window.scrollY, document.documentElement.clientHeight, document.documentElement.scrollHeight);
-      if (window.scrollY + document.documentElement.clientHeight > document.documentElement.scrollHeight - 300) {
+      if (
+        window.scrollY + document.documentElement.clientHeight >
+        document.documentElement.scrollHeight - 300
+      ) {
         if (hasMorePosts && !loadPostsLoading) {
+          const lastId = mainPosts[mainPosts.length - 1]?.id;
+          console.log('메인 포스트의 길이는 ? ');
+          console.log(mainPosts.length);
+          console.log(mainPosts[mainPosts.length]);
+          console.log(`lastId는 ? ${lastId}`);
           dispatch({
             type: LOAD_POSTS_REQUEST,
+            lastId,
           });
         }
       }
@@ -52,12 +70,13 @@ const main = () => {
     return () => {
       window.removeEventListener('scroll', onScroll);
     };
-  }, [hasMorePosts, loadPostsLoading]);
+  }, [hasMorePosts, loadPostsLoading, mainPosts]);
+
   return (
     <>
       <Head>
-        <meta charSet='utf-8' />
-        <link rel='icon' href='/favicon.png' />
+        <meta charSet="utf-8" />
+        <link rel="icon" href="/favicon.png" />
         <title>Juneed | main</title>
       </Head>
       <AppLayout>

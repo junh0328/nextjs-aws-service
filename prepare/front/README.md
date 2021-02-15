@@ -301,15 +301,15 @@ const PostCard = ({ post }) => {
       <Card
         cover={post.Images[0] && <PostImages images={post.images} />}
         actions={[
-          <RetweetOutlined key='retweet' />,
-          <HeartOutlined key='heart' />,
-          <CommentOutlined key='commet' />,
+          <RetweetOutlined key="retweet" />,
+          <HeartOutlined key="heart" />,
+          <CommentOutlined key="commet" />,
           <Popover
-            key='more'
+            key="more"
             content={
               <Button.Group>
                 {id && post.User.id === id ? (
-                  ((<Button>수정</Button>), (<Button type='danger'>삭제</Button>))
+                  ((<Button>수정</Button>), (<Button type="danger">삭제</Button>))
                 ) : (
                   <Button>신고</Button>
                 )}
@@ -635,7 +635,10 @@ useEffect(() => {
 useEffect(() => {
   function onScroll() {
     // console.log(window.scrollY, document.documentElement.clientHeight, document.documentElement.scrollHeight);
-    if (window.scrollY + document.documentElement.clientHeight > document.documentElement.scrollHeight - 300) {
+    if (
+      window.scrollY + document.documentElement.clientHeight >
+      document.documentElement.scrollHeight - 300
+    ) {
       if (hasMorePosts && !loadPostsLoading) {
         dispatch({
           type: LOAD_POSTS_REQUEST,
@@ -1780,3 +1783,110 @@ function* retweet(action) {
 ```
 
 <p>리트윗 아이디가 존재한다면 해당 게시글 유저의 닉네임을 적어주는 로직입니다.</p>
+
+<img  width="80%" src="./images/retweetSuccess.png" title="retweetSuccess">
+
+<p>어떤 사용자가 리트윗을 했고, 리트윗을 한 게시물은 무엇인지 모두 확인할 수 있는 리트윗 기능이 완성되었습니다. 우리는 리듀서를 통해 백엔드로부터 넘어오는 initialState의 객체및 프로퍼티에 접근할 수 있게 됩니다. post.Retweet에 접근할 수 있는 이유도 📁pages/main 에서 mainPosts의 매핑 값을 props로 전달하는 post 변수를 사용하고 있기 때문입니다. 그 외의 initialState에 접근하기 위해서는 useSelector 함수를 사용하여 state에 직접 접근해줘야 핟나는 것을 잊으면 안됩니다.</p>
+
+<h2>🌟 쿼리스트링과 lastId를 사용하여 인피니티 스크롤 에러 해결하기 🌟</h2>
+
+<p>더미데이터(shortId와 faker를 사용한)를 통해 게시글을 불러왔을 때는 정적으로 정해진 게시물 수를 받아왔기 때문에 문제가 되지 않았지만, LOAD_POSTS_REQUEST를 통해 서버로부터 데이터를 받아올 때 </p>
+
+```js
+case LOAD_POSTS_SUCCESS:
+        draft.loadPostsLoading = false;
+        draft.loadPostsDone = true;
+        draft.mainPosts = action.data.concat(draft.mainPosts);
+        // 더미데이터와 기존데 이터를 합쳐줌
+        draft.hasMorePosts = draft.mainPosts.length < 50;
+```
+
+<p>현재 메모리 상에 존재하는 게시물들을 또 반복적으로 가져오는 오류가 있었습니다. 우리는 더미데이터가 아닌 실제 데이터를 받아와야 하므로, 해당 게시글들을 새로운 규칙에 맞게 스크롤을 내릴 때마다 조건에 충족되면 LOAD_POSTS_REQUEST를 실행항 수 있도록 기존 함수를 바꿔보겠습니다.</p>
+
+```js
+useEffect(() => {
+  function onScroll() {
+    // console.log(window.scrollY, document.documentElement.clientHeight, document.documentElement.scrollHeight);
+    if (
+      window.scrollY + document.documentElement.clientHeight >
+      document.documentElement.scrollHeight - 300
+    ) {
+      if (hasMorePosts && !loadPostsLoading) {
+        const lastId = mainPosts[mainPosts.length - 1]?.id;
+        dispatch({
+          type: LOAD_POSTS_REQUEST,
+          lastId,
+        });
+      }
+    }
+  }
+  window.addEventListener('scroll', onScroll);
+  return () => {
+    window.removeEventListener('scroll', onScroll);
+  };
+}, [hasMorePosts, loadPostsLoading, mainPosts]);
+```
+
+<p>기존 함수의 구성과는 다르지 않지만, lastId라는 변수를 새로 만들어줬습니다. 이 lastId 변수는 <a href="https://ko.javascript.info/optional-chaining" target="_blank">옵셔널 체이닝 연산자(?)</a>를 포함하고 있습니다. 따라서 mainPosts.length -1 가 mainPosts[] 배열에 존재하면 해당 id를 lastId로 담고 이 lastId를 같이 보내주게 됩니다. 이 데이터를 담아 백엔드에 보내는 사가의 api도 변경해야 겠죠? </p>
+
+```js
+function loadPostsAPI(lastId) {
+  return axios.get(`/posts?lastId=${lastId || 0}`);
+  // lastId.?id를 했을 때, lastId가 undefined인 경우 0 을 보일 수 있도록 쿼리문을 처리하였다.
+}
+```
+
+<p>유일하게 get 방식에서는 post나 patch처럼 파라미터로 데이터를 넘겨줄 수 없으므로 쿼리형식으로 데이터(lastId)를 넘겨주게 됩니다. 여기서도 조건문이 들어가는데, 이 조건문은 앞서 옵셔널 체이닝을 사용했기 때문에 사용 가능합니다. lastId가 존재한다면 쿼리값(lastId)에 해당 쿼리를 넣어주고, 그렇지 않다면(undefined) 0 을 보내줍니다.</p>
+
+<p>이제 리듀서에서만 변경해주면 모든 작업이 완료됩니다.</p>
+
+<img width="80%" src="./images/changedReducer.png" title="changedReducer">
+
+<p>action.data의 길이가 10의 배수와 같아지면, hasMorePosts가 true인 상태가 됩니다. 게시글이 10개 보다 적게 남을 경우 hasMorePosts가 false가 되면서, 게시글을 더이상 불러오지 않습니다. </p>
+
+<h4>🌟 옵셔널 체이닝 연산자(optional channing operator) 🌟</h4>
+
+```js
+let user = {}; // 주소 정보가 없는 사용자
+
+alert(user?.address?.street); // undefined, 에러가 발생하지 않습니다.
+```
+
+<p>옵셔널 체이닝 연산자는 ?. <b style="color:skyblue">'앞'</b>의 평가 대상이 <b style="color:skyblue">undefined</b> 또는 <b style="color:skyblue">null</b> 일 경우 평가를 멈추고 <b style="color:blue">undefined</b>륿 반환합니다. user?.address로 주소를 읽으면 아래와 같이 user 객체가 존재하지 않더라도 에러가 발생하지 않습니다.</p>
+
+```js
+let user = null;
+
+alert(user?.address); // undefined
+alert(user?.address.street); // undefined
+```
+
+<p>위 예시를 통해 우리는 ?. 은 ?. '앞'의 평가 대상에만 동작하고, 확장은 되지 않는다느 사실을 알 수 있습니다.</p>
+
+<p>현재 해결된 상태에서의 devTools를 보신다면 REQUEST도 일정하게 한 번만 가고, 게시글(post)에 수에 따라 정확히 hasMorePosts 값을 바꿔주는 것을 알 수 있습니다.</p>
+
+<div style="border: 1px solid gray; margin-bottom: 10px">
+<p>🌟 옵셔널 체이닝을 남용하지 마세요</p>
+<p>?. 는 존재하지 않아도 괜찮은 대상에만 사용해야 합니다.</p>
+<p>사용자 주소를 다루는 위 예시에서 논리상 user는 반드시 있어야 하는데 address는 필수값이 아닙니다. 그러니 </p>
+<p>user.address?.street를 사용하는 것이 바람직합니다.</p>
+</div>
+
+<div style="border: 1px solid gray ; margin-bottom: 10px">
+<p>🌟 ?. 앞의 변수는 꼭 선언되어 있어야 합니다.</p>
+<p>변수 user가 선언되어있지 않으면 user?.anything 평가시 에러가 발생합니다.</p>
+
+```js
+// ReferenceError: user is not defined
+alert(user?.address);
+```
+
+<p>There must be let/const/var user. The optional chaining works only for declared variables.</p>
+</div>
+
+<div>
+<img style="margin-right:10px" width="40%" src="./images/retweetSuccess.png" title="retweetSuccess">
+<img width="40%" src="./images/retweetSuccess.png" title="retweetSuccess">
+</div>
+
+<p>자 이제 SSR 전까지의 작업이 모두 진행되었습니다. 추가하고 싶은 부분이나, 정리할 부분을 다시 정리해서 리액트, 넥스트의 꽃인 SSR과 다이나믹 라우팅을 공부해 봅시다!</p>

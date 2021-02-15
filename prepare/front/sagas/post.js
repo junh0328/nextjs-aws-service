@@ -30,13 +30,22 @@ import {
 } from '../reducers/post';
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from '../reducers/user';
 
-function loadPostsAPI() {
-  return axios.get('/posts');
+/*  get 방식에서 데이터를 넣어주기 위해서는 쿼리로 해당 데이터를 넘겨줘야 한다.
+여기서 우리는 action.lastId가 들어있는 경우 (useEffect로 게시글이 height 기준에 맞춰 내려갔을 때 새로운 posts를 불러와라)
+몇 번째 게시글을 기준으로 새로운 게시글을 불러올 것인지를 정하기 위해 lastId라는 변수를 만들어 주었다.
+쿼리 방식은 파라미터 방식과 다르게 ' 키 ? 값 ' 형식으로 물음표를 사용하여 나타낸다.
+위 주소를 캐싱하면 들어있는 데이터까지 모두 케싱된다.
+케싱은 (get)방식에서만 사용 가능하며, (post, patch, ...)등 기타 방식에서는 사용이 불가하다.
+*/
+
+function loadPostsAPI(lastId) {
+  return axios.get(`/posts?lastId=${lastId || 0}`);
+  // lastId.?id를 했을 때, lastId가 undefined인 경우 0 을 보일 수 있도록 쿼리문을 처리하였다.
 }
 
-function* loadPosts() {
+function* loadPosts(action) {
   try {
-    const result = yield call(loadPostsAPI);
+    const result = yield call(loadPostsAPI, action.lastId);
 
     yield put({
       type: LOAD_POSTS_SUCCESS,
