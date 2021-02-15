@@ -15,7 +15,9 @@ router.get('/', async (req, res, next) => {
     if (parseInt(req.query.lastId, 10)) {
       // 초기 로딩이 아닐 때 > 스크롤을 내려서 더 posts들을 불러올 때
       where.id = {
-        [Op.lt]: parseInt(req.query.lastId, 10), // id가 lastId 보다 작은 게시물 10개를 불러와라
+        [Op.lt]: parseInt(req.query.lastId, 10),
+        // id가 lastId 보다 작은 게시물 10개를 불러와라
+        // Op(Operator)는 시퀄라이즈에서 제공하는 연산자 모듈로 lt(less than)을 이용할 수 있도록 만들어준다.
       };
     } // 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1
     const posts = await Post.findAll({
