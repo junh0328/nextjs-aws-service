@@ -6,7 +6,6 @@ import 'antd/dist/antd.css';
 import React from 'react';
 import Head from 'next/head';
 import PropTypes from 'prop-types';
-import withReduxSaga from 'next-redux-saga';
 
 import wrapper from '../store/configureStore';
 
@@ -27,7 +26,7 @@ Juneed.propTypes = {
   Component: PropTypes.elementType.isRequired,
 };
 
-export default wrapper.withRedux(withReduxSaga(Juneed));
+export default wrapper.withRedux(Juneed);
 
 // store에서만든 wrapper로 _app.js의 Juneed를 감싸준다.
 // pages에 들어있는 컴포넌트들에서 공통적으로 redux를 통한 상태 관리를 하기 위해

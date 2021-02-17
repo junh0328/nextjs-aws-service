@@ -545,6 +545,7 @@ function* logIn(action) {
 - eslint-config-airbnb
 - shortid
 - immer
+- faker
 
 <h2> 🌟 shortId를 사용하여 데이터 중복 없애기 🌟 </h2>
 <p> 우리는 서버와의 통신 없이 더미 데이터, 더미 포스트, 더미 유저 등을 통해 데이터를 그려주고 있습니다. mainPosts를 매핑하여 post라는 props로 하여금, 포스트 게시물을 하나씩 나열하는 상황입니다. 각각의 포스트와 유저, 댓글(comment) 들은 모두 id를 가지고 있습니다. 이 아이디를 추적하여 게시글을 지우거나 추가하는 등의 모든 행동들이 실행될 수 있기 때문입니다. 따라서 서버와의 소통 이전 단계에서는 shortId를 사용하여 절대 겹치지 않는 id를 generate 할 수 있습니다. </p>
@@ -1905,11 +1906,11 @@ alert(user?.address);
 
 <p>CSR은 사용자에게 보여짐과 동시에 모든 html과 js를 불러온 상태이기 때문에, TTV과 됨과 동시에 TTI 모든 동적인 행동을 할 수 있게 됩니다.</p>
 <img  width="80%" src="./images/CSR.png" title="CSR">
-<p>출처: <a href="https://www.youtube.com/watch?v=iZ9csAfU5Os"></a>유튜브, 드림 코딩 엘리 SSR </p>
+<p>출처: <a href="https://www.youtube.com/watch?v=iZ9csAfU5Os" target="_blank">유튜브, 드림 코딩 엘리 SSR</a> </p>
 
 <p>하지만, SSR은 html과 일부 js파일은 서버로부터 사전에 받아 놓았기 때문에 TTV 상태에서도 TTI가 전부 활성화되어 있지는 않습니다.</p>
 <img  width="80%" src="./images/SSR.png" title="SSR">
-<p>출처: <a href="https://www.youtube.com/watch?v=iZ9csAfU5Os"></a>유튜브, 드림 코딩 엘리 SSR</p>
+<p>출처: <a href="https://www.youtube.com/watch?v=iZ9csAfU5Os" target="_blank">유튜브, 드림 코딩 엘리 SSR</a></p>
 
 <p>최종적으로 CSR을 많이 사용한다면, 우리가 최종적으로 번들링하여 사용자게에 보내주는 js 파일을 어떻게 하면 효율적으로 많이 분할하여 첫 번째로 사용자가 보기 위해서 필요한 정말 필수적인 html 요소만 보낼 수 있을지 고민해봐야 하고, SSR의 경우 사용자가 보고, 인터렉션(TTI)하는 이 시간의 단차를 줄이기 위해서 어떤 노력을 할 수 있을지 고민해봐야 합니다. 예를 들면 어떻게 하면 조금 더 매끄러운 UI와 UX를 제공할 수 있을지에 대한 고민들이 포함됩니다. </p>
 
@@ -1917,3 +1918,9 @@ alert(user?.address);
 Next에서는 SSR뿐만 아니라, static generation, no pre-rendering, pre-rendering상태를 모두 지원하기 때문에 리액트로 작업을 계속한다면 next.js를 배워보는 것도 매우 효과적일 겁니다.</p>
 
 <p>어떤 것이 최고다, 제일 낫다라는 판단 보다는 우리가 만들어야 하는 웹사이트 특성에 맞게 다양한 방식의 렌더링을 활용하여 페이지를 구성한다면 최선의 선택이 될 것입니다.</p>
+
+## 8. 📁 remove dependencies
+
+- next-redux-saga
+
+<p>next @9 버전 이상부터는 redux-saga를 next 모듈을 불러오지 않아도 사용가능해 졌습니다. 이에 따라 📁pages/_app.js를 감싸던(hoc) withReduxSaga()를 지워줬습니다.</p>
