@@ -11,7 +11,7 @@ import Head from 'next/head';
 import { useDispatch, useSelector } from 'react-redux';
 import useInput from '../hooks/useInput';
 import AppLayout from '../components/AppLayout';
-import { SIGN_UP_REQUEST } from '../reducers/user';
+import { DEFAULT_DONE_ACTION, SIGN_UP_REQUEST } from '../reducers/user';
 
 const ErrorMessage = styled.div`
   color: red;
@@ -28,7 +28,7 @@ const layout = {
 
 const Signup = () => {
   const dispatch = useDispatch();
-  const { signUpLoading, signUpDone, signUpError } = useSelector((state) => state.user);
+  const { signUpLoading, signUpDone, signUpError, me } = useSelector((state) => state.user);
 
   const [email, onChangeEmail] = useInput('');
   const [nickname, onChangeNickname] = useInput('');
@@ -44,9 +44,18 @@ const Signup = () => {
     },
     [password]
   );
+  useEffect(() => {
+    if (me && me.id) {
+      alert('로그인 된 상태에서 접근할 수 없습니다.');
+      Router.replace('/');
+    }
+  });
 
   useEffect(() => {
     if (signUpDone) {
+      dispatch({
+        type: DEFAULT_DONE_ACTION,
+      });
       alert('회원가입 성공\n 로그인 페이지로 이동합니다!');
       Router.replace('/');
     }

@@ -91,6 +91,8 @@ export const LOAD_FOLLOWERS_FAILURE = 'LOAD_FOLLOWERS_FAILURE';
 export const ADD_POST_TO_ME = 'ADD_POST_TO_ME';
 export const REMOVE_POST_OF_ME = 'REMOVE_POST_OF_ME';
 
+export const DEFAULT_DONE_ACTION = 'DEFAULT_DONE_ACTION';
+
 export const dummyUser = (data) => ({
   ...data,
   nickname: '이준희',
@@ -113,9 +115,19 @@ export const logoutRequestAction = () => {
   };
 };
 
+export const defaultDoneAction = () => {
+  return {
+    type: DEFAULT_DONE_ACTION,
+  };
+};
+
 const reducer = (state = initialState, action) =>
   produce(state, (draft) => {
     switch (action.type) {
+      case DEFAULT_DONE_ACTION:
+        draft.logOutDone = false;
+        draft.signUpDone = false;
+        break;
       case LOAD_USER_REQUEST:
         draft.loadUserLoading = true;
         draft.loadUserDone = false;

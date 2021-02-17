@@ -52,7 +52,7 @@ export default function Home() {
 
   useEffect(() => {
     if (me) {
-      alert('로그인 성공 메인페이지로 이동합니다!');
+      alert('로그인 성공\n메인페이지로 이동합니다!');
       Router.replace('/main');
     }
   }, [me]);

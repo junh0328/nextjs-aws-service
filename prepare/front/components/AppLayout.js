@@ -36,11 +36,13 @@ const AppLayout = ({ children }) => {
             <a>메인</a>
           </Link>
         </Menu.Item>
-        <Menu.Item>
-          <Link href="/profile">
-            <a>프로필</a>
-          </Link>
-        </Menu.Item>
+        {me && (
+          <Menu.Item>
+            <Link href="/profile">
+              <a>프로필</a>
+            </Link>
+          </Menu.Item>
+        )}
         <Menu.Item>
           <SearchInput placeholder="input search text" enterButton />
         </Menu.Item>

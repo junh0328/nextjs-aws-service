@@ -6,14 +6,15 @@ import React, { useEffect } from 'react';
 import Head from 'next/head';
 import { useDispatch, useSelector } from 'react-redux';
 import Router from 'next/router';
-import { END } from 'redux-saga';
+// import { END } from 'redux-saga';
+// import axios from 'axios';
 
 import AppLayout from '../components/AppLayout';
 import PostForm from '../components/PostForm';
 import PostCard from '../components/PostCard';
 import { LOAD_POSTS_REQUEST } from '../reducers/post';
-import { LOAD_USER_REQUEST } from '../reducers/user';
-import wrapper from '../store/configureStore';
+import { DEFAULT_DONE_ACTION, LOAD_USER_REQUEST } from '../reducers/user';
+// import wrapper from '../store/configureStore';
 
 const main = () => {
   const { me, logOutDone } = useSelector((state) => state.user);
@@ -37,10 +38,22 @@ const main = () => {
 
   useEffect(() => {
     if (logOutDone) {
-      alert('로그아웃 완료! \n로그인 페이지로 이동합니다.');
+      dispatch({
+        type: DEFAULT_DONE_ACTION,
+      });
+      alert('로그아웃 성공!\n로그인 페이지로 돌아갑니다.');
       Router.replace('/');
     }
   }, [logOutDone]);
+
+  useEffect(() => {
+    dispatch({
+      type: LOAD_USER_REQUEST,
+    });
+    dispatch({
+      type: LOAD_POSTS_REQUEST,
+    });
+  }, []);
 
   // 제일 처음 mainPosts가 빈 배열일 때 실행됨
 
@@ -87,16 +100,21 @@ const main = () => {
   );
 };
 
-export const getServerSideProps = wrapper.getServerSideProps(async (context) => {
-  console.log(context);
-  context.store.dispatch({
-    type: LOAD_USER_REQUEST,
-  });
-  context.store.dispatch({
-    type: LOAD_POSTS_REQUEST,
-  });
-  context.store.dispatch(END);
-  await context.store.sagaTask.toPromise();
-});
+// export const getServerSideProps = wrapper.getServerSideProps(async (context) => {
+//   const cookie = context.req ? context.req.headers.cookie : '';
+//   axios.defaults.headers.Cookie = '';
+//   if (context.req && cookie) {
+//     axios.defaults.headers.Cookie = cookie;
+//   }
+//   console.log(context);
+//   context.store.dispatch({
+//     type: LOAD_USER_REQUEST,
+//   });
+//   context.store.dispatch({
+//     type: LOAD_POSTS_REQUEST,
+//   });
+//   context.store.dispatch(END);
+//   await context.store.sagaTask.toPromise();
+// });
 
 export default main;
