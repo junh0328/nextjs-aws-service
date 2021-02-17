@@ -56,7 +56,9 @@ router.post('/', isLoggedIn, upload.none(), async (req, res, next) => {
     if (req.body.image) {
       if (Array.isArray(req.body.image)) {
         // 이미지를 여러 개 올리면 image: [제로초.png , 부기초.png] >> 배열로 올라감
-        const images = await Promise.all(req.body.image.map((image) => Image.create({ src: image })));
+        const images = await Promise.all(
+          req.body.image.map((image) => Image.create({ src: image }))
+        );
         // 매핑하여 시퀄라이즈 테이블에 올려준다. 파일 주소는 db에 저장되고 파일 자체는 uploads 폴더에 저장됨
         await post.addImages(images);
       } else {

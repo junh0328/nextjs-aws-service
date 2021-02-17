@@ -31,7 +31,6 @@ const PostCard = ({ post }) => {
   // = const id = me?.id; optional channing 연산자
 
   const id = useSelector((state) => state.user.me?.id);
-  const liked = post.Likers.find((v) => v.id === id);
 
   const onLike = useCallback(() => {
     if (!id) {
@@ -65,7 +64,7 @@ const PostCard = ({ post }) => {
       type: REMOVE_POST_REQUEST,
       data: post.id,
     });
-  }, []);
+  }, [id]);
 
   const onRetweet = useCallback(() => {
     if (!id) {
@@ -75,7 +74,9 @@ const PostCard = ({ post }) => {
       type: RETWEET_REQUEST,
       data: post.id,
     });
-  });
+  }, [id]);
+
+  const liked = post.Likers.find((v) => v.id === id);
 
   return (
     <div>
@@ -131,7 +132,7 @@ const PostCard = ({ post }) => {
         )}
       </Card>
       {commentFormOpened && (
-        <>
+        <div>
           <CommentForm post={post} />
           <List
             header={`${post.Comments ? post.Comments.length : 0}개의 댓글`}
@@ -147,7 +148,7 @@ const PostCard = ({ post }) => {
               </li>
             )}
           />
-        </>
+        </div>
       )}
       {/* <Comments /> */}
     </div>
