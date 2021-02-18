@@ -60,9 +60,11 @@ const AppLayout = ({ children }) => {
           {children}
         </Col>
         <Col xs={24} md={6}>
-          <a href="https://github.com/junh0328" target="_blank" rel="noreferrer noopener">
-            Contact me
-          </a>
+          <div style={{ margin: '10px' }}>
+            <a href="https://github.com/junh0328" target="_blank" rel="noreferrer noopener">
+              CONTACT ME
+            </a>
+          </div>
         </Col>
       </Row>
     </div>
