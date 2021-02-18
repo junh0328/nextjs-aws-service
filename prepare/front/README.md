@@ -1926,3 +1926,50 @@ Next에서는 SSR뿐만 아니라, static generation, no pre-rendering, pre-rend
 - next-redux-saga
 
 <p>next @9 버전 이상부터는 redux-saga를 next 모듈을 불러오지 않아도 사용가능해 졌습니다. 이에 따라 📁pages/_app.js를 감싸던(hoc) withReduxSaga()를 지워줬습니다.</p>
+
+<img  width="80%" src="./images/removeNextReduxSaga.png" title="removeNextReduxSaga">
+
+<p>사전에 configureStore에 만들어 놨던 wrapper가 next-redux-saga의 기능을 대신해주기 때문입니다. (버전이 업데이트되면서 더 이상 <a href="https://github.com/bmealhouse/next-redux-saga" target="_blank">next-redux-saga</a>를 사용할 필요가 없어졌습니다.)</p>
+
+<h2>🌟 pages/main에 서버사이드 렌더링 적용하기 🌟</h2>
+
+<p>SSR을 적용하기 위해서 Next(@9 이하 버전)에는 getInitialProps를 사용하거 SSR을 적용해줬다면 Next@9 버전 이상부터는 3가지 함수를 사용하여 SSR을 구현해줄 수 있습니다.</p>
+
+|        종류        |                                   의미                                    |
+| :----------------: | :-----------------------------------------------------------------------: |
+|   getStaticProps   |         언제 접속해도 fetch 되는 데이터가 바뀔 일이 없을 때 사용          |
+|         -          |         빌드할 때 미리 SSR을 통해 html로 만들어서 가지고 있는다.          |
+| getServerSideProps | 접속할 때마다 사용자의 요구 및 인터렉션에 따라 화면이 바뀌어야 할 때 사용 |
+|         -          |             웬만한 경우 getServerSideProps가 default로 사용됨             |
+|   getStaticPaths   |                      getStaticProps와 같이 사용한다.                      |
+|         -          |      /pages/user,post,hashtag 와 같이 다이나믹 라우팅 시에 사용된다.      |
+
+```js
+📁pages/main
+...
+
+export const getServerSideProps = wrapper.getServerSideProps(async (context) => {
+  const cookie = context.req ? context.req.headers.cookie : '';
+  axios.defaults.headers.Cookie = '';
+  if (context.req && cookie) {
+    axios.defaults.headers.Cookie = cookie;
+  }
+  console.log(context);
+
+  context.store.dispatch({
+    type: LOAD_POSTS_REQUEST,
+  });
+  context.store.dispatch(END);
+  await context.store.sagaTask.toPromise();
+});
+
+export default main;
+```
+
+- 서버 사이드 렌더링은 기존의 export 시킨 main 보다 위에 적용해야만 합니다.
+- 서버 사이드 렌더링은 프론트서버에서 해주는 것이 아닌, 백엔드 서버에서 해주는 것이기 때문입니다.
+- store에서 만들어 주었던 wrapper의 기능을 사용하여 서버로부터 사전에 실행할 것을 알려줍니다.
+- async, await를 사용하여 정확히 요청한 결과가 넘어올 때까지 (서버사이드렌더링이 실행될 때까지) 순차적으로 사용됩니다.
+- wrapper에서 제공하는 context 메소드를 통해 dispatch 시킵니다.
+
+<p>서버 사이드 렌더링 과정에서 중요한 점은 렌더링 요청 시에 쿠키를 포함시켜줘야 한다는 것입니다. getServerSideProps와 같은 SSR은 결과적으로 서버 쪽에서 실행되기 때문에, 내 계정으로 사용할 때만 쿠키를 그대로 사용하도록 하고, 그렇지 않을 경우에는 쿠키를 초기화해 줘야 합니다. 쿠키를 초기화하지 않을 경우, 같은 도메인에 접속한 다른 사람(유저)이 내 쿠키(정보)를 바탕으로 우리가 제공하는 서비스를 실행할 수도 있기 때문에 치명적인 오류로 작용할 수 있습니다.</p>

@@ -4,9 +4,13 @@
 import produce from 'immer';
 
 const initialState = {
-  loadUserInfoLoading: false, // 유저 정보 가져오기 시도 중
-  loadUserInfoDone: false, // 유저 정보 가져오기 완료
-  loadUserInfoError: null, // 유저 정보 가져오기 에러
+  loadMyInfoLoading: false, // 유저 정보 가져오기 시도 중
+  loadMyInfoDone: false, // 유저 정보 가져오기 완료
+  loadMyInfoError: null, // 유저 정보 가져오기 에러
+
+  loadUserLoading: false, // 유저 정보 가져오기 시도 중
+  loadUserDone: false, // 유저 정보 가져오기 완료
+  loadUserError: null, // 유저 정보 가져오기 에러
 
   logInLoading: false, // 로그인 시도 중
   logInDone: false, // 로그인 완료
@@ -45,7 +49,12 @@ const initialState = {
   loadFollowersError: null, // 팔로워 목록 가져오기 실패
 
   me: null,
+  userInfo: null,
 };
+
+export const LOAD_MY_INFO_REQUEST = 'LOAD_MY_INFO_REQUEST';
+export const LOAD_MY_INFO_SUCCESS = 'LOAD_MY_INFO_SUCCESS';
+export const LOAD_MY_INFO_FAILURE = 'LOAD_MY_INFO_FAILURE';
 
 export const LOAD_USER_REQUEST = 'LOAD_USER_REQUEST';
 export const LOAD_USER_SUCCESS = 'LOAD_USER_SUCCESS';
@@ -128,6 +137,20 @@ const reducer = (state = initialState, action) =>
         draft.logOutDone = false;
         draft.signUpDone = false;
         break;
+      case LOAD_MY_INFO_REQUEST:
+        draft.loadMyInfoLoading = true;
+        draft.loadMyInfoDone = false;
+        draft.loadMyInfoError = action.error;
+        break;
+      case LOAD_MY_INFO_SUCCESS:
+        draft.loadMyInfoLoading = false;
+        draft.me = action.data;
+        draft.loadMyInfoDone = true;
+        break;
+      case LOAD_MY_INFO_FAILURE:
+        draft.loadMyInfoLoading = false;
+        draft.loadMyInfoError = action.error;
+        break;
       case LOAD_USER_REQUEST:
         draft.loadUserLoading = true;
         draft.loadUserDone = false;
@@ -135,7 +158,7 @@ const reducer = (state = initialState, action) =>
         break;
       case LOAD_USER_SUCCESS:
         draft.loadUserLoading = false;
-        draft.me = action.data;
+        draft.userInfo = action.data;
         draft.loadUserDone = true;
         break;
       case LOAD_USER_FAILURE:

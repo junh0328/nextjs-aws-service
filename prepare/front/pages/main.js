@@ -13,7 +13,7 @@ import AppLayout from '../components/AppLayout';
 import PostForm from '../components/PostForm';
 import PostCard from '../components/PostCard';
 import { LOAD_POSTS_REQUEST } from '../reducers/post';
-import { DEFAULT_DONE_ACTION, LOAD_USER_REQUEST } from '../reducers/user';
+import { DEFAULT_DONE_ACTION, LOAD_MY_INFO_REQUEST } from '../reducers/user';
 import wrapper from '../store/configureStore';
 
 const main = () => {
@@ -48,7 +48,7 @@ const main = () => {
 
   useEffect(() => {
     dispatch({
-      type: LOAD_USER_REQUEST,
+      type: LOAD_MY_INFO_REQUEST,
     });
   }, []);
 
@@ -113,3 +113,11 @@ export const getServerSideProps = wrapper.getServerSideProps(async (context) => 
 });
 
 export default main;
+
+/*
+  getServerSideProps와 같은 SSR은 결과적으로 서버 쪽에서 실행되기 때문에, 내 계정으로 사용할 때만 쿠키를 그대로 사용하고
+  그렇지 않을 경우에는 쿠키를 초기화해 줘야 한다.
+
+  쿠키를 초기화하지 않을 경우, 같은 도메인에 접속한 다른 사람이 내 쿠키(정보)를 바탕으로 우리가 제공하는 서비스를 실행할 수도 있기 때문에
+  치명적인 오류로 작용할 수 있다.
+*/
