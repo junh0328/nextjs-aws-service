@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Menu, Input, Row, Col } from 'antd';
 import styled, { createGlobalStyle } from 'styled-components';
 import { useSelector } from 'react-redux';
+import { HomeFilled, ProfileFilled } from '@ant-design/icons';
 
 import UserProfile from './UserProfile';
 
@@ -30,20 +31,29 @@ const AppLayout = ({ children }) => {
   return (
     <div>
       <Global />
-      <div style={{ position: 'fixed', top: 0, zIndex: 9999, width: '100%', height: '60px' }}>
+      <div style={{ position: 'fixed', top: 0, zIndex: 9, width: '100%', height: '60px' }}>
         <Menu
           mode="horizontal"
-          style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '60px',
+          }}
         >
           <Menu.Item>
             <Link href="/main">
-              <a>메인</a>
+              <a>
+                <HomeFilled style={{ width: '100%' }} />
+              </a>
             </Link>
           </Menu.Item>
           {me && (
             <Menu.Item>
               <Link href="/profile">
-                <a>프로필</a>
+                <a>
+                  <ProfileFilled style={{ width: '100%' }} />
+                </a>
               </Link>
             </Menu.Item>
           )}
@@ -52,7 +62,7 @@ const AppLayout = ({ children }) => {
           </Menu.Item>
         </Menu>
       </div>
-      <Row gutter={8} style={{ marginTop: 80 }}>
+      <Row gutter={8} style={{ paddingTop: 80, backgroundColor: 'rgba(var(--b3f,250,250,250),1)' }}>
         <Col xs={24} md={6}>
           {me && <UserProfile />}
         </Col>

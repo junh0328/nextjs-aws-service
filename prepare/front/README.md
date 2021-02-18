@@ -1944,6 +1944,8 @@ Next에서는 SSR뿐만 아니라, static generation, no pre-rendering, pre-rend
 |   getStaticPaths   |                      getStaticProps와 같이 사용한다.                      |
 |         -          |      /pages/user,post,hashtag 와 같이 다이나믹 라우팅 시에 사용된다.      |
 
+<h4> 🖥 getServerSideProps </h4>
+
 ```js
 📁pages/main
 ...
@@ -1973,3 +1975,39 @@ export default main;
 - wrapper에서 제공하는 context 메소드를 통해 dispatch 시킵니다.
 
 <p>서버 사이드 렌더링 과정에서 중요한 점은 렌더링 요청 시에 쿠키를 포함시켜줘야 한다는 것입니다. getServerSideProps와 같은 SSR은 결과적으로 서버 쪽에서 실행되기 때문에, 내 계정으로 사용할 때만 쿠키를 그대로 사용하도록 하고, 그렇지 않을 경우에는 쿠키를 초기화해 줘야 합니다. 쿠키를 초기화하지 않을 경우, 같은 도메인에 접속한 다른 사람(유저)이 내 쿠키(정보)를 바탕으로 우리가 제공하는 서비스를 실행할 수도 있기 때문에 치명적인 오류로 작용할 수 있습니다.</p>
+
+<h4> 🖥 getStaticProps </h4>
+
+<p>웬만한 경우에는 getServerSideProps를 쓰게 되지만, getStaticProps도 언제 쓰는 지 알아두는 것이 좋습니다. 예를 들면 블로그 게시글처럼, 한 번 만들어 놓으면 다시 바뀔(수정 될) 경우가 거의 없는 정보에 한하여 getStaticProps를 사용합니다. 말그대로 정적인 상황에서 자주 사용되죠. 이렇게 getStaticProps를 사용한 파일이 next에 의해 build되면 정적인 html 문서로 뽑아지고 SEO에 효과적으로 노출될 수 있습니다. 블로그의 글들이 html 태그로 되어있고 그 title (및 각종 태그) 등을 검색 엔진이 검사하면서 사용자가 검색한 키워드가 내 게시글에 포함되어 있다면, 결과물로 노출될 가능성이 큽니다.</p>
+
+<h2>🌟 다이나믹 라우팅 적용하기 🌟</h2>
+
+<p>next 8버전 까지는 다이나믹 라우팅을 지원하지 않아 express 같은 프레임워크를 가져다 썼지만, next 9 버전부터는 다이나믹 라우팅이 가능해졌습니다.</p>
+
+<p>📁pages/post/[id].js 와 같은 방식의 폴더 및 파일의 네이밍을 통해 next는 다이나믹 라우팅을 지원합니다. 기본 구조는 아래와 같습니다. </p>
+
+```js
+// post/[id].js
+
+import React from 'react';
+import { useRouter } from 'next/router';
+
+const Post = () => {
+  const router = useRouter();
+  const { id } = router.query;
+
+  return (
+    <>
+      <div>{id}번 게시글</div>
+    </>
+  );
+};
+
+export default Post;
+```
+
+<p>동적인 라우팅을 할 때는 일반 Router가 아닌 ,next/router의 훅함수인 useRouter를 사용하여 실행합니다. {id}는 const id = router.query.id 구조분해할당 하여 가져왔습니다. 그를 통해 {id}번 게시물처럼 접근할 수 있게 되었습니다. </p>
+
+<img  width="80%" src="./images/dynamicRoutingPage.png" title="dynamicRoutingPage">
+
+<p>주소에 post/1 과 같이 입력한다면 '1'번 게시물이 뜨는 것을 볼 수 있습니다. 이제 여기에 id에 따라 불러올 정보를 넣어주고 보여준다면, 다이나믹 라우팅이 완성됩니다.</p>

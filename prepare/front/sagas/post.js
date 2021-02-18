@@ -27,6 +27,9 @@ import {
   RETWEET_REQUEST,
   RETWEET_SUCCESS,
   RETWEET_FAILURE,
+  LOAD_POST_REQUEST,
+  LOAD_POST_SUCCESS,
+  LOAD_POST_FAILURE,
 } from '../reducers/post';
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from '../reducers/user';
 
@@ -55,6 +58,29 @@ function* loadPosts(action) {
     console.error(err);
     yield put({
       type: LOAD_POSTS_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
+// 단일 포스트 불러오기
+function loadPostAPI(data) {
+  return axios.get(`/post/${data}`);
+  // lastId.?id를 했을 때, lastId가 undefined인 경우 0 을 보일 수 있도록 쿼리문을 처리하였다.
+}
+
+function* loadPost(action) {
+  try {
+    const result = yield call(loadPostAPI, action.data);
+
+    yield put({
+      type: LOAD_POST_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOAD_POST_FAILURE,
       error: err.response.data,
     });
   }
@@ -227,6 +253,11 @@ function* retweet(action) {
 function* watchloadPosts() {
   yield takeLatest(LOAD_POSTS_REQUEST, loadPosts);
 }
+
+function* watchloadPost() {
+  yield takeLatest(LOAD_POST_REQUEST, loadPost);
+}
+
 function* watchUploadImages() {
   yield takeLatest(UPLOAD_IMAGES_REQUEST, uploadImages);
 }
@@ -254,6 +285,7 @@ function* watchRetweet() {
 export default function* postSaga() {
   yield all([
     fork(watchloadPosts),
+    fork(watchloadPost),
     fork(watchUploadImages),
     fork(watchAddPost),
     fork(watchAddComment),

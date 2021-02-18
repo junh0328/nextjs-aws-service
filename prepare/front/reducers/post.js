@@ -6,6 +6,7 @@ import produce from 'immer';
 // import faker from 'faker';
 
 const initialState = {
+  singlePost: null,
   mainPosts: [],
   imagePaths: [],
   hasMorePosts: true,
@@ -13,6 +14,10 @@ const initialState = {
   loadPostsLoading: false, // 포스트 불러오기 요청중
   loadPostsDone: false, // 포스트 불러오기 성공
   loadPostsError: null, // 포스트 불러오기 실패
+
+  loadPostLoading: false, // 단일 포스트 불러오기 요청중
+  loadPostDone: false, // 단일 포스트 불러오기 성공
+  loadPostError: null, // 단일 포스트 불러오기 실패
 
   addPostLoading: false, // 포스트 추가 요청중
   addPostDone: false, // 포스트 추가 성공
@@ -87,6 +92,10 @@ export const LOAD_POSTS_REQUEST = 'LOAD_POSTS_REQUEST';
 export const LOAD_POSTS_SUCCESS = 'LOAD_POSTS_SUCCESS';
 export const LOAD_POSTS_FAILURE = 'LOAD_POSTS_FAILURE';
 
+export const LOAD_POST_REQUEST = 'LOAD_POST_REQUEST';
+export const LOAD_POST_SUCCESS = 'LOAD_POST_SUCCESS';
+export const LOAD_POST_FAILURE = 'LOAD_POST_FAILURE';
+
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
 export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS';
 export const ADD_POST_FAILURE = 'ADD_POST_FAILURE';
@@ -152,6 +161,20 @@ const reducer = (state = initialState, action) => {
       case LOAD_POSTS_FAILURE:
         draft.loadPostsLoading = false;
         draft.loadPostsError = action.error;
+        break;
+      case LOAD_POST_REQUEST:
+        draft.loadPostLoading = true;
+        draft.loadPostDone = false;
+        draft.loadPostError = null;
+        break;
+      case LOAD_POST_SUCCESS:
+        draft.loadPostLoading = false;
+        draft.loadPostDone = true;
+        draft.singlePost = action.data;
+        break;
+      case LOAD_POST_FAILURE:
+        draft.loadPostLoading = false;
+        draft.loadPostError = action.error;
         break;
       case ADD_POST_REQUEST:
         draft.addPostLoading = true;

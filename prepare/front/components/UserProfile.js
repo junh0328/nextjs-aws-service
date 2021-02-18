@@ -13,6 +13,7 @@ const UserProfile = () => {
   }, []);
   return (
     <Card
+      style={{ backgroundColor: 'rgba(var(--b3f,250,250,250),1)' }}
       actions={[
         <div key="twit">
           {/* 트윗 수 */}
