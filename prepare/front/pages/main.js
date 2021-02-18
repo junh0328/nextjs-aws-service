@@ -6,15 +6,15 @@ import React, { useEffect } from 'react';
 import Head from 'next/head';
 import { useDispatch, useSelector } from 'react-redux';
 import Router from 'next/router';
-// import { END } from 'redux-saga';
-// import axios from 'axios';
+import { END } from 'redux-saga';
+import axios from 'axios';
 
 import AppLayout from '../components/AppLayout';
 import PostForm from '../components/PostForm';
 import PostCard from '../components/PostCard';
 import { LOAD_POSTS_REQUEST } from '../reducers/post';
 import { DEFAULT_DONE_ACTION, LOAD_USER_REQUEST } from '../reducers/user';
-// import wrapper from '../store/configureStore';
+import wrapper from '../store/configureStore';
 
 const main = () => {
   const { me, logOutDone } = useSelector((state) => state.user);
@@ -49,9 +49,6 @@ const main = () => {
   useEffect(() => {
     dispatch({
       type: LOAD_USER_REQUEST,
-    });
-    dispatch({
-      type: LOAD_POSTS_REQUEST,
     });
   }, []);
 
@@ -100,21 +97,19 @@ const main = () => {
   );
 };
 
-// export const getServerSideProps = wrapper.getServerSideProps(async (context) => {
-//   const cookie = context.req ? context.req.headers.cookie : '';
-//   axios.defaults.headers.Cookie = '';
-//   if (context.req && cookie) {
-//     axios.defaults.headers.Cookie = cookie;
-//   }
-//   console.log(context);
-//   context.store.dispatch({
-//     type: LOAD_USER_REQUEST,
-//   });
-//   context.store.dispatch({
-//     type: LOAD_POSTS_REQUEST,
-//   });
-//   context.store.dispatch(END);
-//   await context.store.sagaTask.toPromise();
-// });
+export const getServerSideProps = wrapper.getServerSideProps(async (context) => {
+  const cookie = context.req ? context.req.headers.cookie : '';
+  axios.defaults.headers.Cookie = '';
+  if (context.req && cookie) {
+    axios.defaults.headers.Cookie = cookie;
+  }
+  console.log(context);
+
+  context.store.dispatch({
+    type: LOAD_POSTS_REQUEST,
+  });
+  context.store.dispatch(END);
+  await context.store.sagaTask.toPromise();
+});
 
 export default main;

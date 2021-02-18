@@ -30,24 +30,29 @@ const AppLayout = ({ children }) => {
   return (
     <div>
       <Global />
-      <Menu mode="horizontal">
-        <Menu.Item>
-          <Link href="/main">
-            <a>메인</a>
-          </Link>
-        </Menu.Item>
-        {me && (
+      <div style={{ position: 'fixed', top: 0, zIndex: 9999, width: '100%', height: '60px' }}>
+        <Menu
+          mode="horizontal"
+          style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+        >
           <Menu.Item>
-            <Link href="/profile">
-              <a>프로필</a>
+            <Link href="/main">
+              <a>메인</a>
             </Link>
           </Menu.Item>
-        )}
-        <Menu.Item>
-          <SearchInput placeholder="input search text" enterButton />
-        </Menu.Item>
-      </Menu>
-      <Row gutter={8}>
+          {me && (
+            <Menu.Item>
+              <Link href="/profile">
+                <a>프로필</a>
+              </Link>
+            </Menu.Item>
+          )}
+          <Menu.Item>
+            <SearchInput placeholder="input search text" enterButton />
+          </Menu.Item>
+        </Menu>
+      </div>
+      <Row gutter={8} style={{ marginTop: 80 }}>
         <Col xs={24} md={6}>
           {me && <UserProfile />}
         </Col>
