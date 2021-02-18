@@ -295,7 +295,7 @@ router.post('/:postId/retweet', isLoggedIn, async (req, res, next) => {
     const retweet = await Post.create({
       UserId: req.user.id,
       RetweetId: retweetTargetId,
-      content: 'retweet', // model 설정에서 allowNull(빈 값)을 넣지 못하게 만들었음..
+      content: '사용자에 의해 삭제된 게시물입니다.', // model 설정에서 allowNull(빈 값)을 넣지 못하게 만들었음..
     });
     // 내가 어떤 게시글을 리트윗했는지 알려주는 변수 retweetWithPrevPost
     const retweetWithPrevPost = await Post.findOne({
