@@ -2011,3 +2011,17 @@ export default Post;
 <img  width="80%" src="./images/dynamicRoutingPage.png" title="dynamicRoutingPage">
 
 <p>주소에 post/1 과 같이 입력한다면 '1'번 게시물이 뜨는 것을 볼 수 있습니다. 이제 여기에 id에 따라 불러올 정보를 넣어주고 보여준다면, 다이나믹 라우팅이 완성됩니다.</p>
+
+## 9. 📁 downloaded dependencies
+
+- babel-plugin-styled-components
+
+<h2>🌟 styled-components 서버사이드 렌더링하기 🌟</h2>
+
+<p>SSR로 html 파일을 서버에서 넘겨줄 때, CSS는 기본적으로 넘겨주지 않습니다. 따라서 이번 강의에서는 바벨을 (📁/.babelrc) 사용하여 html에 포함된 코드로 만들어 CSS를 넘겨주겠습니다. styled-components를 서버사이드 렌더링하기 위해서는 getInitialProps를 비롯한 class형 컴포넌트를 사용해야 합니다. 설정은 외우시지 않아도 되고, 공식 문서에 따라 작성되었으므로 그대로 사용하셔도 무방합니다.  📁/pages/_documents 에 해당 코드를 작성해주세요.</p>
+
+<p>_document.js 파일은 _app.js보다 위에서 실행되는 파일입니다. pages에서 라우팅되는 모든 파일은 _document.js > _app.js를 거쳐 라우팅될 것입니다.</p>
+
+<img  width="80%" src="./images/postmanResult.png" title="postmanResult">
+
+<p>모든 작업이 완료된 상태에서 실제 배포시에 검색엔진이 어떻게 렌더링 받는지를 보여주겠습니다. 'Postman' 어플리케이션을 이용하여 서버에 GET 요청을 보내면 넘어오는 결과값이 다음과 같습니다. 우리가 사전에 지정해준 HEAD 부분에서 원하는 값을 찾기도 하고, content, tilte, img 등이 구성되어있는 것을 알 수 있습니다.</p>

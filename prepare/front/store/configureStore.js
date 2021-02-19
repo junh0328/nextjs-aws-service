@@ -8,6 +8,7 @@ import reducer from '../reducers';
 import rootSaga from '../sagas';
 
 const configureStore = (context) => {
+  console.log('액션 실행');
   console.log(context);
   const sagaMiddleware = createSagaMiddleware();
   const middlewares = [sagaMiddleware];

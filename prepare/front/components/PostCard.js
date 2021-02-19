@@ -33,20 +33,20 @@ const PostCard = ({ post }) => {
   const id = useSelector((state) => state.user.me?.id);
 
   const onLike = useCallback(() => {
-    if (!id) {
-      return alert('로그인이 필요합니다!');
-    }
-    return dispatch({
+    // if (!id) {
+    //   return alert('로그인이 필요합니다!');
+    // }
+    dispatch({
       type: LIKE_POST_REQUEST,
       data: post.id,
     });
   }, []);
 
   const onUnLike = useCallback(() => {
-    if (!id) {
-      return alert('로그인이 필요합니다!');
-    }
-    return dispatch({
+    // if (!id) {
+    //   return alert('로그인이 필요합니다!');
+    // }
+    dispatch({
       type: UNLIKE_POST_REQUEST,
       data: post.id,
     });
