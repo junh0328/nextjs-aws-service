@@ -64,9 +64,14 @@ router.get('/', async (req, res, next) => {
         },
       ],
     }); // 지금까지 작성한 모든 게시글을 보여줄 것.
-    // console.log(posts);
+    if (!posts) {
+      return res.status(200).send('posts가 전달되지 않았습니다.');
+    }
+    console.log('posts 출력');
+    console.log(posts);
     res.status(200).json(posts);
   } catch (error) {
+    console.dir(error);
     console.error(error);
     return next(error);
   }

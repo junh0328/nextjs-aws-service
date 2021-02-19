@@ -1894,7 +1894,10 @@ alert(user?.address);
 
 <h2>🌟 SSR(Server Side Rendering) 🌟</h2>
 
-<p>리액트는 대표적인 CSR(client side rendering)입니다. 이러한 리액트의 CSR적인 부분에서 SSR 적으로 바꿔 주기 위해서 next.js와 같은 라이브러리를 사용합니다. SSR을 사용하는 가장 큰 이유는 효율적인 SEO를 위해서 입니다. 아래 문단에서 다루겠지만, SEO는 google, naver와 같은 검색 엔진들이 우리의 웹사이트에서 html 태그안의 내용을(title, meta-data 등등,,,) 분석하여 사용자가 입력한 정보를 바탕으로 알맞은(사용자가 원하는) 정보를 찾을 수 있게 하는 기능입니다. 리액트는 CSR로 작동되는데, 사용자가 우리의 해당 도메인에 접속하면, 클라이언트 서버가 html과 js 등의 파일을 다운받아 보여주는 형식입니다. CSR 상태에서는 사전에 html을 가지고 있지 않기 때문에 검색 엔진에 노출되는 빈도가 현저히 적거나, 브라우저에 따라 검색 엔진에 해당 정보가 노출되지 않아 검색을 해도 나오지 않을 수 있습니다.(도메인을 통해 접속하는 것은 가능해지는 정도, 해당 사이트에 관련된 정보를 검색 엔진이 크롤링하지 못할 수 있음)그래서 SSR을 통해 서버가 사전에 html과 일부 js 파일을 넘겨주게 되면, 검색 엔진에서 이를 캐치하여 사용자가 원하는 정보가 담긴 우리 사이트를 보여줄 수 있을 것입니다.</p>
+<p>리액트는 대표적인 CSR(client side rendering)입니다. 이러한 리액트의 CSR적인 부분에서 SSR 적으로 바꿔 주기 위해서 next.js와 같은 라이브러리를 사용합니다. 
+<img  width="80%" src="./images/SSRLibrary.png" title="SSRLibrary">
+<p><b><a href="https://www.npmtrends.com/next-vs-gatsby" target="_blank">npm trends</a>에서 분석한 SSR 라이브러리, next 사용률이 가장 높은 비중을 가짐</b></p>
+SSR을 사용하는 가장 큰 이유는 효율적인 SEO를 위해서 입니다. 아래 문단에서 다루겠지만, SEO는 google, naver와 같은 검색 엔진들이 우리의 웹사이트에서 html 태그안의 내용을(title, meta-data 등등,,,) 분석하여 사용자가 입력한 정보를 바탕으로 알맞은(사용자가 원하는) 정보를 찾을 수 있게 하는 기능입니다. 리액트는 CSR로 작동되는데, 사용자가 우리의 해당 도메인에 접속하면, 클라이언트 서버가 html과 js 등의 파일을 다운받아 보여주는 형식입니다. CSR 상태에서는 사전에 html을 가지고 있지 않기 때문에 검색 엔진에 노출되는 빈도가 현저히 적거나, 브라우저에 따라 검색 엔진에 해당 정보가 노출되지 않아 검색을 해도 나오지 않을 수 있습니다.(도메인을 통해 접속하는 것은 가능해지는 정도, 해당 사이트에 관련된 정보를 검색 엔진이 크롤링하지 못할 수 있음)그래서 SSR을 통해 서버가 사전에 html과 일부 js 파일을 넘겨주게 되면, 검색 엔진에서 이를 캐치하여 사용자가 원하는 정보가 담긴 우리 사이트를 보여줄 수 있을 것입니다.</p>
 
 <h2>🌟 SEO(Search Engine Optimization), 검색 엔진 최적화 🌟</h2>
 
@@ -1935,14 +1938,16 @@ Next에서는 SSR뿐만 아니라, static generation, no pre-rendering, pre-rend
 
 <p>SSR을 적용하기 위해서 Next(@9 이하 버전)에는 getInitialProps를 사용하거 SSR을 적용해줬다면 Next@9 버전 이상부터는 3가지 함수를 사용하여 SSR을 구현해줄 수 있습니다.</p>
 
-|        종류        |                                   의미                                    |
-| :----------------: | :-----------------------------------------------------------------------: |
-|   getStaticProps   |         언제 접속해도 fetch 되는 데이터가 바뀔 일이 없을 때 사용          |
-|         -          |         빌드할 때 미리 SSR을 통해 html로 만들어서 가지고 있는다.          |
-| getServerSideProps | 접속할 때마다 사용자의 요구 및 인터렉션에 따라 화면이 바뀌어야 할 때 사용 |
-|         -          |             웬만한 경우 getServerSideProps가 default로 사용됨             |
-|   getStaticPaths   |                      getStaticProps와 같이 사용한다.                      |
-|         -          |      /pages/user,post,hashtag 와 같이 다이나믹 라우팅 시에 사용된다.      |
+|        종류        |                                     의미                                     |
+| :----------------: | :--------------------------------------------------------------------------: |
+|   getStaticProps   |           언제 접속해도 fetch 되는 데이터가 바뀔 일이 없을 때 사용           |
+|         -          |           빌드할 때 미리 SSR을 통해 html로 만들어서 가지고 있는다.           |
+|         -          |  getStaticProps: static data를 위해 datfetching (빌드 이후 data 변경 불가)   |
+| getServerSideProps |  접속할 때마다 사용자의 요구 및 인터렉션에 따라 화면이 바뀌어야 할 때 사용   |
+|         -          |              웬만한 경우 getServerSideProps가 default로 사용됨               |
+|         -          | getServerSideProps: ssr을 위해 data fetching ( 빌드 이후에도 data 변경 가능) |
+|   getStaticPaths   |                       getStaticProps와 같이 사용한다.                        |
+|         -          |       /pages/user,post,hashtag 와 같이 다이나믹 라우팅 시에 사용된다.        |
 
 <h4> 🖥 getServerSideProps </h4>
 
@@ -1968,7 +1973,7 @@ export const getServerSideProps = wrapper.getServerSideProps(async (context) => 
 export default main;
 ```
 
-- 서버 사이드 렌더링은 기존의 export 시킨 main 보다 위에 적용해야만 합니다.
+- 서버 사이드 렌더링은 기존의 export 시킨 해당 컴포넌트 (main) 보다 위에 적용해야만 합니다.
 - 서버 사이드 렌더링은 프론트서버에서 해주는 것이 아닌, 백엔드 서버에서 해주는 것이기 때문입니다.
 - store에서 만들어 주었던 wrapper의 기능을 사용하여 서버로부터 사전에 실행할 것을 알려줍니다.
 - async, await를 사용하여 정확히 요청한 결과가 넘어올 때까지 (서버사이드렌더링이 실행될 때까지) 순차적으로 사용됩니다.
@@ -1978,9 +1983,9 @@ export default main;
 
 <h4> 🖥 getStaticProps </h4>
 
-<p>웬만한 경우에는 getServerSideProps를 쓰게 되지만, getStaticProps도 언제 쓰는 지 알아두는 것이 좋습니다. 예를 들면 블로그 게시글처럼, 한 번 만들어 놓으면 다시 바뀔(수정 될) 경우가 거의 없는 정보에 한하여 getStaticProps를 사용합니다. 말그대로 정적인 상황에서 자주 사용되죠. 이렇게 getStaticProps를 사용한 파일이 next에 의해 build되면 정적인 html 문서로 뽑아지고 SEO에 효과적으로 노출될 수 있습니다. 블로그의 글들이 html 태그로 되어있고 그 title (및 각종 태그) 등을 검색 엔진이 검사하면서 사용자가 검색한 키워드가 내 게시글에 포함되어 있다면, 결과물로 노출될 가능성이 큽니다.</p>
+<p>웬만한 경우에는 getServerSideProps를 쓰게 되지만, getStaticProps도 언제 쓰는 지 알아두는 것이 좋습니다. 예를 들면 블로그 게시글처럼, 한 번 만들어 놓으면 다시 바뀔(수정 될) 경우가 없는(불변적인) 정보에 한하여 getStaticProps를 사용합니다. 말그대로 정적인 상황에서 자주 사용되죠. 이렇게 getStaticProps를 사용한 파일이 next에 의해 build되면 정적인 html 문서로 뽑아지고 SEO에 효과적으로 노출될 수 있습니다. 블로그의 글들이 html 태그로 되어있고 그 title (및 각종 태그) 등을 검색 엔진이 검사하면서 사용자가 검색한 키워드가 내 게시글에 포함되어 있다면, 결과물로 노출될 가능성이 큽니다.</p>
 
-<h2>🌟 다이나믹 라우팅 적용하기 🌟</h2>
+<h2>🌟 다이나믹 라우팅 적용하기 (post.id를 통해 해당 포스트 가져오기) 🌟</h2>
 
 <p>next 8버전 까지는 다이나믹 라우팅을 지원하지 않아 express 같은 프레임워크를 가져다 썼지만, next 9 버전부터는 다이나믹 라우팅이 가능해졌습니다.</p>
 
@@ -2025,3 +2030,47 @@ export default Post;
 <img  width="80%" src="./images/postmanResult.png" title="postmanResult">
 
 <p>모든 작업이 완료된 상태에서 실제 배포시에 검색엔진이 어떻게 렌더링 받는지를 보여주겠습니다. 'Postman' 어플리케이션을 이용하여 서버에 GET 요청을 보내면 넘어오는 결과값이 다음과 같습니다. 우리가 사전에 지정해준 HEAD 부분에서 원하는 값을 찾기도 하고, content, tilte, img 등이 구성되어있는 것을 알 수 있습니다.</p>
+
+<h2>🌟 다이나믹 라우팅 적용하기 (user.id를 통해 해당 유저가 쓴 포스트 가져오기) 🌟</h2>
+
+<p>처음에 우리가 만든 다이나믹 라우팅 페이지는, GET 방식으로 포스트 번호가 담긴 파라미터를 보내주면 서버에서 해당 파라미터의 여부를 파악하고 단일 포스트만을 불러와 줬습니다. 이번에 해 볼 기능은 우리가 검색한 특정 사용자가 작성한 게시글을 전부 보기 위한 로직을 만들어 볼 것입니다.</p>
+
+<p>첫 번째로 유저의 id를 데이터로 넘겨주면, 그 데이터를 바탕으로 유저가 쓴 게시물을 불러오는 동기 액션 함수를 만들어줘야 합니다.</p>
+
+```js
+dispatch({
+  type: LOAD_USER_POSTS_REQUEST,
+  lastId: mainPosts[mainPosts.length - 1] && mainPosts[mainPosts.length - 1].id,
+  data: id,
+});
+```
+
+<p>📁/pages/main에서 만들었던 함수와 똑같은데, type 명만 새로 만들어줬습니다. 기존 LOAD_POSTS_REQUEST는 특정 유저를 불러오는 것이 아닌, SSR 시에 게시물을 우리가 지정한 갯수만큼 가져오는 함수이기 때문입니다. 리듀서(case문)에 들어갈 부분은 재사용을 했습니다. </p>
+
+```js
+      case LOAD_HASHTAG_POSTS_REQUEST:
+      case LOAD_USER_POSTS_REQUEST:
+      case LOAD_POSTS_REQUEST:
+        draft.loadPostsLoading = true;
+        draft.loadPostsDone = false;
+        draft.loadPostsError = null;
+        break;
+      case LOAD_HASHTAG_POSTS_SUCCESS:
+      case LOAD_USER_POSTS_SUCCESS:
+      case LOAD_POSTS_SUCCESS:
+        draft.loadPostsLoading = false;
+        draft.loadPostsDone = true;
+        draft.mainPosts = draft.mainPosts.concat(action.data);
+        // 더미데이터와 기존 데이터를 합쳐줌
+        draft.hasMorePosts = action.data.length === 10;
+        break;
+      case LOAD_HASHTAG_POSTS_FAILURE:
+      case LOAD_USER_POSTS_FAILURE:
+      case LOAD_POSTS_FAILURE:
+        draft.loadPostsLoading = false;
+        draft.loadPostsError = action.error;
+```
+
+<p>SUCCESS 시에도 mainPosts를 서버에서 받아오는 정보로 채워주는 것은 같은 로직으로 구성되기 때문이죠. <b>'같은 페이지'에서 작동하는 state가 아니기 때문에</b> 이렇게 공유하여 사용할 수 있습니다. 같은 페이지에서 state를 공유한다면 내가 원하지 않는 상황에 state에 변화가 생길 수 있습니다. </p>
+
+<p>후에, 이 다이나믹 라우팅을 진행할 때도 getServerSideProps vs getStaticProps, getStaticPaths 둘 중 어떤 기능으로 만들어줘야 할 지 고민일텐데요, 그 점까지 짚어가며 진행해보도록 하겠습니다. </p>
