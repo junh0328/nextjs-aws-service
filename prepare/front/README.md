@@ -2035,6 +2035,8 @@ export default Post;
 
 <p>처음에 우리가 만든 다이나믹 라우팅 페이지는, GET 방식으로 포스트 번호가 담긴 파라미터를 보내주면 서버에서 해당 파라미터의 여부를 파악하고 단일 포스트만을 불러와 줬습니다. 이번에 해 볼 기능은 우리가 검색한 특정 사용자가 작성한 게시글을 전부 보기 위한 로직을 만들어 볼 것입니다.</p>
 
+<p>후에, 이 다이나믹 라우팅을 진행할 때도 getServerSideProps vs getStaticProps, getStaticPaths 둘 중 어떤 기능으로 만들어줘야 할 지 고민일텐데요, 그 점까지 짚어가며 진행해보도록 하겠습니다. </p>
+
 <p>첫 번째로 유저의 id를 데이터로 넘겨주면, 그 데이터를 바탕으로 유저가 쓴 게시물을 불러오는 동기 액션 함수를 만들어줘야 합니다.</p>
 
 ```js
@@ -2073,4 +2075,67 @@ dispatch({
 
 <p>SUCCESS 시에도 mainPosts를 서버에서 받아오는 정보로 채워주는 것은 같은 로직으로 구성되기 때문이죠. <b>'같은 페이지'에서 작동하는 state가 아니기 때문에</b> 이렇게 공유하여 사용할 수 있습니다. 같은 페이지에서 state를 공유한다면 내가 원하지 않는 상황에 state에 변화가 생길 수 있습니다. </p>
 
-<p>후에, 이 다이나믹 라우팅을 진행할 때도 getServerSideProps vs getStaticProps, getStaticPaths 둘 중 어떤 기능으로 만들어줘야 할 지 고민일텐데요, 그 점까지 짚어가며 진행해보도록 하겠습니다. </p>
+<p>saga 부분도 api 호출할 때 부분을 제외하면 기존과 같습니다. 이 부분은 결과적으로 백엔드와의 약속이기 때문에 크게 걱정하지 않으셔도 됩니다.</p>
+
+```js
+function loadUserPostsAPI(data, lastId) {
+  return axios.get(`/user/${data}/posts?${lastId || 0}`);
+  // lastId.?id를 했을 때, lastId가 undefined인 경우 0 을 보일 수 있도록 쿼리문을 처리하였다.
+}
+
+function* loadUserPosts(action) {
+  try {
+    const result = yield call(loadUserPostsAPI, action.data, action.lastId);
+
+    yield put({
+      type: LOAD_USER_POSTS_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOAD_USER_POSTS_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+```
+
+<p>서버사이드 렌더링을 적용한 부분은 다음과 같습니다.</p>
+
+```js
+export const getServerSideProps = wrapper.getServerSideProps(async (context) => {
+  const cookie = context.req ? context.req.headers.cookie : '';
+  axios.defaults.headers.Cookie = '';
+  if (context.req && cookie) {
+    axios.defaults.headers.Cookie = cookie;
+  }
+
+  context.store.dispatch({
+    type: LOAD_USER_POSTS_REQUEST,
+    data: context.params.id,
+  });
+  console.log('LOAD_USER_POSTS_REQUEST 출력');
+
+  // context.store.dispatch({
+  //   type: LOAD_MY_INFO_REQUEST,
+  // });
+
+  // context.store.dispatch({
+  //   type: LOAD_USER_REQUEST,
+  //   data: context.params.id,
+  // });
+
+  context.store.dispatch(END);
+  await context.store.sagaTask.toPromise();
+});
+
+export default User;
+```
+
+<p>기존 강의대로 SPA(single-page-application)형식의 페이지에 적용됐다면, LOAD_MY_INFO와 LOAD_USER 또한 사용할 수 있습니다. 하지만, 우리 페이지에서는 서버 트레픽을 줄이기 위해서 로그인 페이지를 따로 구성해줬습니다. 그에 따라 로그인이 된 후, main 페이지에서부터 SSR이 적용되므로 사용자의 정보를 받아올 수 없습니다.</p>
+<p> why? <br/>
+(Routing을 통해 main 페이지로 옮겨주는 구조이기 때문에 USER의 정보를 getServerSideProps에 담지 않았음 > 서버에서 사용자의 정보가 담겨있는지 모름 > 후에 main 페이지에서 useEffect를 로그인된 정보를 기반으로 사용자를 불러옴 > 서버에서 확인 후에 정상적인 활동 가능)
+</p> 
+<p>
+따라서 유저의 포스트는 로그인 권한이 없어도 볼 수 있으므로, 해당 상황에서는 SSR을 통해 데이터를 사전에 저장할 것입니다.</p>
