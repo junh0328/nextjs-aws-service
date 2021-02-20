@@ -60,7 +60,9 @@ router.get('/followings', isLoggedIn, async (req, res, next) => {
     if (!user) {
       res.status(403).send('존재하지 않는 사람을 찾으려고 하시네요?');
     }
-    const followings = await user.getFollowings();
+    const followings = await user.getFollowings({
+      limit: parseInt(req.query.limit, 10),
+    });
     console.log('팔로잉은 : ');
     console.log(followings);
     res.status(200).json(followings);
@@ -86,7 +88,9 @@ router.get('/followers', isLoggedIn, async (req, res, next) => {
     if (!user) {
       res.status(403).send('존재하지 않는 사람을 찾으려고 하시네요?');
     }
-    const followers = await user.getFollowers();
+    const followers = await user.getFollowers({
+      limit: parseInt(req.query.limit, 10),
+    });
     console.log('팔로워는 : ');
     console.log(followers);
     res.status(200).json(followers);

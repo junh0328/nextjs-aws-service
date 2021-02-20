@@ -2139,3 +2139,138 @@ export default User;
 </p> 
 <p>
 따라서 유저의 포스트는 로그인 권한이 없어도 볼 수 있으므로, 해당 상황에서는 SSR을 통해 데이터를 사전에 저장할 것입니다.</p>
+
+<h2>🌟 SWR 라이브러리로 리덕스 사가 가볍게 만들기 🌟</h2>
+
+## 10. 📁 downloaded dependencies
+
+- swr
+
+<p><a href="https://swr.vercel.app/" target="_blank">SWR</a>은 next.js에서 비동기 처리를 할 때 사용되는 request, success, failure 처리 단계에서 액션을 생성하지 않고, 간단하게 처리할 수 있도록 도와주는 라이브러리이다.</p>
+
+```js
+import useSWR from 'swr';
+function Profile() {
+  const { data, error } = useSWR('/api/user', fetcher);
+  if (error) return <div>failed to load</div>;
+  if (!data) return <div>loading...</div>;
+  return <div>hello {data.name}!</div>;
+}
+```
+
+<p>공식 문서의 제일 첫 페이지에서 제공하는 간단한 예제이다. data와 error 이 두가지 상황이 있고 swr 라이브러리에서 제공하는 fetcher로 하여금 api를 전송한다. axios의 기능이 들어있지만, useEffect()안에서 사용할 수 없기 때문에 axios 및 액션 함수에 대한 완벽한 대체가 이루어지지는 않는다. 하지만, 특정 상황에서 swr을 사용하여 관리한다면, 사가및 리듀서를 통해 만들어지는(3단계 과정 요창, 성공, 실패) 어마어마한 코드의 양을 줄일 수 있을 것이다. </p>
+
+<h4> 🌟 기존의 pages/profile 🌟 </h4>
+
+```js
+const Profile = () => {
+  const { me } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch({
+      type: LOAD_FOLLOWINGS_REQUEST,
+    });
+    dispatch({
+      type: LOAD_FOLLOWERS_REQUEST,
+    });
+  }, []);
+
+  return (
+    <div>
+      <Head>
+        <meta charSet="utf-8" />
+        <link rel="icon" href="/favicon.png" />
+        <title>Juneed | Profile</title>
+      </Head>
+      <AppLayout>
+        <NicknameEditForm />
+        <FollowList header="팔로잉 목록" data={me.Followings} />
+        <FollowList header="팔로워 목록" data={me.Followers} />
+      </AppLayout>
+    </div>
+  );
+};
+```
+
+<h4> 🌟 SWR을 사용한 pages/profile 🌟 </h4>
+
+```js
+const fetcher = (url) => axios.get(url, { withCredentials: true }).then((result) => result.data);
+
+const Profile = () => {
+  const { me } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+
+  const [followersLimit, setFollowersLimit] = useState(3);
+  const [followingsLimit, setFollowingsLimit] = useState(3);
+
+  const { data: followersData, error: followerError } = useSWR(
+    `http://localhost:3065/user/followers?limit=${followersLimit}`,
+    fetcher
+  );
+  const { data: followingsData, error: followingError } = useSWR(
+    `http://localhost:3065/user/followings?limit=${followingsLimit}`,
+    fetcher
+  );
+
+  const loadMoreFollowings = useCallback(() => {
+    setFollowingsLimit((prev) => prev + 3);
+  }, []);
+
+  const loadMoreFollowers = useCallback(() => {
+    setFollowersLimit((prev) => prev + 3);
+  }, []);
+
+  if (!me) {
+    return dispatch({
+      type: LOAD_MY_INFO_REQUEST,
+    });
+  }
+
+  if (followerError || followingError) {
+    console.log(followerError || followingError);
+    return <div>팔로잉/팔로우 로딩 중 에러가 발생합니다</div>;
+  }
+
+  return (
+    <div>
+      <Head>
+        <meta charSet="utf-8" />
+        <link rel="icon" href="/favicon.png" />
+        <title>Juneed | Profile</title>
+      </Head>
+      <AppLayout>
+        <NicknameEditForm />
+        <FollowList
+          header="팔로잉 목록"
+          data={followingsData}
+          onClickMore={loadMoreFollowings}
+          loading={!followingsData && !followerError}
+        />
+        <FollowList
+          header="팔로워 목록"
+          data={followersData}
+          onClickMore={loadMoreFollowers}
+          loading={!followersData && !followingError}
+        />
+      </AppLayout>
+    </div>
+  );
+};
+
+export default Profile;
+```
+
+<h2>🌟 프로필 페이지 더보기 버튼으로 팔로잉 팔로워 불러오기 🌟</h2>
+
+<p>기존에 프로필페이지로 들어오면 팔로잉 팔로워를 가진 관계만큼 불러왔습니다. 현재는 작은 서비스 규모로 인해 불러오는데 문제가 없지만, 추후 사용하는 인원과 연결된 관계에 따라 서버에 과부화가 올 수 있습니다. 따라서 이번에는 지정해준 기준에 따라 인원을 불러오고, 더 보기 버튼을 활성화하여 누를 때마다 추가된 인원을 불러오는 기능을 만들어 보도록 하겠습니다. </p>
+
+<p>로직은 따로 사가나 리듀서를 사용하지 않아도 됩니다. useState를 사용하여 현재 불러올 팔로잉 팔로워 수를 설정합니다</p>
+
+```js
+const [followersLimit, setFollowersLimit] = useState(3);
+const [followingsLimit, setFollowingsLimit] = useState(3);
+```
+
+<p>swr과 더불어 이 state를 넘겨줌으로써 우리는 'FollowList' 컴포넌트에 data를 넘겨줄 수 있게 되었습니다. 또한 click 버튼을 통해 기존 state에서 prev => prev + 3 3명을 추가해서 가져오도록 만들어 주었습니다.</p>
