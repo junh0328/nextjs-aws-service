@@ -18,9 +18,16 @@ import wrapper from '../store/configureStore';
 
 const main = () => {
   const { me, logOutDone } = useSelector((state) => state.user);
-  const { mainPosts, hasMorePosts, loadPostsLoading, retweetError, retweetDone } = useSelector(
-    (state) => state.post
-  );
+  const {
+    mainPosts,
+    hasMorePosts,
+    loadPostsLoading,
+    retweetError,
+    retweetDone,
+    addCommentError,
+    likePostError,
+    unlikePostError,
+  } = useSelector((state) => state.post);
   // const mainPosts = useSelector((state)=> state.post.mainPosts) 구조분해를 하지 않으면 다음과 같이 표현할 수 있다.
   const dispatch = useDispatch();
 
@@ -29,6 +36,24 @@ const main = () => {
       alert(retweetError);
     }
   }, [retweetError]);
+
+  useEffect(() => {
+    if (addCommentError) {
+      alert(addCommentError);
+    }
+  }, [addCommentError]);
+
+  useEffect(() => {
+    if (likePostError) {
+      alert(likePostError);
+    }
+  }, [likePostError]);
+
+  useEffect(() => {
+    if (unlikePostError) {
+      alert(unlikePostError);
+    }
+  }, [unlikePostError]);
 
   useEffect(() => {
     if (retweetDone) {
