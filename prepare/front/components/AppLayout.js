@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Menu, Input, Row, Col } from 'antd';
 import styled, { createGlobalStyle } from 'styled-components';
 import { useSelector } from 'react-redux';
@@ -60,7 +59,6 @@ const AppLayout = ({ children }) => {
             height: '60px',
           }}
         >
-          <Image src="/logo.jpg" width="80" height="20" style={{ display: 'flex' }} />
           <Menu.Item>
             <Link href="/main">
               <a>

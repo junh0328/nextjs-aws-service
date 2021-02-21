@@ -1,13 +1,16 @@
 /* eslint-disable react/jsx-props-no-spreading */
+/* eslint-disable react/jsx-wrap-multilines */
+/* eslint-disable jsx-quotes */
 import React, { useCallback, useEffect } from 'react';
 import Head from 'next/head';
 import { Form, Input, Button, Checkbox } from 'antd';
-import Link from 'next/link';
 import styled, { createGlobalStyle } from 'styled-components';
-import Router from 'next/router';
 import { useDispatch, useSelector } from 'react-redux';
+import Link from 'next/link';
+import Router from 'next/router';
+import useInput from '../hooks/useInput';
+
 import { loginRequestAction } from '../reducers/user';
-import useinput from '../hooks/useInput';
 
 const GlobalFlex = createGlobalStyle`
   body{
@@ -41,8 +44,8 @@ export default function Home() {
   const dispatch = useDispatch();
   const { logInLoading, me, logInError } = useSelector((state) => state.user);
 
-  const [email, onChangeEmail] = useinput('');
-  const [password, onChangePassword] = useinput('');
+  const [email, onChangeEmail] = useInput('');
+  const [password, onChangePassword] = useInput('');
 
   useEffect(() => {
     if (logInError) {

@@ -1,21 +1,21 @@
 /* eslint-disable comma-dangle */
-/* eslint-disable quotes */
+
 import Head from 'next/head';
 import React, { useCallback, useState } from 'react';
 import axios from 'axios';
 import useSWR from 'swr';
-import { useDispatch, useSelector } from 'react-redux';
+// import { useDispatch, useSelector } from 'react-redux';
 
 import AppLayout from '../components/AppLayout';
 import FollowList from '../components/FollowList';
 import NicknameEditForm from '../components/NicknameEditForm';
-import { LOAD_MY_INFO_REQUEST } from '../reducers/user';
+// import { LOAD_MY_INFO_REQUEST } from '../reducers/user';
 
 const fetcher = (url) => axios.get(url, { withCredentials: true }).then((result) => result.data);
 
 const Profile = () => {
-  const { me } = useSelector((state) => state.user);
-  const dispatch = useDispatch();
+  // const { me } = useSelector((state) => state.user);
+  // const dispatch = useDispatch();
 
   const [followersLimit, setFollowersLimit] = useState(3);
   const [followingsLimit, setFollowingsLimit] = useState(3);
@@ -37,11 +37,11 @@ const Profile = () => {
     setFollowersLimit((prev) => prev + 3);
   }, []);
 
-  if (!me) {
-    return dispatch({
-      type: LOAD_MY_INFO_REQUEST,
-    });
-  }
+  // if (!me) {
+  //   return dispatch({
+  //     type: LOAD_MY_INFO_REQUEST,
+  //   });
+  // }
 
   if (followerError || followingError) {
     console.log(followerError || followingError);

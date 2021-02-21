@@ -1,5 +1,6 @@
-/* eslint-disable comma-dangle */
 /* eslint-disable react/jsx-props-no-spreading */
+/* eslint-disable react/jsx-wrap-multilines */
+/* eslint-disable comma-dangle */
 /* eslint-disable prefer-template */
 import React, { useCallback, useEffect, useState } from 'react';
 
