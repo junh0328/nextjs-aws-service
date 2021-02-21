@@ -1938,18 +1938,21 @@ Next에서는 SSR뿐만 아니라, static generation, no pre-rendering, pre-rend
 
 <p>SSR을 적용하기 위해서 Next(@9 이하 버전)에는 getInitialProps를 사용하거 SSR을 적용해줬다면 Next@9 버전 이상부터는 3가지 함수를 사용하여 SSR을 구현해줄 수 있습니다.</p>
 
-|        종류        |                                     의미                                     |
-| :----------------: | :--------------------------------------------------------------------------: |
-|   getStaticProps   |           언제 접속해도 fetch 되는 데이터가 바뀔 일이 없을 때 사용           |
-|         -          |           빌드할 때 미리 SSR을 통해 html로 만들어서 가지고 있는다.           |
-|         -          |  getStaticProps: static data를 위해 datfetching (빌드 이후 data 변경 불가)   |
-| getServerSideProps |  접속할 때마다 사용자의 요구 및 인터렉션에 따라 화면이 바뀌어야 할 때 사용   |
-|         -          |              웬만한 경우 getServerSideProps가 default로 사용됨               |
-|         -          | getServerSideProps: ssr을 위해 data fetching ( 빌드 이후에도 data 변경 가능) |
-|   getStaticPaths   |                       getStaticProps와 같이 사용한다.                        |
-|         -          |       /pages/user,post,hashtag 와 같이 다이나믹 라우팅 시에 사용된다.        |
+|           종류           |                                     의미                                     |
+| :----------------------: | :--------------------------------------------------------------------------: |
+|   getStaticProps (SSG)   |           언제 접속해도 fetch 되는 데이터가 바뀔 일이 없을 때 사용           |
+|            -             |           빌드할 때 미리 SSR을 통해 html로 만들어서 가지고 있는다.           |
+|            -             |  getStaticProps: static data를 위해 datfetching (빌드 이후 data 변경 불가)   |
+|   getStaticPaths (SSG)   |                       getStaticProps와 같이 사용한다.                        |
+|            -             |       /pages/user,post,hashtag 와 같이 다이나믹 라우팅 시에 사용된다.        |
+| getServerSideProps (SSR) |  접속할 때마다 사용자의 요구 및 인터렉션에 따라 화면이 바뀌어야 할 때 사용   |
+|            -             |              웬만한 경우 getServerSideProps가 default로 사용됨               |
+|            -             | getServerSideProps: ssr을 위해 data fetching ( 빌드 이후에도 data 변경 가능) |
 
-<h4> 🖥 getServerSideProps </h4>
+<h2> <a href="https://darrengwon.tistory.com/814" target="_blank">SSG vs SSR</a></h2>
+<p>서버사이드 렌더링을 자동으로 제공하는 Next.js에서는 데이터를 pre-render 할 때, 두 가지 방식을 사용합니다. SSG(static generation) 방식과 SSR(serverside rendering) 방식입니다. SSG는 html 파일을 사전에 제공하는 대신 사용자에 요구에 따라 fetching 하는 데이터 값의 변경이 불가능합니다. 하지만 SSR은 사용자 개별의 요청에 따라 data를 fetching 하기 때문에 유동적으로 데이터 값이 변화합니다. </p>
+
+<h4> 🖥 SSR! getServerSideProps </h4>
 
 ```js
 📁pages/main
@@ -1981,7 +1984,7 @@ export default main;
 
 <p>서버 사이드 렌더링 과정에서 중요한 점은 렌더링 요청 시에 쿠키를 포함시켜줘야 한다는 것입니다. getServerSideProps와 같은 SSR은 결과적으로 서버 쪽에서 실행되기 때문에, 내 계정으로 사용할 때만 쿠키를 그대로 사용하도록 하고, 그렇지 않을 경우에는 쿠키를 초기화해 줘야 합니다. 쿠키를 초기화하지 않을 경우, 같은 도메인에 접속한 다른 사람(유저)이 내 쿠키(정보)를 바탕으로 우리가 제공하는 서비스를 실행할 수도 있기 때문에 치명적인 오류로 작용할 수 있습니다.</p>
 
-<h4> 🖥 getStaticProps </h4>
+<h4>  🖥 SSG! getStaticProps, getStaticProps </h4>
 
 <p>웬만한 경우에는 getServerSideProps를 쓰게 되지만, getStaticProps도 언제 쓰는 지 알아두는 것이 좋습니다. 예를 들면 블로그 게시글처럼, 한 번 만들어 놓으면 다시 바뀔(수정 될) 경우가 없는(불변적인) 정보에 한하여 getStaticProps를 사용합니다. 말그대로 정적인 상황에서 자주 사용되죠. 이렇게 getStaticProps를 사용한 파일이 next에 의해 build되면 정적인 html 문서로 뽑아지고 SEO에 효과적으로 노출될 수 있습니다. 블로그의 글들이 html 태그로 되어있고 그 title (및 각종 태그) 등을 검색 엔진이 검사하면서 사용자가 검색한 키워드가 내 게시글에 포함되어 있다면, 결과물로 노출될 가능성이 큽니다.</p>
 
@@ -2274,3 +2277,30 @@ const [followingsLimit, setFollowingsLimit] = useState(3);
 ```
 
 <p>swr과 더불어 이 state를 넘겨줌으로써 우리는 'FollowList' 컴포넌트에 data를 넘겨줄 수 있게 되었습니다. 또한 click 버튼을 통해 기존 state에서 prev => prev + 3 3명을 추가해서 가져오도록 만들어 주었습니다.</p>
+
+<h2> 🌟 다이나믹 라우팅을 활용하기 위한 검색기능 만들기 🌟 </h2>
+
+<p>검색 기능은 우리가 antd에서 받아온 컴포넌트 SearchInput을 활용하여, 라우팅 처리만으로 구현할 수 있습니다.</p>
+
+```js
+  📁 components/AppLayout
+  ...
+
+  const [searchInput, onChangeSearchInput] = useInput('');
+
+  const onSearch = useCallback(() => {
+    Router.push(`/hashtag/${searchInput}`);
+  }, [searchInput]);
+
+...
+
+<SearchInput
+  value={searchInput}
+  onChange={onChangeSearchInput}
+  onSearch={onSearch}
+  placeholder="input search text"
+  enterButton
+/>
+```
+
+<p>우리가 custom 훅으로 만든 useInput을 활용하여 useState문과 setSearchInput을 관리해주었고 next/router 가 제공하는 'Router'를 통해 searchInput으로 관리되는 value 값으로 push() 시켜주었습니다. 간단한 로직이지만, 드디어 검색기능을 활용할 수 있게 됐습니다.</p>

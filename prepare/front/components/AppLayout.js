@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -6,7 +6,9 @@ import { Menu, Input, Row, Col } from 'antd';
 import styled, { createGlobalStyle } from 'styled-components';
 import { useSelector } from 'react-redux';
 import { HomeFilled, ProfileFilled } from '@ant-design/icons';
+import Router from 'next/router';
 
+import useInput from '../hooks/useInput';
 import UserProfile from './UserProfile';
 
 const SearchInput = styled(Input.Search)`
@@ -28,6 +30,12 @@ const Global = createGlobalStyle`
 `;
 const AppLayout = ({ children }) => {
   const { me } = useSelector((state) => state.user);
+
+  const [searchInput, onChangeSearchInput] = useInput('');
+
+  const onSearch = useCallback(() => {
+    Router.push(`/hashtag/${searchInput}`);
+  }, [searchInput]);
 
   return (
     <div>
@@ -70,7 +78,13 @@ const AppLayout = ({ children }) => {
             </Menu.Item>
           )}
           <Menu.Item>
-            <SearchInput placeholder="input search text" enterButton />
+            <SearchInput
+              value={searchInput}
+              onChange={onChangeSearchInput}
+              onSearch={onSearch}
+              placeholder="input search text"
+              enterButton
+            />
           </Menu.Item>
         </Menu>
       </div>
