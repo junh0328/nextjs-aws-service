@@ -2304,3 +2304,23 @@ const [followingsLimit, setFollowingsLimit] = useState(3);
 ```
 
 <p>우리가 custom 훅으로 만든 useInput을 활용하여 useState문과 setSearchInput을 관리해주었고 next/router 가 제공하는 'Router'를 통해 searchInput으로 관리되는 value 값으로 push() 시켜주었습니다. 간단한 로직이지만, 드디어 검색기능을 활용할 수 있게 됐습니다.</p>
+
+<h2>🌟 <a href="https://momentjs.com/" target="_blank">moment</a> 라이브러리를 사용하여 작성일시 적어주기 🌟</h2>
+
+## 10. 📁 downloaded dependencies
+
+- moment
+
+```js
+📁components/PostCard
+import moment from 'moment';
+
+...
+
+moment.locale('ko');
+// 한국으로 지역을 설정합니다.
+
+<div style={{ float: 'right' }}>{moment(post.createdAt).format('YYYY.MM.DD')}</div>
+```
+
+<p>시퀄라이즈에서 제공하는 createdAt을 바탕으로 format을 지정해 주었습니다. 이밖에도 <a href="https://momentjs.com/" target="_blank">moment 공식홈페이지</a>를 통해 다양한 format을 적용할 수 있습니다.</p>
