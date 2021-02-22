@@ -181,6 +181,7 @@ const PostCard = ({ post }) => {
             renderItem={(item) => (
               <li>
                 <Comment
+                  datetime={moment(post.Comments.createdAt).format('YYYY.MM.DD')}
                   style={{ marginBottom: 10, borderBottom: '1px solid #f0f0f0' }}
                   author={item.User.nickname}
                   avatar={
