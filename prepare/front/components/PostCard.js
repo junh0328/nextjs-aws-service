@@ -93,25 +93,30 @@ const PostCard = ({ post }) => {
         extra={id && <FollowButton post={post} />}
         cover={post.Images[0] && <PostImages images={post.Images} />}
         actions={[
-          <>
-            <RetweetOutlined key="retweet" onClick={onRetweet} />
-            {post.Retweet && '리트윗 된 게시물 '}
-          </>,
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <RetweetOutlined key="retweet" onClick={onRetweet} style={{ marginRight: 5 }} />
+            {post.Retweet ? <span>리트윗된 게시글</span> : <span>리트윗하기</span>}
+          </div>,
           liked ? (
-            <>
-              <HeartTwoTone twoToneColor="#eb2f96" key="heart" onClick={onUnLike} />
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <HeartTwoTone
+                twoToneColor="#eb2f96"
+                key="heart"
+                onClick={onUnLike}
+                style={{ marginRight: 5 }}
+              />
               {post.Likers.length}
-            </>
+            </div>
           ) : (
-            <>
-              <HeartOutlined key="heart" onClick={onLike} />
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <HeartOutlined key="heart" onClick={onLike} style={{ marginRight: 5 }} />
               {post.Likers.length}
-            </>
+            </div>
           ),
-          <>
-            <CommentOutlined key="commet" onClick={onToggleComment} />
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <CommentOutlined key="commet" onClick={onToggleComment} style={{ marginRight: 5 }} />
             {post.Comments.length}
-          </>,
+          </div>,
           <Popover
             key="more"
             content={
@@ -139,7 +144,7 @@ const PostCard = ({ post }) => {
             <div style={{ float: 'right' }}>{moment(post.createdAt).format('YYYY.MM.DD')}</div>
             <Card.Meta
               avatar={
-                <Link href={`user/${post.Retweet.User.id}`}>
+                <Link href={`/user/${post.Retweet.User.id}`}>
                   <a>
                     <Avatar>{post.Retweet.User.nickname[0]}</Avatar>
                   </a>
@@ -154,7 +159,7 @@ const PostCard = ({ post }) => {
             <div style={{ float: 'right' }}>{moment(post.createdAt).format('YYYY.MM.DD')}</div>
             <Card.Meta
               avatar={
-                <Link href={`user/${post.User.id}`}>
+                <Link href={`/user/${post.User.id}`}>
                   <a>
                     <Avatar>{post.User.nickname[0]}</Avatar>
                   </a>
@@ -176,9 +181,10 @@ const PostCard = ({ post }) => {
             renderItem={(item) => (
               <li>
                 <Comment
+                  style={{ marginBottom: 10, borderBottom: '1px solid #f0f0f0' }}
                   author={item.User.nickname}
                   avatar={
-                    <Link href={`user/${item.User.id}`}>
+                    <Link href={`/user/${item.User.id}`}>
                       <a>
                         <Avatar>{item.User.nickname[0]}</Avatar>
                       </a>
