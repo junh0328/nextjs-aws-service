@@ -38,7 +38,7 @@ const PostForm = () => {
   }, [imageInput.current]);
 
   const onChangeImages = useCallback((e) => {
-    console.log(e.target.files);
+    // console.log(e.target.files);
     const imageFormData = new FormData(); // multipart 형식으로 보내야 multer에서 처리할 수 있음
     [].forEach.call(e.target.files, (f) => {
       imageFormData.append('image', f); // apend의 키('image'), 값(f)는 backend의 multer에서 준 키 값과 맞춰 줘야 한다.

@@ -49,8 +49,8 @@ export const getServerSideProps = wrapper.getServerSideProps(async (context) => 
   if (context.req && cookie) {
     axios.defaults.headers.Cookie = cookie;
   }
-  console.log('context 출력');
-  console.log(context);
+  // console.log('context 출력');
+  // console.log(context);
 
   // context.store.dispatch({
   //   type: LOAD_MY_INFO_REQUEST,

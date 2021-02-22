@@ -88,10 +88,10 @@ const main = () => {
       ) {
         if (hasMorePosts && !loadPostsLoading) {
           const lastId = mainPosts[mainPosts.length - 1]?.id;
-          console.log('메인 포스트의 길이는 ? ');
-          console.log(mainPosts.length);
-          console.log(mainPosts[mainPosts.length]);
-          console.log(`lastId는 ? ${lastId}`);
+          // console.log('메인 포스트의 길이는 ? ');
+          // console.log(mainPosts.length);
+          // console.log(mainPosts[mainPosts.length]);
+          // console.log(`lastId는 ? ${lastId}`);
           dispatch({
             type: LOAD_POSTS_REQUEST,
             lastId,
@@ -128,7 +128,7 @@ export const getServerSideProps = wrapper.getServerSideProps(async (context) => 
   if (context.req && cookie) {
     axios.defaults.headers.Cookie = cookie;
   }
-  console.log(context);
+  // console.log(context);
 
   context.store.dispatch({
     type: LOAD_POSTS_REQUEST,

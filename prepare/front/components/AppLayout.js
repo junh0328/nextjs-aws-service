@@ -54,7 +54,6 @@ const AppLayout = ({ children }) => {
           mode="horizontal"
           style={{
             display: 'flex',
-            justifyContent: 'center',
             alignItems: 'center',
             height: '60px',
           }}

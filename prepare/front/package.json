@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^4.4.0",
+    "@next/bundle-analyzer": "^10.0.7",
     "antd": "^4.11.2",
     "axios": "^0.21.1",
     "babel-plugin-styled-components": "^1.12.0",

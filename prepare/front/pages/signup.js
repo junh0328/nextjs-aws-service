@@ -69,7 +69,7 @@ const Signup = () => {
   }, [signUpError]);
 
   const onsubmit = () => {
-    console.log('입력하신 사용자 정보' + email + password + nickname);
+    // console.log('입력하신 사용자 정보' + email + password + nickname);
     // dispatch로 SIGN_UP_REQUEST action을 실행시킴
     dispatch({
       type: SIGN_UP_REQUEST,

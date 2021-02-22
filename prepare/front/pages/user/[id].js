@@ -115,7 +115,7 @@ export const getServerSideProps = wrapper.getServerSideProps(async (context) => 
     type: LOAD_USER_POSTS_REQUEST,
     data: context.params.id,
   });
-  console.log('LOAD_USER_POSTS_REQUEST 출력');
+  // console.log('LOAD_USER_POSTS_REQUEST 출력');
 
   // context.store.dispatch({
   //   type: LOAD_MY_INFO_REQUEST,
@@ -128,7 +128,7 @@ export const getServerSideProps = wrapper.getServerSideProps(async (context) => 
 
   context.store.dispatch(END);
   await context.store.sagaTask.toPromise();
-  console.log('getState', context.store.getState().post.mainPosts);
+  // console.log('getState', context.store.getState().post.mainPosts);
   return { props: {} };
 });
 

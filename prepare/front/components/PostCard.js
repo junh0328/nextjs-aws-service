@@ -82,6 +82,8 @@ const PostCard = ({ post }) => {
 
   const liked = post.Likers.find((v) => v.id === id);
 
+  // console.log('post 상태값 출력');
+  // console.log(post);
   return (
     <div>
       {/* 이 postcard의 주인이 내가 아니면, 팔로우 언팔로우 버튼을 띄워 가능하게 한다. */}
@@ -91,13 +93,25 @@ const PostCard = ({ post }) => {
         extra={id && <FollowButton post={post} />}
         cover={post.Images[0] && <PostImages images={post.Images} />}
         actions={[
-          <RetweetOutlined key="retweet" onClick={onRetweet} />,
+          <>
+            <RetweetOutlined key="retweet" onClick={onRetweet} />
+            {post.Retweet && '리트윗 된 게시물 '}
+          </>,
           liked ? (
-            <HeartTwoTone twoToneColor="#eb2f96" key="heart" onClick={onUnLike} />
+            <>
+              <HeartTwoTone twoToneColor="#eb2f96" key="heart" onClick={onUnLike} />
+              {post.Likers.length}
+            </>
           ) : (
-            <HeartOutlined key="heart" onClick={onLike} />
+            <>
+              <HeartOutlined key="heart" onClick={onLike} />
+              {post.Likers.length}
+            </>
           ),
-          <CommentOutlined key="commet" onClick={onToggleComment} />,
+          <>
+            <CommentOutlined key="commet" onClick={onToggleComment} />
+            {post.Comments.length}
+          </>,
           <Popover
             key="more"
             content={
