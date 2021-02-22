@@ -1,7 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable implicit-arrow-linebreak */
-/* eslint-disable lines-between-class-members */
-/* eslint-disable react/react-in-jsx-scope */
 
 import React from 'react';
 import Document, { Html, Head, Main, NextScript } from 'next/document';
@@ -39,7 +37,6 @@ export default class MyDocument extends Document {
         <Head />
         <body>
           <Main />
-          <script src="https://polyfill.io/v3/polyfill.min.js?features=default%2Ces2015%2Ces2016%2Ces2017%2Ces2018%2Ces2019" />
           <NextScript />
         </body>
       </Html>

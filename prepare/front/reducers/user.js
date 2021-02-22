@@ -1,7 +1,7 @@
 /* eslint-disable implicit-arrow-linebreak */
 /* eslint-disable arrow-body-style */
 
-import produce from 'immer';
+import produce from '../util/produce';
 
 const initialState = {
   loadMyInfoLoading: false, // 유저 정보 가져오기 시도 중

@@ -2,7 +2,7 @@
 /* eslint-disable comma-dangle */
 /* eslint-disable arrow-body-style */
 // import shortId from 'shortid';
-import produce from 'immer';
+import produce from '../util/produce';
 // import faker from 'faker';
 
 const initialState = {
