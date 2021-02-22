@@ -2324,3 +2324,30 @@ moment.locale('ko');
 ```
 
 <p>시퀄라이즈에서 제공하는 createdAt을 바탕으로 format을 지정해 주었습니다. 이밖에도 <a href="https://momentjs.com/" target="_blank">moment 공식홈페이지</a>를 통해 다양한 format을 적용할 수 있습니다.</p>
+
+<h2> 🌟 커스텀 웹팩 설정하기 🌟</h2>
+
+## 11. 📁 downloaded dependencies
+
+- @next/bundle-analyzer
+- cross-env
+
+<p>프론트엔드 프로그래머로 작업하는 마지막 단계입니다. build 과정을 거치면서 우리가 만든 서비스의 용량을 줄여나갈 수 있습니다. 이때 커스텀 웹팩을 통해 해당 라이브러리 또는 모듈에서 필요한 부분만 사용하도록 커스텀할 수 있는데, next.config.js 파일을 통해 해당 작업을 시행합니다.</p>
+
+<p>또한 build 시에, 개발(dev) 환경인지 배포(production) 환경인지를 설정해줄 수 있는 cross-env 라이브러리가 있습니다. 맥 os 또는 리눅스에서는 이 cross-env 라이브러리가 없더라도 NODE_ENV를 설정해줄 수 있지만, 윈도우에서는 아닙니다. 따라서 맥 사용자라도 통합된 환경을 만들어주기 위해 cross-env 모듈을 통해 next build 스크립트를 감싸주면 통합된 개발환경에서 build가 가능해집니다.</p>
+
+```js
+  "build": "cross-env ANALYZE=true NODE_ENV=production next build",
+```
+
+<p>앞으로의 build는 배포 바로 직전에 사용하므로 NODE_ENV = production으로 해둘 것입니다. 빌드 결과는 다음과 같이 나타납니다.</p>
+
+<img  width="80%" src="./images/build.png" title="npmrunbuild">
+
+<p>총 3가지 종류들로 나누어 지는데, SSR, SSG, Static 파일입니다.</p>
+
+|   종류   |                                                                             의미                                                                             |
+| :------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------: |
+|  λ SSR   |                        next.js의 서버사이드 렌더링이 적용된 파일들입니다. 항상 사용자에게 fetching할 데이터 값을 받아와 렌더링합니다.                        |
+|  ● SSG   | next.js의 SSG가 적용된 파일들입니다. 프론트 서버의 요청에 의해 서버로부터 미리 생성된 정적인 html 파일이 JSON 형식(pre-render할 데이터)과 함께 들어있습니다. |
+| ○ Static |                              initial props가 존재하지 않는 순수 html 파일입니다. 우리 프로젝트의 index 페이지가 그 예시입니다.                               |
