@@ -45,10 +45,9 @@ if (process.env.NODE_ENV === 'production') {
   // 개발 모드일 때
   app.use(morgan('dev'));
 }
-app.use(morgan('dev'));
 app.use(
   cors({
-    origin: ['http://localhost:3000', 'juneed.com', 'http://13.209.68.1'],
+    origin: ['http://localhost:80', 'juneed.com', 'http://13.209.68.1'],
     credentials: true,
   })
 );
