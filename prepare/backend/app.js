@@ -36,10 +36,19 @@ db.sequelize
 
 passportConfig(); // /passport/index 에서 exports한 전략을 실행시킴
 
+if (process.env.NODE_ENV === 'production') {
+  // 배포 모드일 때
+  app.use(morgan('combined'));
+  app.use(hpp());
+  app.use(helmet());
+} else {
+  // 개발 모드일 때
+  app.use(morgan('dev'));
+}
 app.use(morgan('dev'));
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'juneed.com'],
     credentials: true,
   })
 );
