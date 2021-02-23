@@ -164,7 +164,7 @@ router.post('/', isNotLoggedIn, async (req, res, next) => {
       nickname: req.body.nickname,
       password: hashedPassword,
     });
-    res.setHeader('Access-Control-Allow-Origin', 'http://13.209.68.1');
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.status(201).send('ok');
   } catch (error) {
     console.error(error);

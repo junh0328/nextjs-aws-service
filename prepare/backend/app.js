@@ -47,7 +47,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 app.use(
   cors({
-    origin: ['http://localhost:80', 'juneed.com', 'http://13.209.68.1'],
+    origin: ['http://localhost:3000', 'juneed.com', 'http://13.209.68.1'],
     credentials: true,
   })
 );

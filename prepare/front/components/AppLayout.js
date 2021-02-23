@@ -85,7 +85,13 @@ const AppLayout = ({ children }) => {
           </Menu.Item>
         </Menu>
       </div>
-      <Row gutter={8} style={{ paddingTop: 80, backgroundColor: 'rgba(var(--b3f,250,250,250),1)' }}>
+      <Row
+        gutter={8}
+        style={{
+          paddingTop: 80,
+          backgroundColor: 'rgba(var(--b3f,250,250,250),1)',
+        }}
+      >
         <Col xs={24} md={6}>
           {me && <UserProfile />}
         </Col>
