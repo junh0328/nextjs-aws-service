@@ -1,14 +1,16 @@
+/* eslint-disable import/no-unresolved */
 /* eslint-disable comma-dangle */
 
 import Head from 'next/head';
 import React, { useCallback, useState } from 'react';
 import axios from 'axios';
-import useSWR from 'swr';
 // import { useDispatch, useSelector } from 'react-redux';
 
+import useSWR from 'swr';
 import AppLayout from '../components/AppLayout';
 import FollowList from '../components/FollowList';
 import NicknameEditForm from '../components/NicknameEditForm';
+import { backUrl } from '../config/config';
 // import { LOAD_MY_INFO_REQUEST } from '../reducers/user';
 
 const fetcher = (url) => axios.get(url, { withCredentials: true }).then((result) => result.data);
@@ -21,11 +23,11 @@ const Profile = () => {
   const [followingsLimit, setFollowingsLimit] = useState(3);
 
   const { data: followersData, error: followerError } = useSWR(
-    `http://localhost:3065/user/followers?limit=${followersLimit}`,
+    `${backUrl}/user/followers?limit=${followersLimit}`,
     fetcher
   );
   const { data: followingsData, error: followingError } = useSWR(
-    `http://localhost:3065/user/followings?limit=${followingsLimit}`,
+    `${backUrl}/user/followings?limit=${followingsLimit}`,
     fetcher
   );
 
