@@ -43,7 +43,7 @@ if (process.env.NODE_ENV === 'production') {
   app.use(helmet());
   app.use(
     cors({
-      origin: ['juneed.com', 'http://15.164.68.76'],
+      origin: ['http://junheedot.com'],
       credentials: true,
     })
   );
@@ -52,7 +52,7 @@ if (process.env.NODE_ENV === 'production') {
   app.use(morgan('dev'));
   app.use(
     cors({
-      origin: ['http://localhost:3000'],
+      origin: true,
       credentials: true,
     })
   );
@@ -70,6 +70,11 @@ app.use(
     saveUninitialized: false,
     resave: false,
     secret: process.env.COOKIE_SECRET, // secret?
+    cookie: {
+      httpOnly: true,
+      secure: false,
+      domain: process.env.NODE_ENV === 'production' && '.junheedot.com',
+    },
   })
 );
 app.use(passport.initialize());
