@@ -226,7 +226,8 @@ const reducer = (state = initialState, action) => {
         draft.uploadImagesError = null;
         break;
       case UPLOAD_IMAGES_SUCCESS: {
-        draft.imagePaths = action.data;
+        // 기존에 이미지를 올렸다면, 추가적으로 더 올릴 수 있게 끔 만듬
+        draft.imagePaths = draft.imagePaths.concat(action.data);
         draft.uploadImagesLoading = false;
         draft.uploadImagesDone = true;
         break;
