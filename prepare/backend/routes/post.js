@@ -106,8 +106,8 @@ router.post('/', isLoggedIn, upload.none(), async (req, res, next) => {
 
 router.post('/images', isLoggedIn, upload.array('image'), async (req, res, next) => {
   //POST /post/images ,
-  // console.log(req.files);
-  res.json(req.files.map((v) => v.location));
+  console.log(req.files);
+  res.json(req.files.map((v) => v.location.replace(/\/original\//, '/thumb/')));
 });
 
 // 특정 게시글에 댓글달기
