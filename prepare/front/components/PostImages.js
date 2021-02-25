@@ -25,6 +25,7 @@ const PostImages = ({ images }) => {
           alt={images[0].src}
           onClick={onZoom}
           style={{ minHeight: 200 }}
+          // 필요한 지는 잘 모르겠다.
         />
         {showImageZoom && <ImagesZoom images={images} onClose={onClose} />}
       </>

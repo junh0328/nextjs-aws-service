@@ -24,7 +24,7 @@ const ImagesZoom = ({ images, onClose }) => {
         <div>
           <Slick
             initialSlide={0} // 초기 슬라이드 0번째 이미지
-            beforeChange={(slide) => setCurrentSlide(slide)}
+            beforeChange={(slide, newSlide) => setCurrentSlide(newSlide)}
             infinite // 마지막 이미지에서 넘기면 다시 첫 번째 이미지로
             arrows={false} // 슬라이드 양 옆의 화살표를 없앰
             slidesToShow={1} // 슬라이드에 한 이미지만 보이기
