@@ -2,8 +2,8 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const multerS3 = require('multer-s3');
-const AWS = require('aws-sdk');
+// const multerS3 = require('multer-s3');
+// const AWS = require('aws-sdk');
 
 const { Post, Comment, User, Image, Hashtag } = require('../models');
 
@@ -18,18 +18,17 @@ try {
   fs.mkdirSync('uploads');
 }
 
-AWS.config.update({
-  accessKeyId: process.env.S3_ACCESS_KEY_ID,
-  secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
-  region: 'ap-northeast-2',
-});
 const upload = multer({
   // multer 속성 지정  storage(저장 어디에 할꺼야?)
-  storage: multerS3({
-    s3: new AWS.S3(),
-    bucket: 'next-aws-s3',
-    key(req, file, cb) {
-      cb(null, `original/${Date.now()}_${path.basename(file.originalname)}`);
+  storage: multer.diskStorage({
+    destination(req, file, done) {
+      done(null, 'uploads'); // uploads라는 폴더에 할거야 >> 후에 아마존에 올리면 아마존 서버에 저장, S3 서비스로 대체
+    },
+    filename(req, file, done) {
+      // 파일명 : 제로초.png
+      const ext = path.extname(file.originalname); // 확장자 추출(.png) > 업로드 시에 날짜를 붙여 중복 파일 명을 바꾼다.
+      const basename = path.basename(file.originalname, ext); // 제로초
+      done(null, basename + '_' + new Date().getTime() + ext);
     },
   }),
   limits: { fileSize: 20 * 1024 * 1024 }, // 20MB로 용량 제한

@@ -16,6 +16,9 @@ const configureStore = (context) => {
     process.env.NODE_ENV === 'production'
       ? compose(applyMiddleware(...middlewares))
       : composeWithDevTools(applyMiddleware(...middlewares));
+
+  // const enhancer = composeWithDevTools(applyMiddleware(...middlewares));
+
   const store = createStore(reducer, enhancer);
   store.sagaTask = sagaMiddleware.run(rootSaga);
   return store;

@@ -165,7 +165,7 @@ router.post('/', isNotLoggedIn, async (req, res, next) => {
       password: hashedPassword,
     });
     // 배포 모드 시 http
-    res.setHeader('Access-Control-Allow-Origin', 'http://junheedot.com');
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.status(201).send('ok');
   } catch (error) {
     console.error(error);
