@@ -164,7 +164,8 @@ router.post('/', isNotLoggedIn, async (req, res, next) => {
       nickname: req.body.nickname,
       password: hashedPassword,
     });
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    // 배포 모드 시 http
+    res.setHeader('Access-Control-Allow-Origin', 'http://15.164.68.76');
     res.status(201).send('ok');
   } catch (error) {
     console.error(error);

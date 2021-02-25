@@ -41,16 +41,22 @@ if (process.env.NODE_ENV === 'production') {
   app.use(morgan('combined'));
   app.use(hpp());
   app.use(helmet());
+  app.use(
+    cors({
+      origin: ['juneed.com', 'http://15.164.68.76'],
+      credentials: true,
+    })
+  );
 } else {
   // 개발 모드일 때
   app.use(morgan('dev'));
+  app.use(
+    cors({
+      origin: ['http://localhost:3000'],
+      credentials: true,
+    })
+  );
 }
-app.use(
-  cors({
-    origin: ['http://localhost:3000', 'juneed.com', 'http://13.209.68.1'],
-    credentials: true,
-  })
-);
 
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use('/', express.static(path.join(__dirname, 'uploads')));
