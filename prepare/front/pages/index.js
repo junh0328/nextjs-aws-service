@@ -84,7 +84,6 @@ export default function Home() {
       <Head>
         <title>juneed | login</title>
         <link rel="icon" href="/favicon.png" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
       <GlobalFlex />
       <Row gutter={16}>
