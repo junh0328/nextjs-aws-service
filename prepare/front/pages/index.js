@@ -3,7 +3,7 @@
 /* eslint-disable jsx-quotes */
 import React, { useCallback, useEffect } from 'react';
 import Head from 'next/head';
-import { Form, Input, Button, Checkbox } from 'antd';
+import { Row, Col, Form, Input, Button, Checkbox } from 'antd';
 import styled, { createGlobalStyle } from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import Link from 'next/link';
@@ -18,6 +18,15 @@ const GlobalFlex = createGlobalStyle`
     align-items: center;
     justify-content: center;
   }
+   // mobile
+   @media (max-width: 600px) {
+    display: flex;
+    flex-wrap: wrap;
+
+    img {
+      width: 80%;
+    }
+}
 `;
 
 const ButtonWrapper = styled.div`
@@ -75,18 +84,15 @@ export default function Home() {
       <Head>
         <title>juneed | login</title>
         <link rel="icon" href="/favicon.png" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
       <GlobalFlex />
-      <div
-        className="container"
-        style={{
-          display: 'flex',
-          alignItems: 'flex-end',
-          alignContent: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <>
+      <Row gutter={16}>
+        <Col
+          style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+          md={12}
+          xs={24}
+        >
           <Form
             style={{ marginRight: 30 }}
             {...layout}
@@ -134,7 +140,7 @@ export default function Home() {
             <Form.Item {...tailLayout} name="remember" valuePropName="checked">
               <Checkbox>Remember me</Checkbox>
             </Form.Item>
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <Form.Item {...tailLayout}>
                 <ButtonWrapper>
                   <Button type="primary" htmlType="submit" loading={logInLoading}>
@@ -153,11 +159,13 @@ export default function Home() {
               </Form.Item>
             </div>
           </Form>
-        </>
-        <div style={{ textAlign: 'center' }}>
-          <img src="../external/emoji.gif" width="400px" alt="emoji" />
-        </div>
-      </div>
+        </Col>
+        <Col md={12} xs={24}>
+          <div style={{ textAlign: 'center' }}>
+            <img src="../external/emoji.gif" width="400px" alt="emoji" />
+          </div>
+        </Col>
+      </Row>
     </div>
   );
 }
