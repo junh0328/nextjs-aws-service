@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable react/jsx-wrap-multilines */
 /* eslint-disable jsx-quotes */

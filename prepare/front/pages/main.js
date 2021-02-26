@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 /* eslint-disable comma-dangle */
 /* eslint-disable operator-linebreak */
 /* eslint-disable space-infix-ops */
