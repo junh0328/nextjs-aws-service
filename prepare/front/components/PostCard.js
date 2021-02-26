@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable react/jsx-wrap-multilines */
 import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
@@ -93,28 +95,35 @@ const PostCard = ({ post }) => {
         extra={id && <FollowButton post={post} />}
         cover={post.Images[0] && <PostImages images={post.Images} />}
         actions={[
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <RetweetOutlined key="retweet" onClick={onRetweet} style={{ marginRight: 5 }} />
+          <div
+            onClick={onRetweet}
+            style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+          >
+            <RetweetOutlined key="retweet" style={{ marginRight: 5 }} />
             {post.Retweet ? <span>리트윗된 게시글</span> : <span>리트윗하기</span>}
           </div>,
           liked ? (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <HeartTwoTone
-                twoToneColor="#eb2f96"
-                key="heart"
-                onClick={onUnLike}
-                style={{ marginRight: 5 }}
-              />
+            <div
+              onClick={onUnLike}
+              style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+            >
+              <HeartTwoTone twoToneColor="#eb2f96" key="heart" style={{ marginRight: 5 }} />
               {post.Likers.length}
             </div>
           ) : (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <HeartOutlined key="heart" onClick={onLike} style={{ marginRight: 5 }} />
+            <div
+              onClick={onLike}
+              style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+            >
+              <HeartOutlined key="heart" style={{ marginRight: 5 }} />
               {post.Likers.length}
             </div>
           ),
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <CommentOutlined key="commet" onClick={onToggleComment} style={{ marginRight: 5 }} />
+          <div
+            onClick={onToggleComment}
+            style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+          >
+            <CommentOutlined key="commet" style={{ marginRight: 5 }} />
             {post.Comments.length}
           </div>,
           <Popover

@@ -58,6 +58,8 @@ const main = () => {
   useEffect(() => {
     if (retweetDone) {
       alert('리트윗 성공! \n포스트 상단에서 리트윗된 게시물을 확인하세요!');
+      setTimeout(window.scrollTo(0, 0), 1000);
+      // 포스트 최상단으로 이동
     }
   }, [retweetDone]);
 
