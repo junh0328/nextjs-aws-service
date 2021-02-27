@@ -10,7 +10,6 @@ const initialState = {
   mainPosts: [],
   imagePaths: [],
   hasMorePosts: true,
-  AddedPosts: true,
 
   loadPostsLoading: false, // 포스트 불러오기 요청중
   loadPostsDone: false, // 포스트 불러오기 성공
@@ -195,7 +194,6 @@ const reducer = (state = initialState, action) => {
         draft.addPostLoading = true;
         draft.addPostDone = false;
         draft.addPostError = null;
-        draft.AddedPosts = action.data.length < 11;
         break;
       case ADD_POST_SUCCESS:
         draft.addPostLoading = false;

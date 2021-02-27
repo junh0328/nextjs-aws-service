@@ -28,9 +28,16 @@ const main = () => {
     addCommentError,
     likePostError,
     unlikePostError,
+    addPostError,
   } = useSelector((state) => state.post);
   // const mainPosts = useSelector((state)=> state.post.mainPosts) 구조분해를 하지 않으면 다음과 같이 표현할 수 있다.
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (addPostError) {
+      alert(addPostError);
+    }
+  }, [addPostError]);
 
   useEffect(() => {
     if (retweetError) {
