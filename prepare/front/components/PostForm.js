@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 /* eslint-disable comma-dangle */
 import React, { useCallback, useEffect, useRef } from 'react';
 import { Button, Form, Input } from 'antd';
@@ -20,7 +21,7 @@ const PostForm = () => {
 
   useEffect(() => {
     if (AddedPosts === false) {
-      alert(
+      return alert(
         '서비스 안정화를 위해 게시글은 최대 10개 까지만 작성하실 수 있습니다.\n기존 게시글을 삭제 후에 이용해주세요'
       );
     }
