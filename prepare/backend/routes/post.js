@@ -43,12 +43,11 @@ router.post('/', isLoggedIn, upload.none(), async (req, res, next) => {
       where: { UserId: req.user.id },
     });
     console.log(`userPost의 수는 ${userPost}`);
-    // 또는 if(userPost > 10 이런식으로 조건문 처리 하고싶어요 )
-    if (userPost) {
+    if (userPost > 9) {
       return res
         .status(403)
         .send(
-          '서비스 최적화를 위해 게시글은 10개 이상 작성할 수 없습니다.\n불필요한 게시글을 삭제하고 이용해주세요'
+          '서비스 최적화를 위해 게시글은 10개 이상 작성할 수 없습니다.\n불필요한 게시글을 삭제하고 이용해주세요 😁'
         );
     }
     const hashtags = req.body.content.match(/#[^\s#]+/g);
