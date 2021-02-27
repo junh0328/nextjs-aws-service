@@ -58,21 +58,37 @@ const AppLayout = ({ children }) => {
             height: '60px',
           }}
         >
-          <Menu.Item>
-            <Link href="/main">
-              <a>
-                <HomeFilled style={{ width: '100%' }} />
-              </a>
-            </Link>
-          </Menu.Item>
-          {me && (
-            <Menu.Item>
-              <Link href="/profile">
-                <a>
-                  <ProfileFilled style={{ width: '100%' }} />
-                </a>
-              </Link>
-            </Menu.Item>
+          {me ? (
+            <>
+              <Menu.Item>
+                <Link href="/main" shallow>
+                  <a>
+                    <HomeFilled style={{ width: '100%' }} />
+                  </a>
+                </Link>
+              </Menu.Item>
+
+              <Menu.Item>
+                <Link href="/profile">
+                  <a>
+                    <ProfileFilled style={{ width: '100%' }} />
+                  </a>
+                </Link>
+              </Menu.Item>
+            </>
+          ) : (
+            <>
+              <Menu.Item>
+                <Link href="/">
+                  <a>로그인</a>
+                </Link>
+              </Menu.Item>
+              <Menu.Item>
+                <Link href="/signup">
+                  <a>회원가입</a>
+                </Link>
+              </Menu.Item>
+            </>
           )}
           <Menu.Item>
             <SearchInput

@@ -16,6 +16,7 @@ import PostCard from '../components/PostCard';
 import { LOAD_POSTS_REQUEST } from '../reducers/post';
 import { DEFAULT_DONE_ACTION, LOAD_MY_INFO_REQUEST } from '../reducers/user';
 import wrapper from '../store/configureStore';
+import ArrowUp from '../components/ArrowUp';
 
 const main = () => {
   const { me, logOutDone } = useSelector((state) => state.user);
@@ -128,6 +129,7 @@ const main = () => {
           <PostCard key={post.id} post={post} />
         ))}
       </AppLayout>
+      <ArrowUp />
     </>
   );
 };
