@@ -23,6 +23,7 @@ const GlobalFlex = createGlobalStyle`
    @media (max-width: 600px) {
     display: flex;
     flex-wrap: wrap;
+    font-size: 0.8rem;
 
     img {
       width: 80%;
