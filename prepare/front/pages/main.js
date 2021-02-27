@@ -9,7 +9,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import Router from 'next/router';
 import { END } from 'redux-saga';
 import axios from 'axios';
-import { createGlobalStyle } from 'styled-components';
 
 import AppLayout from '../components/AppLayout';
 import PostForm from '../components/PostForm';
@@ -17,14 +16,6 @@ import PostCard from '../components/PostCard';
 import { LOAD_POSTS_REQUEST } from '../reducers/post';
 import { DEFAULT_DONE_ACTION, LOAD_MY_INFO_REQUEST } from '../reducers/user';
 import wrapper from '../store/configureStore';
-
-const GlobalFlex = createGlobalStyle`
-
-// for mobile font
-@media (max-width: 600px) {
-    font-size: 0.8rem;
-}
-`;
 
 const main = () => {
   const { me, logOutDone } = useSelector((state) => state.user);
@@ -124,7 +115,6 @@ const main = () => {
         <link rel="icon" href="/favicon.png" />
         <title>Juneed | main</title>
       </Head>
-      <GlobalFlex />
       <AppLayout>
         {me && <PostForm />}
         {mainPosts.map((post) => (
