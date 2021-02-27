@@ -1,3 +1,4 @@
+/* eslint-disable comma-dangle */
 import React, { useCallback, useEffect, useRef } from 'react';
 import { Button, Form, Input } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,7 +9,7 @@ import useInput from '../hooks/useInput';
 const PostForm = () => {
   const dispatch = useDispatch();
   const imageInput = useRef();
-  const { imagePaths, addPostDone } = useSelector((state) => state.post);
+  const { imagePaths, addPostDone, AddedPosts } = useSelector((state) => state.post);
   const [text, onChangeText, setText] = useInput('');
 
   useEffect(() => {
@@ -16,6 +17,14 @@ const PostForm = () => {
       setText('');
     }
   }, [addPostDone]);
+
+  useEffect(() => {
+    if (AddedPosts === false) {
+      alert(
+        '서비스 안정화를 위해 게시글은 최대 10개 까지만 작성하실 수 있습니다.\n기존 게시글을 삭제 후에 이용해주세요'
+      );
+    }
+  }, [AddedPosts]);
 
   const onsubmit = useCallback(() => {
     if (!text || !text.trim()) {
