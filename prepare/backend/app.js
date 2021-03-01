@@ -36,6 +36,7 @@ db.sequelize
 
 passportConfig(); // /passport/index 에서 exports한 전략을 실행시킴
 
+app.set('trust proxy', 1);
 if (process.env.NODE_ENV === 'production') {
   // 배포 모드일 때
   app.use(morgan('combined'));
@@ -70,6 +71,7 @@ app.use(
     saveUninitialized: false,
     resave: false,
     secret: process.env.COOKIE_SECRET, // secret?
+    proxy: true,
     cookie: {
       httpOnly: true,
       secure: true,
