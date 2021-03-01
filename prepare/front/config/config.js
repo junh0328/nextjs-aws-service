@@ -2,7 +2,7 @@
 
 // AWS 탄력적 IP
 export const backUrl =
-  process.env.NODE_ENV === 'production' ? 'http://api.junheedot.com' : 'http://localhost:3065';
+  process.env.NODE_ENV === 'production' ? 'https://api.junheedot.com' : 'http://localhost:3065';
 
 // 개발 모드 시, backend local의 IP
 export const backUrlLocal = 'http://localhost:80';

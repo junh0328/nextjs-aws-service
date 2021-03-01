@@ -43,7 +43,7 @@ if (process.env.NODE_ENV === 'production') {
   app.use(helmet());
   app.use(
     cors({
-      origin: ['http://junheedot.com'],
+      origin: ['https://junheedot.com'],
       credentials: true,
     })
   );
@@ -72,7 +72,7 @@ app.use(
     secret: process.env.COOKIE_SECRET, // secret?
     cookie: {
       httpOnly: true,
-      secure: false,
+      secure: true,
       domain: process.env.NODE_ENV === 'production' && '.junheedot.com',
     },
   })
