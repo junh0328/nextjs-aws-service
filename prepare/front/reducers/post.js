@@ -220,7 +220,7 @@ const reducer = (state = initialState, action) => {
         break;
       case UPDATE_POST_SUCCESS: {
         draft.updatePostLoading = true;
-        draft.updatePostDone = false;
+        draft.updatePostDone = true;
         draft.mainPosts.find((v) => v.id === action.data.PostId).content = action.data.content;
         break;
       }
@@ -234,8 +234,8 @@ const reducer = (state = initialState, action) => {
         draft.removePostError = null;
         break;
       case REMOVE_POST_SUCCESS: {
-        draft.removePostLoading = true;
-        draft.removePostDone = false;
+        draft.removePostLoading = false;
+        draft.removePostDone = true;
         draft.mainPosts = draft.mainPosts.filter((v) => v.id !== action.data.PostId);
         break;
       }
