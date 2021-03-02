@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 /* eslint-disable consistent-return */
 /* eslint-disable comma-dangle */
 import React, { useCallback, useEffect, useRef } from 'react';
