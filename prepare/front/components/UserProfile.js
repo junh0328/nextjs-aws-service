@@ -19,7 +19,7 @@ const UserProfile = () => {
       actions={[
         <div key="twit">
           {/* 트윗 수 */}
-          <Link href={`user/${me.id}`}>
+          <Link href={`user/${me.id}`} prefetch={false}>
             <a>
               짹짹
               <br />

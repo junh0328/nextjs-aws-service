@@ -73,7 +73,7 @@ const User = () => {
         </Head>
       )}
       {/* 유저 안포가 내가 아닌 경우에만 클릭 시 타인의 정보(트윗, 팔로잉, 팔로워) 정보 뜨게 바꿈 */}
-      {userInfo ? (
+      {userInfo && userInfo.id !== me?.id ? (
         <Card
           style={{ marginBottom: 20 }}
           actions={[

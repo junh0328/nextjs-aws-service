@@ -1,3 +1,4 @@
+/* eslint-disable comma-dangle */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable react/jsx-wrap-multilines */
@@ -25,6 +26,7 @@ import {
   LIKE_POST_REQUEST,
   UNLIKE_POST_REQUEST,
   RETWEET_REQUEST,
+  UPDATE_POST_REQUEST,
 } from '../reducers/post';
 
 moment.locale('ko');
@@ -32,6 +34,7 @@ moment.locale('ko');
 const PostCard = ({ post }) => {
   const dispatch = useDispatch();
   const [commentFormOpened, setCommentForemOpened] = useState(false);
+  const [editMode, setEditMode] = useState(false);
   // const { me } = useSelector((state) => state.user);
   // const id = me && me.id;
   // = const id = me?.id; optional channing 연산자
@@ -60,6 +63,27 @@ const PostCard = ({ post }) => {
 
   const onToggleComment = useCallback(() => {
     setCommentForemOpened((prev) => !prev);
+  }, []);
+
+  const onClickUpdate = useCallback(() => {
+    setEditMode(true);
+  }, []);
+
+  const onChangePost = useCallback(
+    (editText) => () => {
+      dispatch({
+        type: UPDATE_POST_REQUEST,
+        data: {
+          PostId: post.id,
+          content: editText,
+        },
+      });
+    },
+    [post]
+  );
+
+  const onCancelUpdate = useCallback(() => {
+    setEditMode(false);
   }, []);
 
   const onRemovePost = useCallback(() => {
@@ -132,7 +156,11 @@ const PostCard = ({ post }) => {
               <Button.Group>
                 {id && post.User.id === id ? (
                   <>
-                    {!post.RetweetId && <Button>수정</Button>}
+                    {!post.RetweetId && (
+                      <Button onClick={onClickUpdate} style={{ marginRight: 10 }}>
+                        수정
+                      </Button>
+                    )}
                     <Button type="danger" onClick={onRemovePost}>
                       삭제
                     </Button>
@@ -160,7 +188,9 @@ const PostCard = ({ post }) => {
                 </Link>
               }
               title={post.Retweet.User.nickname}
-              description={<PostCardContent postData={post.Retweet.content} />}
+              description={
+                <PostCardContent postData={post.Retweet.content} onCancelUpdate={onCancelUpdate} />
+              }
             />
           </Card>
         ) : (
@@ -175,7 +205,14 @@ const PostCard = ({ post }) => {
                 </Link>
               }
               title={post.User.nickname}
-              description={<PostCardContent postData={post.content} />}
+              description={
+                <PostCardContent
+                  onChangePost={onChangePost}
+                  onCancelUpdate={onCancelUpdate}
+                  editMode={editMode}
+                  postData={post.content}
+                />
+              }
             />
           </>
         )}

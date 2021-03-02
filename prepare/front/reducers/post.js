@@ -23,6 +23,10 @@ const initialState = {
   addPostDone: false, // 포스트 추가 성공
   addPostError: null, // 포스트 추가 실패
 
+  updatePostLoading: false, // 포스트 수정 요청중
+  updatePostDone: false, // 포스트 수정 성공
+  updatePostError: null, // 포스트 수정 실패
+
   removePostLoading: false, // 포스트 삭제 요청중
   removePostDone: false, // 포스트 삭제 성공
   removePostError: null, // 포스트 삭제 실패
@@ -107,6 +111,10 @@ export const LOAD_POST_FAILURE = 'LOAD_POST_FAILURE';
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
 export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS';
 export const ADD_POST_FAILURE = 'ADD_POST_FAILURE';
+
+export const UPDATE_POST_REQUEST = 'UPDATE_POST_REQUEST';
+export const UPDATE_POST_SUCCESS = 'UPDATE_POST_SUCCESS';
+export const UPDATE_POST_FAILURE = 'UPDATE_POST_FAILURE';
 
 export const REMOVE_POST_REQUEST = 'REMOVE_POST_REQUEST';
 export const REMOVE_POST_SUCCESS = 'REMOVE_POST_SUCCESS';
@@ -204,6 +212,21 @@ const reducer = (state = initialState, action) => {
       case ADD_POST_FAILURE:
         draft.addPostLoading = false;
         draft.addPostError = action.error;
+        break;
+      case UPDATE_POST_REQUEST:
+        draft.updatePostLoading = true;
+        draft.updatePostDone = false;
+        draft.updatePostError = null;
+        break;
+      case UPDATE_POST_SUCCESS: {
+        draft.updatePostLoading = true;
+        draft.updatePostDone = false;
+        draft.mainPosts.find((v) => v.id === action.data.PostId).content = action.data.content;
+        break;
+      }
+      case UPDATE_POST_FAILURE:
+        draft.updatePostLoading = false;
+        draft.updatePostError = true;
         break;
       case REMOVE_POST_REQUEST:
         draft.removePostLoading = true;
