@@ -6,6 +6,7 @@ import styled, { createGlobalStyle } from 'styled-components';
 import { useSelector } from 'react-redux';
 import { HomeFilled, ProfileFilled } from '@ant-design/icons';
 import Router from 'next/router';
+import Image from 'next/image';
 
 import useInput from '../hooks/useInput';
 import UserProfile from './UserProfile';
@@ -58,6 +59,18 @@ const AppLayout = ({ children }) => {
             height: '60px',
           }}
         >
+          <Menu.Item>
+            <Link href="/main">
+              <a>
+                <Image
+                  src="/junheedotlogo.png"
+                  alt="Picture of the author"
+                  width={100}
+                  height={50}
+                />
+              </a>
+            </Link>
+          </Menu.Item>
           <Menu.Item>
             <Link href="/main">
               <a>
