@@ -44,7 +44,7 @@ router.post('/', isLoggedIn, upload.none(), async (req, res, next) => {
     });
     console.log(`userPost의 수는 ${userPost}`);
     // 또는 if(userPost > 10 이런식으로 조건문 처리 하고싶어요 )
-    if (userPost) {
+    if (userPost > 9) {
       return res
         .status(403)
         .send(
