@@ -7,7 +7,9 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import reducer from '../reducers';
 import rootSaga from '../sagas';
 
-const configureStore = () => {
+const configureStore = (context) => {
+  console.log('액션 실행');
+  console.log(context);
   const sagaMiddleware = createSagaMiddleware();
   const middlewares = [sagaMiddleware];
   const enhancer = composeWithDevTools(applyMiddleware(...middlewares));
