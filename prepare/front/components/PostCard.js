@@ -2,7 +2,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable react/jsx-wrap-multilines */
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Card, Popover, Avatar, List, Comment } from 'antd';
 import {
@@ -40,6 +40,13 @@ const PostCard = ({ post }) => {
   // = const id = me?.id; optional channing 연산자
 
   const id = useSelector((state) => state.user.me?.id);
+  const { updatePostDone } = useSelector((state) => state.post);
+
+  useEffect(() => {
+    if (updatePostDone) {
+      setEditMode(false);
+    }
+  }, [updatePostDone]);
 
   const onLike = useCallback(() => {
     // if (!id) {
