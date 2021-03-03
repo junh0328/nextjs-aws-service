@@ -13,7 +13,7 @@ import axios from 'axios';
 import AppLayout from '../components/AppLayout';
 import PostForm from '../components/PostForm';
 import PostCard from '../components/PostCard';
-import { LOAD_POSTS_REQUEST } from '../reducers/post';
+import { DEFAULT_POST_ACTION, LOAD_POSTS_REQUEST } from '../reducers/post';
 import { DEFAULT_DONE_ACTION, LOAD_MY_INFO_REQUEST } from '../reducers/user';
 import wrapper from '../store/configureStore';
 import ArrowUp from '../components/ArrowUp';
@@ -69,6 +69,7 @@ const main = () => {
       alert('리트윗 성공! \n포스트 상단에서 리트윗된 게시물을 확인하세요!');
       setTimeout(window.scrollTo(0, 0), 1000);
       // 포스트 최상단으로 이동
+      dispatch({ type: DEFAULT_POST_ACTION });
     }
   }, [retweetDone]);
 

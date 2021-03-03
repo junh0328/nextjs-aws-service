@@ -128,6 +128,8 @@ export const RETWEET_REQUEST = 'RETWEET_REQUEST';
 export const RETWEET_SUCCESS = 'RETWEET_SUCCESS';
 export const RETWEET_FAILURE = 'RETWEET_FAILURE';
 
+export const DEFAULT_POST_ACTION = 'DEFAULT_POST_ACTION';
+
 // 동적 액션 크리에이터 : 액션을 그때그때 만들어줌
 export const addPost = (data) => ({
   type: ADD_POST_REQUEST,
@@ -158,6 +160,12 @@ export const dummyPost = (data) => ({
 //     nickname: '이준희',
 //   },
 // });
+
+export const defaultPostAction = () => {
+  return {
+    type: DEFAULT_POST_ACTION,
+  };
+};
 
 const reducer = (state = initialState, action) => {
   return produce(state, (draft) => {
@@ -325,6 +333,9 @@ const reducer = (state = initialState, action) => {
       case RETWEET_FAILURE:
         draft.retweetLoading = false;
         draft.retweetError = action.error;
+        break;
+      case DEFAULT_POST_ACTION:
+        draft.retweetDone = false;
         break;
       default:
         break;
