@@ -2,22 +2,46 @@
 /* eslint-disable comma-dangle */
 
 import Head from 'next/head';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
-// import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import Router from 'next/router';
 
 import useSWR from 'swr';
 import AppLayout from '../components/AppLayout';
 import FollowList from '../components/FollowList';
 import NicknameEditForm from '../components/NicknameEditForm';
 import { backUrl } from '../config/config';
+import { DEFAULT_DONE_ACTION } from '../reducers/user';
 // import { LOAD_MY_INFO_REQUEST } from '../reducers/user';
 
 const fetcher = (url) => axios.get(url, { withCredentials: true }).then((result) => result.data);
 
 const Profile = () => {
-  // const { me } = useSelector((state) => state.user);
-  // const dispatch = useDispatch();
+  const { unfollowDone, removefollowerDone, logOutDone } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (unfollowDone) {
+      alert('팔로잉 제거!');
+    }
+  }, [unfollowDone]);
+
+  useEffect(() => {
+    if (removefollowerDone) {
+      alert('팔로워 제거!');
+    }
+  }, [removefollowerDone]);
+
+  useEffect(() => {
+    if (logOutDone) {
+      dispatch({
+        type: DEFAULT_DONE_ACTION,
+      });
+      alert('로그아웃 성공!\n로그인 페이지로 돌아갑니다.');
+      Router.replace('/');
+    }
+  }, [logOutDone]);
 
   const [followersLimit, setFollowersLimit] = useState(3);
   const [followingsLimit, setFollowingsLimit] = useState(3);
