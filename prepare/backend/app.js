@@ -17,7 +17,7 @@ const hashtagRouter = require('./routes/hashtag');
 
 const db = require('./models');
 const passportConfig = require('./passport');
-const port = 80;
+const port = 3065;
 
 dotenv.config(); //.env를 사용할 수 있게 해주는 명령어
 const app = express();
@@ -36,6 +36,7 @@ db.sequelize
 
 passportConfig(); // /passport/index 에서 exports한 전략을 실행시킴
 
+app.set('trust proxy', 1);
 if (process.env.NODE_ENV === 'production') {
   // 배포 모드일 때
   app.use(morgan('combined'));
@@ -43,7 +44,7 @@ if (process.env.NODE_ENV === 'production') {
   app.use(helmet());
   app.use(
     cors({
-      origin: ['http://junheedot.com'],
+      origin: ['https://junheedot.com'],
       credentials: true,
     })
   );
@@ -70,9 +71,10 @@ app.use(
     saveUninitialized: false,
     resave: false,
     secret: process.env.COOKIE_SECRET, // secret?
+    proxy: true,
     cookie: {
       httpOnly: true,
-      secure: false,
+      secure: true,
       domain: process.env.NODE_ENV === 'production' && '.junheedot.com',
     },
   })

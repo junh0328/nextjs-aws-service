@@ -1,3 +1,6 @@
+/* eslint-disable no-alert */
+/* eslint-disable consistent-return */
+/* eslint-disable comma-dangle */
 import React, { useCallback, useEffect, useRef } from 'react';
 import { Button, Form, Input } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,31 +11,14 @@ import { backUrl } from '../config/config';
 const PostForm = () => {
   const dispatch = useDispatch();
   const imageInput = useRef();
-  const { imagePaths, addPostDone } = useSelector((state) => state.post);
+  const { imagePaths, addPostDone, addPostError } = useSelector((state) => state.post);
   const [text, onChangeText, setText] = useInput('');
 
   useEffect(() => {
-    if (addPostDone) {
+    if (addPostDone || addPostError) {
       setText('');
     }
-  }, [addPostDone]);
-
-  const onsubmit = useCallback(() => {
-    if (!text || !text.trim()) {
-      return alert('게시글을 작성하세요.');
-    }
-    const formData = new FormData();
-    imagePaths.forEach((p) => {
-      formData.append('image', p);
-    });
-    formData.append('content', text);
-
-    return dispatch({
-      type: ADD_POST_REQUEST,
-      data: formData,
-    });
-  }, [text, imagePaths]);
-  // 여기서 addPost는 sagas/post에서 만들어 놓은 함수이기 때문에 파라미터만 넣어주면 된다. (따로 지정 x)
+  }, [addPostDone, addPostError]);
 
   const onClickImageUpload = useCallback(() => {
     imageInput.current.click();
@@ -56,6 +42,23 @@ const PostForm = () => {
       data: index,
     });
   });
+
+  const onsubmit = useCallback(() => {
+    if (!text || !text.trim()) {
+      return alert('게시글을 작성하세요.');
+    }
+    const formData = new FormData();
+    imagePaths.forEach((p) => {
+      formData.append('image', p);
+    });
+    formData.append('content', text);
+
+    return dispatch({
+      type: ADD_POST_REQUEST,
+      data: formData,
+    });
+  }, [text, imagePaths]);
+  // 여기서 addPost는 sagas/post에서 만들어 놓은 함수이기 때문에 파라미터만 넣어주면 된다. (따로 지정 x)
 
   return (
     <Form style={{ margin: '10px 0 20' }} encType="multipart/form-data" onFinish={onsubmit}>

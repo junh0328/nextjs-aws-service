@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 /* eslint-disable comma-dangle */
 /* eslint-disable operator-linebreak */
 /* eslint-disable space-infix-ops */
@@ -15,6 +16,7 @@ import PostCard from '../components/PostCard';
 import { LOAD_POSTS_REQUEST } from '../reducers/post';
 import { DEFAULT_DONE_ACTION, LOAD_MY_INFO_REQUEST } from '../reducers/user';
 import wrapper from '../store/configureStore';
+import ArrowUp from '../components/ArrowUp';
 
 const main = () => {
   const { me, logOutDone } = useSelector((state) => state.user);
@@ -27,9 +29,16 @@ const main = () => {
     addCommentError,
     likePostError,
     unlikePostError,
+    addPostError,
   } = useSelector((state) => state.post);
   // const mainPosts = useSelector((state)=> state.post.mainPosts) 구조분해를 하지 않으면 다음과 같이 표현할 수 있다.
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (addPostError) {
+      alert(addPostError);
+    }
+  }, [addPostError]);
 
   useEffect(() => {
     if (retweetError) {
@@ -120,6 +129,7 @@ const main = () => {
           <PostCard key={post.id} post={post} />
         ))}
       </AppLayout>
+      <ArrowUp />
     </>
   );
 };

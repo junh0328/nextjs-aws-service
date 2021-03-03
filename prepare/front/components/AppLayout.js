@@ -6,7 +6,6 @@ import styled, { createGlobalStyle } from 'styled-components';
 import { useSelector } from 'react-redux';
 import { HomeFilled, ProfileFilled } from '@ant-design/icons';
 import Router from 'next/router';
-import Image from 'next/image';
 
 import useInput from '../hooks/useInput';
 import UserProfile from './UserProfile';
@@ -59,33 +58,37 @@ const AppLayout = ({ children }) => {
             height: '60px',
           }}
         >
-          <Menu.Item>
-            <Link href="/main">
-              <a>
-                <Image
-                  src="/junheedotlogo.png"
-                  alt="Picture of the author"
-                  width={100}
-                  height={50}
-                />
-              </a>
-            </Link>
-          </Menu.Item>
-          <Menu.Item>
-            <Link href="/main">
-              <a>
-                <HomeFilled style={{ width: '100%' }} />
-              </a>
-            </Link>
-          </Menu.Item>
-          {me && (
-            <Menu.Item>
-              <Link href="/profile">
-                <a>
-                  <ProfileFilled style={{ width: '100%' }} />
-                </a>
-              </Link>
-            </Menu.Item>
+          {me ? (
+            <>
+              <Menu.Item>
+                <Link href="/main" shallow>
+                  <a>
+                    <HomeFilled style={{ width: '100%' }} />
+                  </a>
+                </Link>
+              </Menu.Item>
+
+              <Menu.Item>
+                <Link href="/profile">
+                  <a>
+                    <ProfileFilled style={{ width: '100%' }} />
+                  </a>
+                </Link>
+              </Menu.Item>
+            </>
+          ) : (
+            <>
+              <Menu.Item>
+                <Link href="/">
+                  <a>로그인</a>
+                </Link>
+              </Menu.Item>
+              <Menu.Item>
+                <Link href="/signup">
+                  <a>회원가입</a>
+                </Link>
+              </Menu.Item>
+            </>
           )}
           <Menu.Item>
             <SearchInput

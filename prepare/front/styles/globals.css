@@ -16,3 +16,22 @@ a {
 * {
   box-sizing: border-box;
 }
+
+@media (max-width: 600px) {
+  html,
+  body {
+    padding: 0;
+    margin: 0;
+    font-size: 0.6rem;
+  }
+
+  .ant-card {
+    font-size: 12px;
+  }
+  .ant-card-meta-title {
+    font-size: 14px;
+  }
+  .ant-card-actions > li > span {
+    font-size: 12px !important;
+  }
+}

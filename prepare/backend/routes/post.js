@@ -42,6 +42,7 @@ router.post('/', isLoggedIn, upload.none(), async (req, res, next) => {
     const userPost = await Post.count({
       where: { UserId: req.user.id },
     });
+
     console.log(`userPost의 수는 ${userPost}`);
     // 또는 if(userPost > 10 이런식으로 조건문 처리 하고싶어요 )
     if (userPost > 9) {
@@ -278,6 +279,16 @@ router.get('/:postId', async (req, res, next) => {
 router.post('/:postId/retweet', isLoggedIn, async (req, res, next) => {
   // POST /post/1/retweet
   try {
+    const userPost = await Post.count({
+      where: { UserId: req.user.id },
+    });
+    if (userPost > 5) {
+      return res
+        .status(403)
+        .send(
+          '서비스 최적화를 위해 게시글은 5개 이상 작성할 수 없습니다.\n불필요한 게시글을 삭제하고 이용해주세요 😁'
+        );
+    }
     const post = await Post.findOne({
       where: { id: req.params.postId }, // 리트윗 할 게시물이 존재하는 지 찾아보는 where 절
       include: [

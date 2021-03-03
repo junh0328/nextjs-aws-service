@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable react/jsx-wrap-multilines */
 /* eslint-disable jsx-quotes */
@@ -19,12 +20,16 @@ const GlobalFlex = createGlobalStyle`
     justify-content: center;
   }
 
-  // mobile
-  @media (max-width: 600px) {
+   // mobile
+   @media (max-width: 600px) {
     display: flex;
     flex-wrap: wrap;
-}
+    font-size: 0.8rem;
 
+    img {
+      width: 80%;
+    }
+}
 `;
 
 const ButtonWrapper = styled.div`

@@ -1,3 +1,5 @@
+/* eslint-disable no-alert */
+/* eslint-disable comma-dangle */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable react/jsx-wrap-multilines */
@@ -25,6 +27,7 @@ import {
   LIKE_POST_REQUEST,
   UNLIKE_POST_REQUEST,
   RETWEET_REQUEST,
+  UPDATE_POST_REQUEST,
 } from '../reducers/post';
 
 moment.locale('ko');
@@ -32,16 +35,14 @@ moment.locale('ko');
 const PostCard = ({ post }) => {
   const dispatch = useDispatch();
   const [commentFormOpened, setCommentForemOpened] = useState(false);
+  const [editMode, setEditMode] = useState(false);
   // const { me } = useSelector((state) => state.user);
   // const id = me && me.id;
   // = const id = me?.id; optional channing 연산자
-
   const id = useSelector((state) => state.user.me?.id);
+  const liked = post.Likers.find((v) => v.id === id);
 
   const onLike = useCallback(() => {
-    // if (!id) {
-    //   return alert('로그인이 필요합니다!');
-    // }
     dispatch({
       type: LIKE_POST_REQUEST,
       data: post.id,
@@ -49,9 +50,6 @@ const PostCard = ({ post }) => {
   }, []);
 
   const onUnLike = useCallback(() => {
-    // if (!id) {
-    //   return alert('로그인이 필요합니다!');
-    // }
     dispatch({
       type: UNLIKE_POST_REQUEST,
       data: post.id,
@@ -60,6 +58,27 @@ const PostCard = ({ post }) => {
 
   const onToggleComment = useCallback(() => {
     setCommentForemOpened((prev) => !prev);
+  }, []);
+
+  const onClickUpdate = useCallback(() => {
+    setEditMode(true);
+  }, []);
+
+  const onChangePost = useCallback(
+    (editText) => () => {
+      dispatch({
+        type: UPDATE_POST_REQUEST,
+        data: {
+          PostId: post.id,
+          content: editText,
+        },
+      });
+    },
+    [post]
+  );
+
+  const onCancelUpdate = useCallback(() => {
+    setEditMode(false);
   }, []);
 
   const onRemovePost = useCallback(() => {
@@ -81,8 +100,6 @@ const PostCard = ({ post }) => {
       data: post.id,
     });
   }, [id]);
-
-  const liked = post.Likers.find((v) => v.id === id);
 
   // console.log('post 상태값 출력');
   // console.log(post);
@@ -132,7 +149,11 @@ const PostCard = ({ post }) => {
               <Button.Group>
                 {id && post.User.id === id ? (
                   <>
-                    {!post.RetweetId && <Button>수정</Button>}
+                    {!post.RetweetId && (
+                      <Button onClick={onClickUpdate} style={{ marginRight: 10 }}>
+                        수정
+                      </Button>
+                    )}
                     <Button type="danger" onClick={onRemovePost}>
                       삭제
                     </Button>
@@ -153,14 +174,16 @@ const PostCard = ({ post }) => {
             <div style={{ float: 'right' }}>{moment(post.createdAt).format('YYYY.MM.DD')}</div>
             <Card.Meta
               avatar={
-                <Link href={`/user/${post.Retweet.User.id}`}>
+                <Link href={`/user/${post.Retweet.User.id}`} prefetch={false}>
                   <a>
                     <Avatar>{post.Retweet.User.nickname[0]}</Avatar>
                   </a>
                 </Link>
               }
               title={post.Retweet.User.nickname}
-              description={<PostCardContent postData={post.Retweet.content} />}
+              description={
+                <PostCardContent postData={post.Retweet.content} onCancelUpdate={onCancelUpdate} />
+              }
             />
           </Card>
         ) : (
@@ -168,14 +191,21 @@ const PostCard = ({ post }) => {
             <div style={{ float: 'right' }}>{moment(post.createdAt).format('YYYY.MM.DD')}</div>
             <Card.Meta
               avatar={
-                <Link href={`/user/${post.User.id}`}>
+                <Link href={`/user/${post.User.id}`} prefetch={false}>
                   <a>
                     <Avatar>{post.User.nickname[0]}</Avatar>
                   </a>
                 </Link>
               }
               title={post.User.nickname}
-              description={<PostCardContent postData={post.content} />}
+              description={
+                <PostCardContent
+                  onChangePost={onChangePost}
+                  onCancelUpdate={onCancelUpdate}
+                  editMode={editMode}
+                  postData={post.content}
+                />
+              }
             />
           </>
         )}
@@ -194,7 +224,7 @@ const PostCard = ({ post }) => {
                   style={{ marginBottom: 10, borderBottom: '1px solid #f0f0f0' }}
                   author={item.User.nickname}
                   avatar={
-                    <Link href={`/user/${item.User.id}`}>
+                    <Link href={`/user/${item.User.id}`} prefetch={false}>
                       <a>
                         <Avatar>{item.User.nickname[0]}</Avatar>
                       </a>
@@ -207,7 +237,6 @@ const PostCard = ({ post }) => {
           />
         </div>
       )}
-      {/* <Comments /> */}
     </div>
   );
 };
