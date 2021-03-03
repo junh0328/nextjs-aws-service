@@ -42,7 +42,10 @@ const main = () => {
 
   useEffect(() => {
     if (retweetError) {
-      alert(retweetError).then(dispatch({ type: DEFAULT_POST_ACTION }));
+      alert(retweetError);
+      setTimeout(() => {
+        dispatch({ type: DEFAULT_POST_ACTION });
+      }, 1000);
     }
   }, [retweetError]);
 
