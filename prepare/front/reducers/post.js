@@ -128,7 +128,7 @@ export const RETWEET_REQUEST = 'RETWEET_REQUEST';
 export const RETWEET_SUCCESS = 'RETWEET_SUCCESS';
 export const RETWEET_FAILURE = 'RETWEET_FAILURE';
 
-export const DEFAULT_DONE_ACTION = 'DEFAULT_DONE_ACTION';
+export const DEFAULT_POST_ACTION = 'DEFAULT_POST_ACTION';
 
 // 동적 액션 크리에이터 : 액션을 그때그때 만들어줌
 export const addPost = (data) => ({
@@ -161,9 +161,9 @@ export const dummyPost = (data) => ({
 //   },
 // });
 
-export const defaultDoneAction = () => {
+export const defaultPostAction = () => {
   return {
-    type: DEFAULT_DONE_ACTION,
+    type: DEFAULT_POST_ACTION,
   };
 };
 
@@ -334,7 +334,7 @@ const reducer = (state = initialState, action) => {
         draft.retweetLoading = false;
         draft.retweetError = action.error;
         break;
-      case DEFAULT_DONE_ACTION: {
+      case DEFAULT_POST_ACTION: {
         draft.retweetDone = false;
         break;
       }
