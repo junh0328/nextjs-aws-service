@@ -336,6 +336,7 @@ const reducer = (state = initialState, action) => {
         break;
       case DEFAULT_POST_ACTION:
         draft.retweetDone = false;
+        draft.retweetError = null;
         break;
       default:
         break;
