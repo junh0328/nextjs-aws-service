@@ -39,13 +39,10 @@ const PostCard = ({ post }) => {
   // const { me } = useSelector((state) => state.user);
   // const id = me && me.id;
   // = const id = me?.id; optional channing 연산자
-
   const id = useSelector((state) => state.user.me?.id);
+  const liked = post.Likers.find((v) => v.id === id);
 
   const onLike = useCallback(() => {
-    // if (!id) {
-    //   return alert('로그인이 필요합니다!');
-    // }
     dispatch({
       type: LIKE_POST_REQUEST,
       data: post.id,
@@ -53,9 +50,6 @@ const PostCard = ({ post }) => {
   }, []);
 
   const onUnLike = useCallback(() => {
-    // if (!id) {
-    //   return alert('로그인이 필요합니다!');
-    // }
     dispatch({
       type: UNLIKE_POST_REQUEST,
       data: post.id,
@@ -106,8 +100,6 @@ const PostCard = ({ post }) => {
       data: post.id,
     });
   }, [id]);
-
-  const liked = post.Likers.find((v) => v.id === id);
 
   // console.log('post 상태값 출력');
   // console.log(post);
@@ -245,7 +237,6 @@ const PostCard = ({ post }) => {
           />
         </div>
       )}
-      {/* <Comments /> */}
     </div>
   );
 };
