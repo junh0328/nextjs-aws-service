@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Menu, Input, Row, Col } from 'antd';
 import styled, { createGlobalStyle } from 'styled-components';
 import { useSelector } from 'react-redux';
-import { HomeFilled, ProfileFilled } from '@ant-design/icons';
+import { HomeFilled, InfoCircleFilled, ProfileFilled } from '@ant-design/icons';
 import Router from 'next/router';
 
 import useInput from '../hooks/useInput';
@@ -90,6 +90,13 @@ const AppLayout = ({ children }) => {
               </Menu.Item>
             </>
           )}
+          <Menu.Item>
+            <Link href="/faq" shallow>
+              <a>
+                <InfoCircleFilled style={{ width: '100%' }} />
+              </a>
+            </Link>
+          </Menu.Item>
           <Menu.Item>
             <SearchInput
               value={searchInput}
