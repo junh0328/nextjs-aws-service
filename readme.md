@@ -59,6 +59,93 @@
 
 ## 👉🏼 프로젝트 구현
 
+1. SSR과 리덕스-사가를 이용한 비동기처리
+   > 처음 빈 게시물에서 SSR을 통해 서버에서 데이터를 받아 채워놓는다.
+
+```js
+export const getServerSideProps = wrapper.getServerSideProps(
+  async (context) => {
+    const cookie = context.req ? context.req.headers.cookie : "";
+    axios.defaults.headers.Cookie = "";
+    if (context.req && cookie) {
+      axios.defaults.headers.Cookie = cookie;
+    }
+    context.store.dispatch({
+      type: LOAD_POSTS_REQUEST,
+    });
+    context.store.dispatch(END);
+    await context.store.sagaTask.toPromise();
+  }
+);
+```
+
+2. useDispatch() 훅 함수를 활용해 LOAD_POSTS_REQUEST와 같은 액션이 호출되면 리덕스-사가에서 이를 처리하고 결과값을 LOAD_POSTS_SUCCESS / LOAD_POSTS_FAILURE 로 반환한다.
+
+```js
+unction loadPostsAPI(lastId) {
+  return axios.get(`/posts?lastId=${lastId || 0}`);
+}
+
+function* loadPosts(action) {
+  try {
+    const result = yield call(loadPostsAPI, action.lastId);
+    yield put({
+      type: LOAD_POSTS_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOAD_POSTS_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
+function* watchloadPosts() {
+  yield takeLatest(LOAD_POSTS_REQUEST, loadPosts);
+}
+
+export default function* postSaga() {
+  yield all([
+    fork(watchloadPosts),
+    ....
+  ])
+}
+```
+
+3. 리덕스-사가에서 얻은 정보를 바탕으로 리듀서에서 처리
+
+```js
+const reducer = (state = initialState, action) => {
+  return produce(state, (draft) => {
+    switch (action.type) {
+      case LOAD_POSTS_REQUEST:
+        draft.loadPostsLoading = true;
+        draft.loadPostsDone = false;
+        draft.loadPostsError = null;
+        break;
+      case LOAD_POSTS_SUCCESS:
+        draft.loadPostsLoading = false;
+        draft.loadPostsDone = true;
+        draft.mainPosts = draft.mainPosts.concat(action.data);
+        draft.hasMorePosts = action.data.length === 10;
+        break;
+      case LOAD_POSTS_FAILURE:
+        draft.loadPostsLoading = false;
+        draft.loadPostsError = action.error;
+        break;
+        ...
+      default:
+      break;
+    }
+  });
+};
+
+```
+
+4. 리듀서에서 처리된 값을 바탕으로 Virtual DOM이 이를 비교하교 렌더링한다. 후에 상황은 아래 결과를 참조
+
 <hr/>
 
 ## 👉🏼 프로젝트 결과

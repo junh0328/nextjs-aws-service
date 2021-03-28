@@ -97,10 +97,7 @@ const main = () => {
   useEffect(() => {
     function onScroll() {
       // console.log(window.scrollY, document.documentElement.clientHeight, document.documentElement.scrollHeight);
-      if (
-        window.scrollY + document.documentElement.clientHeight >
-        document.documentElement.scrollHeight - 300
-      ) {
+      if (window.scrollY + document.documentElement.clientHeight > document.documentElement.scrollHeight - 300) {
         if (hasMorePosts && !loadPostsLoading) {
           const lastId = mainPosts[mainPosts.length - 1]?.id;
           // console.log('메인 포스트의 길이는 ? ');
@@ -144,8 +141,6 @@ export const getServerSideProps = wrapper.getServerSideProps(async (context) => 
   if (context.req && cookie) {
     axios.defaults.headers.Cookie = cookie;
   }
-  // console.log(context);
-
   context.store.dispatch({
     type: LOAD_POSTS_REQUEST,
   });

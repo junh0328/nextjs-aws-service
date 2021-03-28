@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable operator-linebreak */
 // hashtag/[tag].js
 
@@ -28,10 +29,7 @@ const Hashtag = () => {
 
   useEffect(() => {
     const onScroll = () => {
-      if (
-        window.pageYOffset + document.documentElement.clientHeight >
-        document.documentElement.scrollHeight - 300
-      ) {
+      if (window.pageYOffset + document.documentElement.clientHeight > document.documentElement.scrollHeight - 300) {
         if (hasMorePosts && !loadPostsLoading) {
           dispatch({
             type: LOAD_HASHTAG_POSTS_REQUEST,

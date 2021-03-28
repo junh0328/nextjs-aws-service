@@ -131,10 +131,12 @@ export const RETWEET_FAILURE = 'RETWEET_FAILURE';
 export const DEFAULT_POST_ACTION = 'DEFAULT_POST_ACTION';
 
 // 동적 액션 크리에이터 : 액션을 그때그때 만들어줌
-export const addPost = (data) => ({
-  type: ADD_POST_REQUEST,
-  data, // data를 넘겨줄 때 어떤 이름으로 넘겨줄 지를 정해주지 않았기 때문에 사가에서 {content: data} 로 지정해 주었다.
-});
+export const addPost = (data) => {
+  return {
+    type: ADD_POST_REQUEST,
+    data, // data를 넘겨줄 때 어떤 이름으로 넘겨줄 지를 정해주지 않았기 때문에 사가에서 {content: data} 로 지정해 주었다.
+  };
+};
 
 export const addComment = (data) => ({
   type: ADD_COMMENT_REQUEST,
