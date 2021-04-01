@@ -14,7 +14,7 @@ import AppLayout from '../components/AppLayout';
 import PostForm from '../components/PostForm';
 import PostCard from '../components/PostCard';
 import { DEFAULT_POST_ACTION, LOAD_POSTS_REQUEST } from '../reducers/post';
-import { LOAD_MY_INFO_REQUEST, DEFAULT_DONE_ACTION } from '../reducers/user';
+import { DEFAULT_DONE_ACTION, LOAD_MY_INFO_REQUEST } from '../reducers/user';
 import wrapper from '../store/configureStore';
 import ArrowUp from '../components/ArrowUp';
 
@@ -43,6 +43,9 @@ const main = () => {
   useEffect(() => {
     if (retweetError) {
       alert(retweetError);
+      setTimeout(() => {
+        dispatch({ type: DEFAULT_POST_ACTION });
+      }, 1000);
     }
   }, [retweetError]);
 
@@ -70,6 +73,7 @@ const main = () => {
       setTimeout(window.scrollTo(0, 0), 1000);
       dispatch({ type: DEFAULT_POST_ACTION });
       // 포스트 최상단으로 이동
+      dispatch({ type: DEFAULT_POST_ACTION });
     }
   }, [retweetDone]);
 
@@ -94,10 +98,7 @@ const main = () => {
   useEffect(() => {
     function onScroll() {
       // console.log(window.scrollY, document.documentElement.clientHeight, document.documentElement.scrollHeight);
-      if (
-        window.scrollY + document.documentElement.clientHeight >
-        document.documentElement.scrollHeight - 300
-      ) {
+      if (window.scrollY + document.documentElement.clientHeight > document.documentElement.scrollHeight - 300) {
         if (hasMorePosts && !loadPostsLoading) {
           const lastId = mainPosts[mainPosts.length - 1]?.id;
           // console.log('메인 포스트의 길이는 ? ');
@@ -141,8 +142,6 @@ export const getServerSideProps = wrapper.getServerSideProps(async (context) => 
   if (context.req && cookie) {
     axios.defaults.headers.Cookie = cookie;
   }
-  // console.log(context);
-
   context.store.dispatch({
     type: LOAD_POSTS_REQUEST,
   });

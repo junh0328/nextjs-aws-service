@@ -108,7 +108,7 @@ const PostCard = ({ post }) => {
       {/* 이 postcard의 주인이 내가 아니면, 팔로우 언팔로우 버튼을 띄워 가능하게 한다. */}
       <Card
         style={{ marginBottom: '30px' }}
-        title={post.RetweetId ? `${post.User.nickname} 님이 리트윗하셨습니다.` : null}
+        title={post.RetweetId ? `${post.User.nickname} 님이 공유한 게시글입니다.` : null}
         extra={id && <FollowButton post={post} />}
         cover={post.Images[0] && <PostImages images={post.Images} />}
         actions={[
@@ -117,7 +117,7 @@ const PostCard = ({ post }) => {
             style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
           >
             <RetweetOutlined key="retweet" style={{ marginRight: 5 }} />
-            {post.Retweet ? <span>리트윗된 게시글</span> : <span>리트윗하기</span>}
+            {post.Retweet ? <span>공유하기</span> : <span>공유하기</span>}
           </div>,
           liked ? (
             <div

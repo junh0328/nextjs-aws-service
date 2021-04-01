@@ -75,6 +75,14 @@ const AppLayout = ({ children }) => {
                   </a>
                 </Link>
               </Menu.Item>
+
+              <Menu.Item>
+                <Link href="/faq" shallow>
+                  <a>
+                    <InfoCircleFilled style={{ width: '100%' }} />
+                  </a>
+                </Link>
+              </Menu.Item>
             </>
           ) : (
             <>
@@ -88,8 +96,14 @@ const AppLayout = ({ children }) => {
                   <a>회원가입</a>
                 </Link>
               </Menu.Item>
+              <Menu.Item>
+                <Link href="/faq" shallow>
+                  <a>FAQ</a>
+                </Link>
+              </Menu.Item>
             </>
           )}
+
           <Menu.Item>
             <Link href="/faq" shallow>
               <a>

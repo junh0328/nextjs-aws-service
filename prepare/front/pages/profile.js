@@ -18,9 +18,8 @@ import { DEFAULT_DONE_ACTION } from '../reducers/user';
 const fetcher = (url) => axios.get(url, { withCredentials: true }).then((result) => result.data);
 
 const Profile = () => {
-  // const { me } = useSelector((state) => state.user);
-  const dispatch = useDispatch();
   const { unfollowDone, removefollowerDone, logOutDone } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (unfollowDone) {
@@ -49,11 +48,11 @@ const Profile = () => {
 
   const { data: followersData, error: followerError } = useSWR(
     `${backUrl}/user/followers?limit=${followersLimit}`,
-    fetcher
+    fetcher,
   );
   const { data: followingsData, error: followingError } = useSWR(
     `${backUrl}/user/followings?limit=${followingsLimit}`,
-    fetcher
+    fetcher,
   );
 
   const loadMoreFollowings = useCallback(() => {
