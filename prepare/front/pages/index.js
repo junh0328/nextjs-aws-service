@@ -1,174 +1,167 @@
 /* eslint-disable no-alert */
-/* eslint-disable react/jsx-props-no-spreading */
-/* eslint-disable react/jsx-wrap-multilines */
-/* eslint-disable jsx-quotes */
-import React, { useCallback, useEffect } from 'react';
+/* eslint-disable comma-dangle */
+/* eslint-disable operator-linebreak */
+/* eslint-disable space-infix-ops */
+/* eslint-disable max-len */
+import React, { useEffect } from 'react';
 import Head from 'next/head';
-import { Row, Col, Form, Input, Button, Checkbox } from 'antd';
-import styled, { createGlobalStyle } from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
-import Link from 'next/link';
 import Router from 'next/router';
-import useInput from '../hooks/useInput';
+import { END } from 'redux-saga';
+import axios from 'axios';
 
-import { loginRequestAction } from '../reducers/user';
+import AppLayout from '../components/AppLayout';
+import PostForm from '../components/PostForm';
+import PostCard from '../components/PostCard';
+import { DEFAULT_POST_ACTION, LOAD_POSTS_REQUEST } from '../reducers/post';
+import { DEFAULT_DONE_ACTION, LOAD_MY_INFO_REQUEST } from '../reducers/user';
+import wrapper from '../store/configureStore';
+import ArrowUp from '../components/ArrowUp';
 
-const GlobalFlex = createGlobalStyle`
-  body{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-   // mobile
-   @media (max-width: 600px) {
-    display: flex;
-    flex-wrap: wrap;
-    font-size: 0.8rem;
-
-    img {
-      width: 80%;
-    }
-}
-`;
-
-const ButtonWrapper = styled.div`
-  margin-top: 1px;
-`;
-
-const layout = {
-  labelCol: {
-    span: 8,
-  },
-  wrapperCol: {
-    span: 16,
-  },
-};
-
-const tailLayout = {
-  wrapperCol: {
-    offset: 8,
-    span: 16,
-  },
-};
-
-export default function Home() {
+const main = () => {
+  const { me, logOutDone } = useSelector((state) => state.user);
+  const {
+    mainPosts,
+    hasMorePosts,
+    loadPostsLoading,
+    retweetError,
+    retweetDone,
+    addCommentError,
+    likePostError,
+    unlikePostError,
+    addPostError,
+  } = useSelector((state) => state.post);
+  // const mainPosts = useSelector((state)=> state.post.mainPosts) 구조분해를 하지 않으면 다음과 같이 표현할 수 있다.
   const dispatch = useDispatch();
-  const { logInLoading, me, logInError } = useSelector((state) => state.user);
-
-  const [email, onChangeEmail] = useInput('');
-  const [password, onChangePassword] = useInput('');
 
   useEffect(() => {
-    if (logInError) {
-      alert(logInError);
+    if (addPostError) {
+      alert(addPostError);
     }
-  }, [logInError]);
+  }, [addPostError]);
 
   useEffect(() => {
-    if (me) {
-      alert('로그인 성공\n메인페이지로 이동합니다!');
-      Router.replace('/main');
+    if (retweetError) {
+      alert(retweetError);
+      setTimeout(() => {
+        dispatch({ type: DEFAULT_POST_ACTION });
+      }, 1000);
     }
-  }, [me]);
+  }, [retweetError]);
 
-  const onSubmitForm = useCallback(() => {
-    dispatch(loginRequestAction({ email, password }));
-  }, [email, password]);
+  useEffect(() => {
+    if (addCommentError) {
+      alert(addCommentError);
+    }
+  }, [addCommentError]);
+
+  useEffect(() => {
+    if (likePostError) {
+      alert(likePostError);
+    }
+  }, [likePostError]);
+
+  useEffect(() => {
+    if (unlikePostError) {
+      alert(unlikePostError);
+    }
+  }, [unlikePostError]);
+
+  useEffect(() => {
+    if (retweetDone) {
+      alert('리트윗 성공! \n포스트 상단에서 리트윗된 게시물을 확인하세요!');
+      setTimeout(window.scrollTo(0, 0), 1000);
+      dispatch({ type: DEFAULT_POST_ACTION });
+      // 포스트 최상단으로 이동
+      dispatch({ type: DEFAULT_POST_ACTION });
+    }
+  }, [retweetDone]);
+
+  useEffect(() => {
+    if (logOutDone) {
+      dispatch({
+        type: DEFAULT_DONE_ACTION,
+      });
+      Router.replace('/');
+    }
+  }, [logOutDone]);
+
+  useEffect(() => {
+    dispatch({
+      type: LOAD_MY_INFO_REQUEST,
+    });
+  }, []);
+
+  // 제일 처음 mainPosts가 빈 배열일 때 실행됨
+
+  useEffect(() => {
+    function onScroll() {
+      // console.log(window.scrollY, document.documentElement.clientHeight, document.documentElement.scrollHeight);
+      if (window.scrollY + document.documentElement.clientHeight > document.documentElement.scrollHeight - 300) {
+        if (hasMorePosts && !loadPostsLoading) {
+          const lastId = mainPosts[mainPosts.length - 1]?.id;
+          // console.log('메인 포스트의 길이는 ? ');
+          // console.log(mainPosts.length);
+          // console.log(mainPosts[mainPosts.length]);
+          // console.log(`lastId는 ? ${lastId}`);
+          dispatch({
+            type: LOAD_POSTS_REQUEST,
+            lastId,
+          });
+        }
+      }
+    }
+    window.addEventListener('scroll', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, [hasMorePosts, loadPostsLoading, mainPosts]);
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
+    <>
       <Head>
-        <title>juneed | login</title>
+        <meta charSet="utf-8" />
         <link rel="icon" href="/favicon.png" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Juneed | main</title>
       </Head>
-      <GlobalFlex />
-      <Row gutter={16}>
-        <Col
-          style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-          md={12}
-          xs={24}
-        >
-          <Form
-            style={{ marginRight: 30 }}
-            {...layout}
-            name="basic"
-            initialValues={{ remember: true }}
-            onFinish={onSubmitForm}
-          >
-            <Form.Item
-              label="Email"
-              name="email"
-              rules={[
-                {
-                  required: true,
-                  message: 'Please input your e-mail!',
-                },
-              ]}
-            >
-              <Input
-                name="user-email"
-                type="email"
-                value={email}
-                required
-                onChange={onChangeEmail}
-              />
-            </Form.Item>
-
-            <Form.Item
-              label="Password"
-              name="password"
-              rules={[
-                {
-                  required: true,
-                  message: 'Please input your password!',
-                },
-              ]}
-            >
-              <Input.Password
-                name="password"
-                value={password}
-                onChange={onChangePassword}
-                required
-              />
-            </Form.Item>
-
-            <Form.Item {...tailLayout} name="remember" valuePropName="checked">
-              <Checkbox>Remember me</Checkbox>
-            </Form.Item>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <Form.Item {...tailLayout}>
-                <ButtonWrapper>
-                  <Button type="primary" htmlType="submit" loading={logInLoading}>
-                    로그인
-                  </Button>
-                </ButtonWrapper>
-              </Form.Item>
-              <Form.Item {...tailLayout}>
-                <ButtonWrapper>
-                  <Button type="primary">
-                    <Link href="/signup">
-                      <a>회원가입</a>
-                    </Link>
-                  </Button>
-                </ButtonWrapper>
-              </Form.Item>
-            </div>
-          </Form>
-        </Col>
-        <Col md={12} xs={24}>
-          <div style={{ textAlign: 'center' }}>
-            <img src="../external/emoji.gif" width="400px" alt="emoji" />
-          </div>
-        </Col>
-      </Row>
-    </div>
+      <AppLayout>
+        {me && <PostForm />}
+        {mainPosts.map((post) => (
+          <PostCard key={post.id} post={post} />
+        ))}
+      </AppLayout>
+      <ArrowUp />
+    </>
   );
-}
+};
+
+export const getServerSideProps = wrapper.getServerSideProps(async (context) => {
+  // 서버 사이드 렌더링시 프론트에서 서버에 쿠키를 보내주기 위한 작업
+
+  const cookie = context.req ? context.req.headers.cookie : '';
+  axios.defaults.headers.Cookie = '';
+  // 그렇지 않을 때는 쿠키를 지워준다.
+  if (context.req && cookie) {
+    // + 서버일 때, 쿠키가 있을 때만 쿠키를 넘겨주도록 한다.
+    axios.defaults.headers.Cookie = cookie;
+  }
+  console.log(context);
+  // context.store.dispatch({
+  //   type: LOAD_MY_INFO_REQUEST,
+  // });
+  context.store.dispatch({
+    type: LOAD_POSTS_REQUEST,
+  });
+  context.store.dispatch(END);
+  await context.store.sagaTask.toPromise();
+});
+
+export default main;
+
+/*
+  getServerSideProps와 같은 SSR은 결과적으로 서버 쪽에서 실행되기 때문에, 내 계정으로 사용할 때만 쿠키를 그대로 사용하고
+  그렇지 않을 경우에는 쿠키를 초기화해 줘야 한다.
+
+  쿠키를 초기화하지 않을 경우, 같은 도메인에 접속한 다른 사람이 내 쿠키(정보)를 바탕으로 우리가 제공하는 서비스를 실행할 수도 있기 때문에
+  치명적인 오류로 작용할 수 있다.
+*/
