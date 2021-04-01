@@ -71,10 +71,9 @@ app.use(
     saveUninitialized: false,
     resave: false,
     secret: process.env.COOKIE_SECRET, // secret?
-    proxy: true,
     cookie: {
       httpOnly: true,
-      secure: true,
+      secure: false,
       domain: process.env.NODE_ENV === 'production' && '.junheedot.com',
     },
   })

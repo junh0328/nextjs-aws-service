@@ -2,8 +2,9 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const multerS3 = require('multer-s3');
-const AWS = require('aws-sdk');
+const { Op } = require('sequelize');
+// const multerS3 = require('multer-s3');
+// const AWS = require('aws-sdk');
 
 const { Post, Comment, User, Image, Hashtag } = require('../models');
 
@@ -18,18 +19,17 @@ try {
   fs.mkdirSync('uploads');
 }
 
-AWS.config.update({
-  accessKeyId: process.env.S3_ACCESS_KEY_ID,
-  secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
-  region: 'ap-northeast-2',
-});
 const upload = multer({
   // multer 속성 지정  storage(저장 어디에 할꺼야?)
-  storage: multerS3({
-    s3: new AWS.S3(),
-    bucket: 'next-aws-s3',
-    key(req, file, cb) {
-      cb(null, `original/${Date.now()}_${path.basename(file.originalname)}`);
+  storage: multer.diskStorage({
+    destination(req, file, done) {
+      done(null, 'uploads'); // uploads라는 폴더에 할거야 >> 후에 아마존에 올리면 아마존 서버에 저장, S3 서비스로 대체
+    },
+    filename(req, file, done) {
+      // 파일명 : 제로초.png
+      const ext = path.extname(file.originalname); // 확장자 추출(.png) > 업로드 시에 날짜를 붙여 중복 파일 명을 바꾼다.
+      const basename = path.basename(file.originalname, ext); // 제로초
+      done(null, basename + '_' + new Date().getTime() + ext);
     },
   }),
   limits: { fileSize: 20 * 1024 * 1024 }, // 20MB로 용량 제한
@@ -42,12 +42,14 @@ router.post('/', isLoggedIn, upload.none(), async (req, res, next) => {
     const userPost = await Post.count({
       where: { UserId: req.user.id },
     });
-    // console.log(`userPost의 수는 ${userPost}`);
-    if (userPost > 5) {
+
+    console.log(`userPost의 수는 ${userPost}`);
+    // 또는 if(userPost > 10 이런식으로 조건문 처리 하고싶어요 )
+    if (userPost > 9) {
       return res
         .status(403)
         .send(
-          '서비스 최적화를 위해 게시글은 5개 이상 작성할 수 없습니다.\n불필요한 게시글을 삭제하고 이용해주세요 😁'
+          '서비스 최적화를 위해 게시글은 10개 이상 작성할 수 없습니다.\n불필요한 게시글을 삭제하고 이용해주세요'
         );
     }
     const hashtags = req.body.content.match(/#[^\s#]+/g);

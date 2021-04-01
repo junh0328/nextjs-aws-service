@@ -48,11 +48,11 @@ const Profile = () => {
 
   const { data: followersData, error: followerError } = useSWR(
     `${backUrl}/user/followers?limit=${followersLimit}`,
-    fetcher
+    fetcher,
   );
   const { data: followingsData, error: followingError } = useSWR(
     `${backUrl}/user/followings?limit=${followingsLimit}`,
-    fetcher
+    fetcher,
   );
 
   const loadMoreFollowings = useCallback(() => {

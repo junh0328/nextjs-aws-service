@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Link from 'next/link';
 import { Menu, Input, Row, Col } from 'antd';
@@ -9,6 +9,8 @@ import Router from 'next/router';
 
 import useInput from '../hooks/useInput';
 import UserProfile from './UserProfile';
+import LoginModal from './LoginModal';
+import SignupModal from './SignupModal';
 
 const SearchInput = styled(Input.Search)`
   vertical-align: middle;
@@ -28,9 +30,27 @@ const Global = createGlobalStyle`
 }
 `;
 const AppLayout = ({ children }) => {
-  const { me } = useSelector((state) => state.user);
-
+  const { me, logInDone } = useSelector((state) => state.user);
   const [searchInput, onChangeSearchInput] = useInput('');
+
+  const [showSignUpModal, setShowSignUpModal] = useState(false);
+  const [showSignInModal, setShowSignInModal] = useState(false);
+  const onClickSignupModal = useCallback(() => {
+    setShowSignUpModal((prev) => !prev);
+  }, []);
+  const onClickSignInModal = useCallback(() => {
+    setShowSignInModal((prev) => !prev);
+  }, []);
+  const onCloseModal = useCallback(() => {
+    setShowSignUpModal(false);
+    setShowSignInModal(false);
+  }, []);
+
+  useEffect(() => {
+    if (logInDone) {
+      onCloseModal();
+    }
+  });
 
   const onSearch = useCallback(() => {
     Router.push(`/hashtag/${searchInput}`);
@@ -61,7 +81,7 @@ const AppLayout = ({ children }) => {
           {me ? (
             <>
               <Menu.Item>
-                <Link href="/main" shallow>
+                <Link href="/" shallow>
                   <a>
                     <HomeFilled style={{ width: '100%' }} />
                   </a>
@@ -86,15 +106,11 @@ const AppLayout = ({ children }) => {
             </>
           ) : (
             <>
-              <Menu.Item>
-                <Link href="/">
-                  <a>로그인</a>
-                </Link>
+              <Menu.Item onClick={onClickSignInModal}>
+                <a>로그인</a>
               </Menu.Item>
-              <Menu.Item>
-                <Link href="/signup">
-                  <a>회원가입</a>
-                </Link>
+              <Menu.Item onClick={onClickSignupModal}>
+                <a>회원가입</a>
               </Menu.Item>
               <Menu.Item>
                 <Link href="/faq" shallow>
@@ -136,6 +152,9 @@ const AppLayout = ({ children }) => {
           </div>
         </Col>
       </Row>
+
+      {showSignInModal && <LoginModal show={onClickSignInModal} onCloseModal={onCloseModal} />}
+      {showSignUpModal && <SignupModal show={onClickSignupModal} onCloseModal={onCloseModal} />}
     </div>
   );
 };
