@@ -106,6 +106,11 @@ const AppLayout = ({ children }) => {
             </>
           ) : (
             <>
+              <Menu.Item>
+                <Link href="/">
+                  <a>메인</a>
+                </Link>
+              </Menu.Item>
               <Menu.Item onClick={onClickSignInModal}>
                 <a>로그인</a>
               </Menu.Item>

@@ -54,12 +54,13 @@ const PostCardContent = ({ postData, editMode, onChangePost, onCancelUpdate }) =
 PostCardContent.propTypes = {
   postData: PropTypes.string.isRequired,
   editMode: PropTypes.bool,
-  onChangePost: PropTypes.func.isRequired,
+  onChangePost: PropTypes.func,
   onCancelUpdate: PropTypes.func.isRequired,
 };
 
 PostCardContent.defaultProps = {
   editMode: false,
+  onChangePost: PropTypes.func,
 };
 
 export default PostCardContent;

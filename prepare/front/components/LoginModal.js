@@ -60,12 +60,12 @@ const LoginModal = ({ show, onCloseModal }) => {
 };
 
 LoginModal.propTypes = {
-  show: PropTypes.bool,
+  show: PropTypes.func,
   onCloseModal: PropTypes.func,
 };
 
 LoginModal.defaultProps = {
-  show: PropTypes.bool,
+  show: PropTypes.func,
   onCloseModal: PropTypes.func,
 };
 
