@@ -164,8 +164,8 @@ router.post('/', isNotLoggedIn, async (req, res, next) => {
       nickname: req.body.nickname,
       password: hashedPassword,
     });
-    // 배포 모드 시 http
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    // 배포 모드 시 https
+    res.setHeader('Access-Control-Allow-Origin', 'https://junheedot.com');
     res.status(201).send('ok');
   } catch (error) {
     console.error(error);
@@ -189,7 +189,7 @@ router.patch('/nickname', isLoggedIn, async (req, res, next) => {
       },
       {
         where: { id: req.user.id },
-      }
+      },
     );
     res.status(200).json({ nickname: req.body.nickname });
   } catch (error) {

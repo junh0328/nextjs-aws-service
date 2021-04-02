@@ -3,8 +3,8 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { Op } = require('sequelize');
-// const multerS3 = require('multer-s3');
-// const AWS = require('aws-sdk');
+const multerS3 = require('multer-s3');
+const AWS = require('aws-sdk');
 
 const { Post, Comment, User, Image, Hashtag } = require('../models');
 
@@ -19,17 +19,19 @@ try {
   fs.mkdirSync('uploads');
 }
 
+AWS.config.update({
+  accessKeyId: process.env.S3_ACCESS_KEY_ID,
+  secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+  region: 'ap-northeast-2',
+});
+
 const upload = multer({
   // multer 속성 지정  storage(저장 어디에 할꺼야?)
-  storage: multer.diskStorage({
-    destination(req, file, done) {
-      done(null, 'uploads'); // uploads라는 폴더에 할거야 >> 후에 아마존에 올리면 아마존 서버에 저장, S3 서비스로 대체
-    },
-    filename(req, file, done) {
-      // 파일명 : 제로초.png
-      const ext = path.extname(file.originalname); // 확장자 추출(.png) > 업로드 시에 날짜를 붙여 중복 파일 명을 바꾼다.
-      const basename = path.basename(file.originalname, ext); // 제로초
-      done(null, basename + '_' + new Date().getTime() + ext);
+  storage: multerS3({
+    s3: new AWS.S3(),
+    bucket: 'next-aws-s3',
+    key(req, file, cb) {
+      cb(null, `original/${Date.now()}_${path.basename(file.originalname)}`);
     },
   }),
   limits: { fileSize: 20 * 1024 * 1024 }, // 20MB로 용량 제한
@@ -44,13 +46,10 @@ router.post('/', isLoggedIn, upload.none(), async (req, res, next) => {
     });
 
     console.log(`userPost의 수는 ${userPost}`);
-    // 또는 if(userPost > 10 이런식으로 조건문 처리 하고싶어요 )
-    if (userPost > 9) {
+    if (userPost > 5) {
       return res
         .status(403)
-        .send(
-          '서비스 최적화를 위해 게시글은 10개 이상 작성할 수 없습니다.\n불필요한 게시글을 삭제하고 이용해주세요'
-        );
+        .send('서비스 최적화를 위해 게시글은 5개 이상 작성할 수 없습니다.\n불필요한 게시글을 삭제하고 이용해주세요');
     }
     const hashtags = req.body.content.match(/#[^\s#]+/g);
     const post = await Post.create({
@@ -64,17 +63,15 @@ router.post('/', isLoggedIn, upload.none(), async (req, res, next) => {
         hashtags.map((tag) =>
           Hashtag.findOrCreate({
             where: { name: tag.slice(1).toLowerCase() },
-          })
-        )
+          }),
+        ),
       ); // [[노드, true], [리액트, true]] 와 같은 형식으로 저장되므로 map() 함수를 돌리는 방법이 달라졌다.
       await post.addHashtags(result.map((v) => v[0]));
     }
     if (req.body.image) {
       if (Array.isArray(req.body.image)) {
         // 이미지를 여러 개 올리면 image: [제로초.png , 부기초.png] >> 배열로 올라감
-        const images = await Promise.all(
-          req.body.image.map((image) => Image.create({ src: image }))
-        );
+        const images = await Promise.all(req.body.image.map((image) => Image.create({ src: image })));
         // 매핑하여 시퀄라이즈 테이블에 올려준다. 파일 주소는 db에 저장되고 파일 자체는 uploads 폴더에 저장됨
         await post.addImages(images);
       } else {
@@ -200,7 +197,7 @@ router.patch('/:postId', isLoggedIn, async (req, res, next) => {
           id: req.params.postId,
           UserId: req.user.id,
         },
-      }
+      },
     );
     const post = await Post.findOne({ where: { id: req.params.postId } });
     if (hashtags) {
@@ -208,12 +205,15 @@ router.patch('/:postId', isLoggedIn, async (req, res, next) => {
         hashtags.map((tag) =>
           Hashtag.findOrCreate({
             where: { name: tag.slice(1).toLowerCase() },
-          })
-        )
+          }),
+        ),
       ); // [[노드, true], [리액트, true]]
       await post.setHashtags(result.map((v) => v[0]));
     }
-    res.status(200).json({ PostId: parseInt(req.params.postId, 10), content: req.body.content });
+    res.status(200).json({
+      PostId: parseInt(req.params.postId, 10),
+      content: req.body.content,
+    });
   } catch (error) {
     console.error(error);
     next(error);
@@ -285,9 +285,7 @@ router.post('/:postId/retweet', isLoggedIn, async (req, res, next) => {
     if (userPost > 5) {
       return res
         .status(403)
-        .send(
-          '서비스 최적화를 위해 게시글은 5개 이상 작성할 수 없습니다.\n불필요한 게시글을 삭제하고 이용해주세요 😁'
-        );
+        .send('서비스 최적화를 위해 게시글은 5개 이상 작성할 수 없습니다.\n불필요한 게시글을 삭제하고 이용해주세요 😁');
     }
     const post = await Post.findOne({
       where: { id: req.params.postId }, // 리트윗 할 게시물이 존재하는 지 찾아보는 where 절
