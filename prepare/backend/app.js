@@ -1,22 +1,22 @@
-const express = require("express");
-const cors = require("cors");
-const session = require("express-session");
-const cookieParser = require("cookie-parser");
-const passport = require("passport");
-const dotenv = require("dotenv");
-const morgan = require("morgan");
-const path = require("path");
-const hpp = require("hpp");
-const helmet = require("helmet");
-const favicon = require("serve-favicon");
+const express = require('express');
+const cors = require('cors');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const passport = require('passport');
+const dotenv = require('dotenv');
+const morgan = require('morgan');
+const path = require('path');
+const hpp = require('hpp');
+const helmet = require('helmet');
+const favicon = require('serve-favicon');
 
-const postsRouter = require("./routes/posts");
-const postRouter = require("./routes/post");
-const userRouter = require("./routes/user");
-const hashtagRouter = require("./routes/hashtag");
+const postsRouter = require('./routes/posts');
+const postRouter = require('./routes/post');
+const userRouter = require('./routes/user');
+const hashtagRouter = require('./routes/hashtag');
 
-const db = require("./models");
-const passportConfig = require("./passport");
+const db = require('./models');
+const passportConfig = require('./passport');
 const port = 3065;
 
 dotenv.config(); //.env를 사용할 수 있게 해주는 명령어
@@ -25,7 +25,7 @@ const app = express();
 db.sequelize
   .sync()
   .then(() => {
-    console.log("db 연결 성공!!!");
+    console.log('db 연결 성공!!!');
   })
   .catch(console.error);
 
@@ -36,31 +36,31 @@ db.sequelize
 
 passportConfig(); // /passport/index 에서 exports한 전략을 실행시킴
 
-app.set("trust proxy", 1);
-if (process.env.NODE_ENV === "production") {
+app.set('trust proxy', 1);
+if (process.env.NODE_ENV === 'production') {
   // 배포 모드일 때
-  app.use(morgan("combined"));
+  app.use(morgan('combined'));
   app.use(hpp());
   app.use(helmet());
   app.use(
     cors({
-      origin: ["https://junheedot.com"],
+      origin: ['https://junheedot.com'],
       credentials: true,
-    })
+    }),
   );
 } else {
   // 개발 모드일 때
-  app.use(morgan("dev"));
+  app.use(morgan('dev'));
   app.use(
     cors({
       origin: true,
       credentials: true,
-    })
+    }),
   );
 }
 
-app.use(favicon(path.join(__dirname, "public", "favicon.ico")));
-app.use("/", express.static(path.join(__dirname, "uploads")));
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use('/', express.static(path.join(__dirname, 'uploads')));
 // static(path.join(...))을 사용하여 현재 폴더 + uploads 폴더에 접근할 수 있도록 허용
 // front의 PostForm 컴포넌트 <img src={`http://localhost:3065/${v}`} 에서 'http://localhost:3065/'
 app.use(express.json()); // 프론트에서 넘겨주는 json({ ...}) 형식의 데이터를 express 에서 사용하기 위한 명령어
@@ -75,21 +75,21 @@ app.use(
     cookie: {
       httpOnly: true,
       secure: true,
-      domain: process.env.NODE_ENV === "production" && ".junheedot.com",
+      domain: process.env.NODE_ENV === 'production' && '.junheedot.com',
     },
-  })
+  }),
 );
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get("/", (req, res) => {
-  res.send("hello express");
+app.get('/', (req, res) => {
+  res.send('hello express');
 });
 
-app.use("/posts", postsRouter); // 단수와 복수를 철저저히 분리하여 관리한다. (posts는 post, 게시물 여러개를 관리하는 것을 의미함)
-app.use("/post", postRouter); //postRouter에서 /post를 공통으로 받기 때문에 미리 공통된 '/post'를 뽑아줬다.
-app.use("/user", userRouter); // Post방식 /user/ >> front redux-saga의 axios.post('http:localhost:3065/user'); 와 일치
-app.use("/hashtag", hashtagRouter);
+app.use('/posts', postsRouter); // 단수와 복수를 철저저히 분리하여 관리한다. (posts는 post, 게시물 여러개를 관리하는 것을 의미함)
+app.use('/post', postRouter); //postRouter에서 /post를 공통으로 받기 때문에 미리 공통된 '/post'를 뽑아줬다.
+app.use('/user', userRouter); // Post방식 /user/ >> front redux-saga의 axios.post('http:localhost:3065/user'); 와 일치
+app.use('/hashtag', hashtagRouter);
 
 app.listen(port, () => {
   console.log(`server is listening on port : ${port}`);
