@@ -189,12 +189,12 @@ const SignupModal = ({ show, onCloseModal }) => {
 };
 
 SignupModal.propTypes = {
-  show: PropTypes.bool,
+  show: PropTypes.func,
   onCloseModal: PropTypes.func,
 };
 
 SignupModal.defaultProps = {
-  show: PropTypes.bool,
+  show: PropTypes.func,
   onCloseModal: PropTypes.func,
 };
 
