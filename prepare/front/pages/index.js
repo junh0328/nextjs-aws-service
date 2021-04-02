@@ -18,8 +18,8 @@ import { DEFAULT_DONE_ACTION, LOAD_MY_INFO_REQUEST } from '../reducers/user';
 import wrapper from '../store/configureStore';
 import ArrowUp from '../components/ArrowUp';
 
-const main = () => {
-  const { me, logOutDone } = useSelector((state) => state.user);
+const Home = () => {
+  const { me, logOutDone, loadMyInfoError } = useSelector((state) => state.user);
   const {
     mainPosts,
     hasMorePosts,
@@ -33,6 +33,12 @@ const main = () => {
   } = useSelector((state) => state.post);
   // const mainPosts = useSelector((state)=> state.post.mainPosts) 구조분해를 하지 않으면 다음과 같이 표현할 수 있다.
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (loadMyInfoError) {
+      console.dir(loadMyInfoError);
+    }
+  });
 
   useEffect(() => {
     if (addPostError) {
@@ -85,12 +91,6 @@ const main = () => {
       Router.replace('/');
     }
   }, [logOutDone]);
-
-  useEffect(() => {
-    dispatch({
-      type: LOAD_MY_INFO_REQUEST,
-    });
-  }, []);
 
   // 제일 처음 mainPosts가 빈 배열일 때 실행됨
 
@@ -145,10 +145,9 @@ export const getServerSideProps = wrapper.getServerSideProps(async (context) => 
     // + 서버일 때, 쿠키가 있을 때만 쿠키를 넘겨주도록 한다.
     axios.defaults.headers.Cookie = cookie;
   }
-  console.log(context);
-  // context.store.dispatch({
-  //   type: LOAD_MY_INFO_REQUEST,
-  // });
+  context.store.dispatch({
+    type: LOAD_MY_INFO_REQUEST,
+  });
   context.store.dispatch({
     type: LOAD_POSTS_REQUEST,
   });
@@ -156,7 +155,7 @@ export const getServerSideProps = wrapper.getServerSideProps(async (context) => 
   await context.store.sagaTask.toPromise();
 });
 
-export default main;
+export default Home;
 
 /*
   getServerSideProps와 같은 SSR은 결과적으로 서버 쪽에서 실행되기 때문에, 내 계정으로 사용할 때만 쿠키를 그대로 사용하고

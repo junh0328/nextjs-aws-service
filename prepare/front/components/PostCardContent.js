@@ -1,4 +1,3 @@
-/* eslint-disable react/no-array-index-key */
 import React, { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { Button, Input } from 'antd';
