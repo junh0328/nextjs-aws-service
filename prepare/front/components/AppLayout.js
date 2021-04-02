@@ -81,7 +81,7 @@ const AppLayout = ({ children }) => {
           {me ? (
             <>
               <Menu.Item>
-                <Link href="/" shallow>
+                <Link href="/">
                   <a>
                     <HomeFilled style={{ width: '100%' }} />
                   </a>

@@ -52,9 +52,9 @@ export const getServerSideProps = wrapper.getServerSideProps(async (context) => 
   // console.log('context 출력');
   // console.log(context);
 
-  // context.store.dispatch({
-  //   type: LOAD_MY_INFO_REQUEST,
-  // });
+  context.store.dispatch({
+    type: LOAD_MY_INFO_REQUEST,
+  });
 
   context.store.dispatch({
     type: LOAD_POST_REQUEST,
