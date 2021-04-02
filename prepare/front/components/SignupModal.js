@@ -123,10 +123,11 @@ const SignupModal = ({ show, onCloseModal }) => {
 
   return (
     <CreateModal onClick={onCloseModal}>
-      <div style={{ width: 400 }} onClick={stopPropagation}>
+      <div onClick={stopPropagation}>
         <CloseModalButton onClick={onCloseModal}>&times;</CloseModalButton>
         <Form onFinish={onsubmit}>
           <div>
+            <h2>회원가입하기 ✔️</h2>
             <label htmlFor="user-email">이메일</label>
             <br />
             <Input

@@ -39,14 +39,14 @@ const LoginModal = ({ show, onCloseModal }) => {
       <div onClick={stopPropagation}>
         <CloseModalButton onClick={onCloseModal}>&times;</CloseModalButton>
         <Form onFinish={onSubmitForm}>
-          <h2>로그인 임시 모달</h2>
+          <h2>로그인 ✔️</h2>
           <div>
-            <label htmlFor="user-email">이메일</label>
+            <span htmlFor="user-email">이메일</span>
             <br />
             <Input name="user-email" type="text" value={email} onChange={onChangeEmail} required />
           </div>
           <div>
-            <label htmlFor="user-password">비밀번호</label>
+            <span htmlFor="user-password">비밀번호</span>
             <br />
             <Input name="user-password" type="password" value={password} onChange={onChangePassword} required />
           </div>
