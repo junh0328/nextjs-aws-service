@@ -68,7 +68,7 @@ const PostForm = () => {
         <div style={{ marginTop: '10px', marginBottom: '30px' }}>
           <Button onClick={onClickImageUpload}>이미지 업로드</Button>
           <Button type="primary" style={{ float: 'right' }} htmlType="submit">
-            짹짹
+            업로드
           </Button>
         </div>
       </div>
