@@ -17,6 +17,7 @@ const SearchInput = styled(Input.Search)`
 `;
 
 const Global = createGlobalStyle`
+
 .ant-row{
   margin-right: 0 !important;
   margin-left: 0 !important;
@@ -32,6 +33,15 @@ const Global = createGlobalStyle`
   padding: 1px 0px;
   padding-left: 9px;
 }
+
+/* media queries are no problem */
+@media (max-width: 420px) {
+  .ant-input-group-wrapper{
+  width:255px;
+}
+}
+
+
 `;
 const AppLayout = ({ children }) => {
   const { me, logInDone } = useSelector((state) => state.user);
