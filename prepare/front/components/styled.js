@@ -8,6 +8,7 @@ export const CreateModal = styled.div`
   top: 0;
   right: 0;
   z-index: 1022;
+  background: rgba(255, 255, 255, 0.8);
 
   & > div {
     text-align: left;

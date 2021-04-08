@@ -28,6 +28,10 @@ const Global = createGlobalStyle`
 .ant-col:last-child{
   padding-right: 0 !important;
 }
+.ant-btn-icon-only{
+  padding: 1px 0px;
+  padding-left: 9px;
+}
 `;
 const AppLayout = ({ children }) => {
   const { me, logInDone } = useSelector((state) => state.user);
@@ -78,6 +82,9 @@ const AppLayout = ({ children }) => {
             height: '60px',
           }}
         >
+          <Menu.Item>
+            <SearchInput value={searchInput} onChange={onChangeSearchInput} onSearch={onSearch} placeholder="Search" />
+          </Menu.Item>
           {me ? (
             <>
               <Menu.Item>
@@ -124,16 +131,6 @@ const AppLayout = ({ children }) => {
               </Menu.Item>
             </>
           )}
-
-          <Menu.Item>
-            <SearchInput
-              value={searchInput}
-              onChange={onChangeSearchInput}
-              onSearch={onSearch}
-              placeholder="input search text"
-              enterButton
-            />
-          </Menu.Item>
         </Menu>
       </div>
       <Row
