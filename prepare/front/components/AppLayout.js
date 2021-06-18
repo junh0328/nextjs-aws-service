@@ -105,13 +105,6 @@ const AppLayout = ({ children }) => {
           )}
 
           <Menu.Item>
-            <Link href="/faq" shallow>
-              <a>
-                <InfoCircleFilled style={{ width: '100%' }} />
-              </a>
-            </Link>
-          </Menu.Item>
-          <Menu.Item>
             <SearchInput
               value={searchInput}
               onChange={onChangeSearchInput}

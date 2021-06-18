@@ -38,7 +38,7 @@ const PostCardContent = ({ postData, editMode, onChangePost, onCancelUpdate }) =
         postData.split(/(#[^\s#]+)/g).map((v, i) => {
           if (v.match(/(#[^\s#]+)/)) {
             return (
-              <Link href={`/hashtag/${v.slice(1)}`} prefetch={false} key={i}>
+              <Link href={`/hashtag/${v.slice(1)}`} prefetch={false} key={v}>
                 <a>{v}</a>
               </Link>
             );
