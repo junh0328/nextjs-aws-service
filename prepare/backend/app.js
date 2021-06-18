@@ -46,7 +46,7 @@ if (process.env.NODE_ENV === 'production') {
     cors({
       origin: ['https://junheedot.com'],
       credentials: true,
-    })
+    }),
   );
 } else {
   // 개발 모드일 때
@@ -55,7 +55,7 @@ if (process.env.NODE_ENV === 'production') {
     cors({
       origin: true,
       credentials: true,
-    })
+    }),
   );
 }
 
@@ -71,12 +71,13 @@ app.use(
     saveUninitialized: false,
     resave: false,
     secret: process.env.COOKIE_SECRET, // secret?
+    proxy: true,
     cookie: {
       httpOnly: true,
-      secure: false,
+      secure: true,
       domain: process.env.NODE_ENV === 'production' && '.junheedot.com',
     },
-  })
+  }),
 );
 app.use(passport.initialize());
 app.use(passport.session());

@@ -1,3 +1,4 @@
+/* eslint-disable react/no-array-index-key */
 import React, { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { Button, Input } from 'antd';
@@ -53,12 +54,13 @@ const PostCardContent = ({ postData, editMode, onChangePost, onCancelUpdate }) =
 PostCardContent.propTypes = {
   postData: PropTypes.string.isRequired,
   editMode: PropTypes.bool,
-  onChangePost: PropTypes.func.isRequired,
+  onChangePost: PropTypes.func,
   onCancelUpdate: PropTypes.func.isRequired,
 };
 
 PostCardContent.defaultProps = {
   editMode: false,
+  onChangePost: PropTypes.func,
 };
 
 export default PostCardContent;

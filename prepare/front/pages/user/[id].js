@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable operator-linebreak */
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -40,10 +41,7 @@ const User = () => {
 
   useEffect(() => {
     const onScroll = () => {
-      if (
-        window.pageYOffset + document.documentElement.clientHeight >
-        document.documentElement.scrollHeight - 300
-      ) {
+      if (window.pageYOffset + document.documentElement.clientHeight > document.documentElement.scrollHeight - 300) {
         if (hasMorePosts && !loadPostsLoading) {
           dispatch({
             type: LOAD_USER_POSTS_REQUEST,
@@ -117,14 +115,14 @@ export const getServerSideProps = wrapper.getServerSideProps(async (context) => 
   });
   // console.log('LOAD_USER_POSTS_REQUEST 출력');
 
-  // context.store.dispatch({
-  //   type: LOAD_MY_INFO_REQUEST,
-  // });
+  context.store.dispatch({
+    type: LOAD_MY_INFO_REQUEST,
+  });
 
-  // context.store.dispatch({
-  //   type: LOAD_USER_REQUEST,
-  //   data: context.params.id,
-  // });
+  context.store.dispatch({
+    type: LOAD_USER_REQUEST,
+    data: context.params.id,
+  });
 
   context.store.dispatch(END);
   await context.store.sagaTask.toPromise();

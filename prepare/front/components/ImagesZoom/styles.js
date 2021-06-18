@@ -90,4 +90,16 @@ export const Global = createGlobalStyle`
   .ant-card-cover{
     transform: none !important;
   }
+
+  @media (max-width: 420px) {
+    & img{
+      width: 100%;
+  }
+  @media (max-width:1080px){
+    & img{
+      width: 100%;
+    }
+  }
+}
+
 `;

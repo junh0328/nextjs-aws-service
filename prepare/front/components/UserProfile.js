@@ -21,7 +21,7 @@ const UserProfile = () => {
           {/* 트윗 수 */}
           <Link href={`user/${me.id}`} prefetch={false}>
             <a>
-              짹짹
+              게시글
               <br />
               {me.Posts.length}
             </a>
@@ -49,7 +49,7 @@ const UserProfile = () => {
     >
       <Card.Meta
         avatar={
-          <Link href={`user/${me.id}`}>
+          <Link href={`user/${me.id}`} prefetch={false}>
             <a>
               <Avatar>{me.nickname[0]}</Avatar>
             </a>

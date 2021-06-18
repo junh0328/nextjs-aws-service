@@ -6,7 +6,7 @@ import { Button, Form, Input } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { ADD_POST_REQUEST, REMOVE_IMAGE, UPLOAD_IMAGES_REQUEST } from '../reducers/post';
 import useInput from '../hooks/useInput';
-import { backUrl } from '../config/config';
+// import { backUrl } from '../config/config';
 
 const PostForm = () => {
   const dispatch = useDispatch();
@@ -62,25 +62,20 @@ const PostForm = () => {
 
   return (
     <Form style={{ margin: '10px 0 20' }} encType="multipart/form-data" onFinish={onsubmit}>
-      <Input.TextArea
-        value={text}
-        onChange={onChangeText}
-        maxLength={140}
-        placeholder="신기한 일이 있었나요?"
-      />
+      <Input.TextArea value={text} onChange={onChangeText} maxLength={140} placeholder="신기한 일이 있었나요?" />
       <div>
-        <input type="file" multiple hidden ref={imageInput} onChange={onChangeImages} />
+        <input type="file" accept="image/jpeg, image/png" multiple hidden ref={imageInput} onChange={onChangeImages} />
         <div style={{ marginTop: '10px', marginBottom: '30px' }}>
           <Button onClick={onClickImageUpload}>이미지 업로드</Button>
           <Button type="primary" style={{ float: 'right' }} htmlType="submit">
-            짹짹
+            업로드
           </Button>
         </div>
       </div>
       <div>
         {imagePaths.map((v, i) => (
           <div key={v} style={{ display: 'inline-block' }}>
-            <img src={`${backUrl}/${v}`} style={{ width: '200px' }} alt={v} />
+            <img src={v.replace(/\/thumb\//, '/original/')} style={{ width: '200px' }} alt={v} />
             <div>
               <Button onClick={onRemoveImage(i)}>제거</Button>
             </div>
