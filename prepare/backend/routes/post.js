@@ -1,57 +1,44 @@
-const express = require('express');
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-const { Op } = require('sequelize');
+const express = require("express");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+const { Op } = require("sequelize");
 // const multerS3 = require('multer-s3');
 // const AWS = require('aws-sdk');
 
-const { Post, Comment, User, Image, Hashtag } = require('../models');
+const { Post, Comment, User, Image, Hashtag } = require("../models");
 
-const { isLoggedIn } = require('./middlewars');
+const { isLoggedIn } = require("./middlewars");
 
 const router = express.Router();
 
 try {
-  fs.accessSync('uploads');
+  fs.accessSync("uploads");
 } catch (error) {
-  console.log('uploads 폴더가 없으므로 생성합니다.');
-  fs.mkdirSync('uploads');
+  console.log("uploads 폴더가 없으므로 생성합니다.");
+  fs.mkdirSync("uploads");
 }
 
 const upload = multer({
   // multer 속성 지정  storage(저장 어디에 할꺼야?)
   storage: multer.diskStorage({
     destination(req, file, done) {
-      done(null, 'uploads'); // uploads라는 폴더에 할거야 >> 후에 아마존에 올리면 아마존 서버에 저장, S3 서비스로 대체
+      done(null, "uploads"); // uploads라는 폴더에 할거야 >> 후에 아마존에 올리면 아마존 서버에 저장, S3 서비스로 대체
     },
     filename(req, file, done) {
       // 파일명 : 제로초.png
       const ext = path.extname(file.originalname); // 확장자 추출(.png) > 업로드 시에 날짜를 붙여 중복 파일 명을 바꾼다.
       const basename = path.basename(file.originalname, ext); // 제로초
-      done(null, basename + '_' + new Date().getTime() + ext);
+      done(null, basename + "_" + new Date().getTime() + ext);
     },
   }),
   limits: { fileSize: 20 * 1024 * 1024 }, // 20MB로 용량 제한
 });
 
 // 포스트(게시글) 작성
-router.post('/', isLoggedIn, upload.none(), async (req, res, next) => {
+router.post("/", isLoggedIn, upload.none(), async (req, res, next) => {
   // POST /post
   try {
-    const userPost = await Post.count({
-      where: { UserId: req.user.id },
-    });
-
-    console.log(`userPost의 수는 ${userPost}`);
-    // 또는 if(userPost > 10 이런식으로 조건문 처리 하고싶어요 )
-    if (userPost > 9) {
-      return res
-        .status(403)
-        .send(
-          '서비스 최적화를 위해 게시글은 10개 이상 작성할 수 없습니다.\n불필요한 게시글을 삭제하고 이용해주세요'
-        );
-    }
     const hashtags = req.body.content.match(/#[^\s#]+/g);
     const post = await Post.create({
       content: req.body.content,
@@ -94,18 +81,18 @@ router.post('/', isLoggedIn, upload.none(), async (req, res, next) => {
           include: [
             {
               model: User, // 댓글 작성자
-              attributes: ['id', 'nickname'],
+              attributes: ["id", "nickname"],
             },
           ],
         },
         {
           model: User, // 게시글 작성자
-          attributes: ['id', 'nickname'],
+          attributes: ["id", "nickname"],
         },
         {
           model: User, // 좋아요 누른 사람
-          as: 'Likers',
-          attributes: ['id'],
+          as: "Likers",
+          attributes: ["id"],
         },
       ],
     });
@@ -117,21 +104,21 @@ router.post('/', isLoggedIn, upload.none(), async (req, res, next) => {
   }
 });
 
-router.post('/images', isLoggedIn, upload.array('image'), async (req, res, next) => {
-  //POST /post/images ,
+router.post("/images", isLoggedIn, upload.array("image"), (req, res, next) => {
+  // POST /post/images
   console.log(req.files);
-  res.json(req.files.map((v) => v.location.replace(/\/original\//, '/thumb/')));
+  res.json(req.files.map((v) => v.filename));
 });
 
 // 특정 게시글에 댓글달기
-router.post('/:postId/comment', isLoggedIn, async (req, res, next) => {
+router.post("/:postId/comment", isLoggedIn, async (req, res, next) => {
   // POST /post/1/comment
   try {
     const post = await Post.findOne({
       where: { id: req.params.postId },
     });
     if (!post) {
-      return res.status(403).send('존재하지 않는 게시글입니다.');
+      return res.status(403).send("존재하지 않는 게시글입니다.");
     }
     const comment = await Comment.create({
       content: req.body.content,
@@ -143,7 +130,7 @@ router.post('/:postId/comment', isLoggedIn, async (req, res, next) => {
       include: [
         {
           model: User,
-          attributes: ['id', 'nickname'],
+          attributes: ["id", "nickname"],
         },
       ],
     });
@@ -154,12 +141,12 @@ router.post('/:postId/comment', isLoggedIn, async (req, res, next) => {
   }
 });
 // 게시글 좋아요
-router.patch('/:postId/like', isLoggedIn, async (req, res, next) => {
+router.patch("/:postId/like", isLoggedIn, async (req, res, next) => {
   // PATCH /post/1/like  >> ${data} = post.id
   try {
     const post = await Post.findOne({ where: { id: req.params.postId } });
     if (!post) {
-      return res.status(403).send('게시글이 존재하지 않습니다.');
+      return res.status(403).send("게시글이 존재하지 않습니다.");
     }
     // post가 있다면, models/post의 관계에 따라 나타낸다
     await post.addLikers(req.user.id);
@@ -170,12 +157,12 @@ router.patch('/:postId/like', isLoggedIn, async (req, res, next) => {
   }
 });
 // 게시글 좋아요 삭제
-router.delete('/:postId/like', isLoggedIn, async (req, res, next) => {
+router.delete("/:postId/like", isLoggedIn, async (req, res, next) => {
   // DELETE /post/1/like
   try {
     const post = await Post.findOne({ where: { id: req.params.postId } });
     if (!post) {
-      return res.status(403).send('게시글이 존재하지 않습니다.');
+      return res.status(403).send("게시글이 존재하지 않습니다.");
     }
     // post가 있다면, models/post의 관계에 따라 나타낸다
     await post.removeLikers(req.user.id);
@@ -187,7 +174,7 @@ router.delete('/:postId/like', isLoggedIn, async (req, res, next) => {
 });
 
 //게시글 수정
-router.patch('/:postId', isLoggedIn, async (req, res, next) => {
+router.patch("/:postId", isLoggedIn, async (req, res, next) => {
   // PATCH /post/10
   const hashtags = req.body.content.match(/#[^\s#]+/g);
   try {
@@ -213,14 +200,17 @@ router.patch('/:postId', isLoggedIn, async (req, res, next) => {
       ); // [[노드, true], [리액트, true]]
       await post.setHashtags(result.map((v) => v[0]));
     }
-    res.status(200).json({ PostId: parseInt(req.params.postId, 10), content: req.body.content });
+    res.status(200).json({
+      PostId: parseInt(req.params.postId, 10),
+      content: req.body.content,
+    });
   } catch (error) {
     console.error(error);
     next(error);
   }
 });
 // 게시글 삭제
-router.delete('/:postId', isLoggedIn, async (req, res, next) => {
+router.delete("/:postId", isLoggedIn, async (req, res, next) => {
   //DELETE /post/10
   try {
     await Post.destroy({
@@ -237,14 +227,14 @@ router.delete('/:postId', isLoggedIn, async (req, res, next) => {
   }
 });
 // 특정 게시글 가져오기
-router.get('/:postId', async (req, res, next) => {
+router.get("/:postId", async (req, res, next) => {
   try {
     const post = await Post.findOne({
       where: { id: req.params.postId },
       include: [
         {
           model: User,
-          attributes: ['id', 'nickname'],
+          attributes: ["id", "nickname"],
         },
         {
           model: Image,
@@ -254,20 +244,20 @@ router.get('/:postId', async (req, res, next) => {
           include: [
             {
               model: User,
-              attributes: ['id', 'nickname'],
-              order: [['createdAt', 'DESC']],
+              attributes: ["id", "nickname"],
+              order: [["createdAt", "DESC"]],
             },
           ],
         },
         {
           model: User, // 좋아요 누른 사람
-          as: 'Likers',
-          attributes: ['id'],
+          as: "Likers",
+          attributes: ["id"],
         },
       ],
     });
     if (!post) {
-      return res.status(403).send('존재하지 않는 게시글입니다.');
+      return res.status(403).send("존재하지 않는 게시글입니다.");
     }
     return res.status(200).json(post);
   } catch (error) {
@@ -276,7 +266,7 @@ router.get('/:postId', async (req, res, next) => {
   }
 });
 // 특정 게시글 리트윗하기
-router.post('/:postId/retweet', isLoggedIn, async (req, res, next) => {
+router.post("/:postId/retweet", isLoggedIn, async (req, res, next) => {
   // POST /post/1/retweet
   try {
     const userPost = await Post.count({
@@ -286,7 +276,7 @@ router.post('/:postId/retweet', isLoggedIn, async (req, res, next) => {
       return res
         .status(403)
         .send(
-          '서비스 최적화를 위해 게시글은 5개 이상 작성할 수 없습니다.\n불필요한 게시글을 삭제하고 이용해주세요 😁'
+          "서비스 최적화를 위해 게시글은 5개 이상 작성할 수 없습니다.\n불필요한 게시글을 삭제하고 이용해주세요 😁"
         );
     }
     const post = await Post.findOne({
@@ -294,16 +284,19 @@ router.post('/:postId/retweet', isLoggedIn, async (req, res, next) => {
       include: [
         {
           model: Post,
-          as: 'Retweet',
+          as: "Retweet",
         },
       ],
     });
     if (!post) {
-      return res.status(403).send('존재하지 않는 게시글입니다.');
+      return res.status(403).send("존재하지 않는 게시글입니다.");
     }
-    if (req.user.id === post.UserId || (post.Retweet && post.Retweet.UserId === req.user.id)) {
+    if (
+      req.user.id === post.UserId ||
+      (post.Retweet && post.Retweet.UserId === req.user.id)
+    ) {
       // 1. 자기 게시글을 리트윗하는 경우/ 2. 자기 게시글을 리트윗한 게시글을 리트윗하는 경우를 막아줘야함
-      return res.status(403).send('자신의 글은 리트윗할 수 없습니다.');
+      return res.status(403).send("자신의 글은 리트윗할 수 없습니다.");
     }
     const retweetTargetId = post.RetweetId || post.id;
     // 일반 타인이 쓴 게시글이거나, 타인(B)이 다른 타인(A)의 리트윗한 게시글은 리트윗할 수 있으므로 이렇게 로직을 설정하였다.
@@ -315,13 +308,13 @@ router.post('/:postId/retweet', isLoggedIn, async (req, res, next) => {
       },
     });
     if (exPost) {
-      return res.status(403).send('이미 리트윗된 게시글입니다.');
+      return res.status(403).send("이미 리트윗된 게시글입니다.");
     }
     // 전부 통과된 경우
     const retweet = await Post.create({
       UserId: req.user.id,
       RetweetId: retweetTargetId,
-      content: '사용자에 의해 삭제된 게시물입니다.', // model 설정에서 allowNull(빈 값)을 넣지 못하게 만들었음..
+      content: "사용자에 의해 삭제된 게시물입니다.", // model 설정에서 allowNull(빈 값)을 넣지 못하게 만들었음..
     });
     // 내가 어떤 게시글을 리트윗했는지 알려주는 변수 retweetWithPrevPost
     const retweetWithPrevPost = await Post.findOne({
@@ -329,11 +322,11 @@ router.post('/:postId/retweet', isLoggedIn, async (req, res, next) => {
       include: [
         {
           model: Post,
-          as: 'Retweet',
+          as: "Retweet",
           include: [
             {
               model: User,
-              attributes: ['id', 'nickname'],
+              attributes: ["id", "nickname"],
             },
             {
               model: Image,
@@ -342,7 +335,7 @@ router.post('/:postId/retweet', isLoggedIn, async (req, res, next) => {
         },
         {
           model: User,
-          attributes: ['id', 'nickname'],
+          attributes: ["id", "nickname"],
         },
         {
           model: Image,
@@ -352,20 +345,20 @@ router.post('/:postId/retweet', isLoggedIn, async (req, res, next) => {
           include: [
             {
               model: User,
-              attributes: ['id', 'nickname'],
+              attributes: ["id", "nickname"],
             },
           ],
         },
         {
           model: User,
-          as: 'Likers',
-          attributes: ['id'],
+          as: "Likers",
+          attributes: ["id"],
         },
       ],
       // 댓글 부분은 게시글에서 바로 보여지는 부분이 아니기 때문에 추가적으로 로직이 길어진다면, routes를 새로 만들어 ('/comments'), (reducer, saga 포함) 그 행동을 할 때 {ex) loadComment} 등 을 만들어 분리해줘도 된다.
     });
     res.status(201).json(retweetWithPrevPost);
-    console.log('리트윗 정보는 ?');
+    console.log("리트윗 정보는 ?");
     console.log(retweetWithPrevPost);
   } catch (error) {
     console.error(error);
